@@ -1,0 +1,6 @@
+{
+  "from": "realtor_user@contacto.cl",
+  "to": ["company_owner_email@contacto.cl"],
+  "cc": ["adminUserEmail", "adminUserEmail"],
+  "subject": "El corredor/a juanito quiere contratar el servicio de..."
+}

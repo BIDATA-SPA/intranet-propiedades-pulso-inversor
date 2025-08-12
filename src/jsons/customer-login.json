@@ -1,0 +1,68 @@
+{
+  "id": "",
+  "name": "",
+  "lastName": "",
+  "phone": "",
+  "dialCode": null,
+  "rut": "",
+  "createdAt": "",
+  "deletedAt": null,
+  "updatedAt": "",
+  "session": {
+    "id": "",
+    "timesLoggedIn": null,
+    "lastAccess": "",
+    "email": "",
+    "accountConfirmed": true,
+    "password": "",
+    "type": {
+      "id": null,
+      "name": ""
+    },
+    "rol": {
+      "id": null,
+      "name": "",
+      "description": null
+    },
+    "status": {
+      "id": null,
+      "name": ""
+    }
+  },
+  "plan": [
+    {
+      "plan": {
+        "id": null,
+        "name": ""
+      },
+      "startDate": "",
+      "endDate": "",
+      "isActive": false
+    },
+    {
+      "plan": {
+        "id": 1,
+        "name": ""
+      },
+      "startDate": "",
+      "endDate": "",
+      "isActive": true
+    }
+  ],
+  "address": {
+    "country": {
+      "id": 1,
+      "name": "Chile"
+    },
+    "internalDbState": {
+      "id": 2,
+      "name": "Tarapacá"
+    },
+    "internalDbCity": {
+      "id": 5,
+      "name": "Iquique"
+    },
+    "street": null
+  },
+  "image": "https://api-dev.procanje.app/users/image/generic-user.jpg"
+}

@@ -1,0 +1,1 @@
+export const WEB_URL_PROPERTIES = 'https://pulsoinversor-web.vercel.app/propiedades/'

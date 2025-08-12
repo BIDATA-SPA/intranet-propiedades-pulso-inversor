@@ -1,0 +1,29 @@
+/* Estilo para cambiar el texto del botón de selección de archivos */
+#multiple_files::before {
+    content: 'Seleccionar imágenes';
+    display: inline-block;
+    background-color: white;
+    border: 1px solid #cbd5e0;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    color: #2d3748;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  #multiple_files::-webkit-file-upload-button {
+    visibility: hidden;
+  }
+  
+  #multiple_files::after {
+    content: '';
+    display: inline-block;
+    margin-left: 1rem;
+    color: #718096;
+    font-weight: 400;
+  }
+  
+  #multiple_files:not(:empty)::after {
+    content: '';
+  }
+  
