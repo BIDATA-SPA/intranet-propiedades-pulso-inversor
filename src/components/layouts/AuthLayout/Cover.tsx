@@ -1,6 +1,5 @@
 import type { CommonProps } from '@/@types/common'
 import Logo from '@/components/template/Logo'
-import { APP_NAME } from '@/constants/app.constant'
 import type { ReactElement, ReactNode } from 'react'
 import { cloneElement } from 'react'
 
@@ -17,7 +16,10 @@ const Cover = ({ children, content, ...rest }: CoverProps) => {
           backgroundImage: `url('/img/others/auth-cover-bg.jpg')`,
         }}
       >
-        <Logo mode="light" imgClass="w-auto h-[4.5rem] max-h-[4.5rem]" />
+        <Logo
+          mode="light"
+          imgClass="w-auto h-[4.5rem] max-h-[4.5rem] bg-red-500"
+        />
         <span className="text-white">
           Desarrollada por{' '}
           <a
@@ -29,7 +31,6 @@ const Cover = ({ children, content, ...rest }: CoverProps) => {
             BIDATA SPA
           </a>{' '}
           &copy; {`${new Date().getFullYear()}`}{' '}
-          <span className="font-semibold">{`${APP_NAME}`}</span>{' '}
         </span>
       </div>
       <div className="flex flex-col justify-center items-center bg-white dark:bg-gray-800">

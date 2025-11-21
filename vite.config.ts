@@ -19,11 +19,11 @@ export default defineConfig({
         display: 'standalone',
         display_override: ['window-controls-overlay'],
         lang: 'es-ES',
-        name: 'PulsoInversor',
+        name: 'Pulso Propiedades',
         short_name:
-          'PulsoInversor | La Plataforma Líder en Canje de Propiedades Inmobiliarias',
+          'Pulso Propiedades | La Plataforma Líder en Canje de Propiedades Inmobiliarias',
         description:
-          'Descubre PulsoInversor, tu aliado definitivo en el corretaje de propiedades. Conéctate con una red ética de corredores y maximiza tus oportunidades de canje con seguridad y eficiencia. Únete a la comunidad de corretaje más innovadora y confiable de Chile.',
+          'Descubre Pulso Propiedades, tu aliado definitivo en el corretaje de propiedades. Conéctate con una red ética de corredores y maximiza tus oportunidades de canje con seguridad y eficiencia. Únete a la comunidad de corretaje más innovadora y confiable de Chile.',
         theme_color: '#19223c',
         background_color: '#d4d4d4',
         icons: [

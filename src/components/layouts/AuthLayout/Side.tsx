@@ -1,7 +1,6 @@
 import type { CommonProps } from '@/@types/common'
 import Logo from '@/components/template/Logo'
 import Segment from '@/components/ui/Segment'
-import { APP_NAME } from '@/constants/app.constant'
 import classNames from 'classnames'
 import { cloneElement } from 'react'
 import { HiCheckCircle } from 'react-icons/hi'
@@ -28,7 +27,7 @@ const segmentSelections = [
   },
   {
     value: 'Crea y confirma tu Contraseña',
-    desc: 'Debes crear una contraseña la cual sera necesaria para entrar al sistema Procanje, recuerda anotarla correctamente.',
+    desc: 'Debes crear una contraseña la cual sera necesaria para entrar al sistema Pulso Propiedades, recuerda anotarla correctamente.',
     disabled: false,
     icon: <MdPassword />,
   },
@@ -45,8 +44,6 @@ const Side = ({ children, content, ...rest }: SideProps) => {
 
   const switchSideBackground = () => {
     switch (urlWb) {
-      case '/crear-cuenta/cliente':
-        return 'bg-gray-600'
       case '/crear-cuenta/':
         return 'bg-lime-600'
       default:
@@ -64,20 +61,10 @@ const Side = ({ children, content, ...rest }: SideProps) => {
       >
         <Logo
           mode="dark"
-          imgClass="w-auto h-[4.1rem] max-h-[4.1rem] drop-shadow-2xl"
+          imgClass="w-auto h-[4.1rem] max-h-[4.1rem] drop-shadow-2xl bg-white/90 rounded-xl p-1.5 border border-white"
         />
         <div className="gap-3">
-          {urlWb === '/iniciar-sesion' ? (
-            <div className="mb-2">
-              <h3 className="text-white font-bold text-center mb-2 md:text-2xl 2xl:text-3xl">
-                Integrate hoy y se parte de la Comunidad
-              </h3>
-              <p className="text-white text-center font-medium">
-                Participa y crea tu propia comunidad, donde podras forjar
-                excelentes relaciones con colegas del mundo del corretaje.
-              </p>
-            </div>
-          ) : (
+          {urlWb === '/iniciar-sesion' ? null : (
             <Segment
               defaultValue={['Registra tus datos']}
               className="gap-2 flex-col mt-3"
@@ -147,7 +134,6 @@ const Side = ({ children, content, ...rest }: SideProps) => {
             BIDATA SPA
           </a>{' '}
           &copy; {`${new Date().getFullYear()}`}{' '}
-          <span className="font-semibold">{`${APP_NAME}`}</span>{' '}
         </span>
       </div>
       <div className="col-span-2 flex flex-col justify-center items-center bg-white dark:bg-gray-800">

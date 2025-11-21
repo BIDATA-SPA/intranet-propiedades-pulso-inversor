@@ -85,7 +85,14 @@ const SideNav = () => {
             !sideNavCollapse && 'side-nav-expand'
           )}
         >
-          <div className="side-nav-header">
+          <div
+            className={classNames(
+              sideNavCollapse
+                ? 'flex items-center justify-center'
+                : 'flex items-center justify-start',
+              'side-nav-header'
+            )}
+          >
             <Link to="/dashbaord">
               <Logo
                 mode={logoMode()}

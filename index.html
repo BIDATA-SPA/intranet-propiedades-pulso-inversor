@@ -1,117 +1,99 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#000000" />
     <!-- pwa config -->
-    <meta
-      name="description"
-      content="Descubre PulsoInversor, tu aliado definitivo en el corretaje de propiedades. Conéctate con una red ética de corredores y maximiza tus oportunidades de canje con seguridad y eficiencia. Únete a la comunidad de corretaje más innovadora y confiable de Chile."
-    />
+    <meta name="description"
+        content="Descubre Pulso Propiedades, tu aliado definitivo en el corretaje de propiedades. Conéctate con una red ética de corredores y maximiza tus oportunidades de canje con seguridad y eficiencia. Únete a la comunidad de corretaje más innovadora y confiable de Chile." />
     <!-- Color barra de estado -->
     <meta name="theme-color" content="#19223c" />
     <!-- Favicon PNG -->
     <link rel="icon" href="/img/pwa/favicon.ico" sizes="64x64" />
     <!-- Favicon SVG -->
-    <link
-      rel="icon"
-      href="/img/pwa/favicon.ico"
-      sizes="any"
-      type="image/svg+xml"
-    />
+    <link rel="icon" href="/img/pwa/favicon.ico" sizes="any" type="image/svg+xml" />
     <!-- Favicon tab safari -->
-    <link
-      rel="mask-icon"
-      href="/img/pwa/favicon.ico"
-      color="#19223c"
-    />
+    <link rel="mask-icon" href="/img/pwa/favicon.ico" color="#19223c" />
     <!-- Apple touch icon -->
-    <link
-      rel="apple-touch-icon"
-      href="/img/pwa/favicon.ico"
-      sizes="180x180"
-    />
+    <link rel="apple-touch-icon" href="/img/pwa/favicon.ico" sizes="180x180" />
     <!-- end pwa config -->
-    <link
-      href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css"
-      rel="stylesheet"
-    />
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
     <title>
-      PulsoInversor | La Plataforma Líder en Canje de Propiedades Inmobiliarias
+        Pulso Propiedades | La Plataforma Líder en Canje de Propiedades Inmobiliarias
     </title>
     <style>
-      #root {
-        width: 100vw;
-        height: 100vh;
-      }
+        #root {
+            width: 100vw;
+            height: 100vh;
+        }
 
-      body {
-        margin: 0;
-        font-family: Helvetica, Arial, sans-serif;
-      }
-      #map {
-        width: 100vw;
-        height: 100vh;
-      }
+        body {
+            margin: 0;
+            font-family: Helvetica, Arial, sans-serif;
+        }
 
-      .control-panel {
-        position: absolute;
-        top: 0;
-        right: 0;
-        max-width: 320px;
-        background: #fff;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        padding: 12px 24px;
-        margin: 20px;
-        font-size: 13px;
-        line-height: 2;
-        color: #6b6b76;
-        text-transform: uppercase;
-        outline: none;
-      }
+        #map {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .control-panel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            max-width: 320px;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            padding: 12px 24px;
+            margin: 20px;
+            font-size: 13px;
+            line-height: 2;
+            color: #6b6b76;
+            text-transform: uppercase;
+            outline: none;
+        }
     </style>
     <!-- Google tag (gtag.js) -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-9WV1FWW1Y7"
-    ></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9WV1FWW1Y7"></script>
     <script>
-      window.dataLayer = window.dataLayer || []
-      function gtag() {
-        dataLayer.push(arguments)
-      }
-      gtag('js', new Date())
+        window.dataLayer = window.dataLayer || []
+        function gtag() {
+            dataLayer.push(arguments)
+        }
+        gtag('js', new Date())
 
-      gtag('config', 'G-9WV1FWW1Y7')
+        gtag('config', 'G-9WV1FWW1Y7')
     </script>
-  </head>
-  <body>
+</head>
+
+<body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <!-- <button id="install-button" style="display: none">Instalar PWA</button> -->
     <script type="module" src="/src/main.tsx"></script>
     <script>
-      let deferredPrompt
+        let deferredPrompt
 
-      window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault()
-        deferredPrompt = e
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault()
+            deferredPrompt = e
 
-        const installButton = document.getElementById('install-button')
-        installButton.style.display = 'block'
+            const installButton = document.getElementById('install-button')
+            installButton.style.display = 'block'
 
-        installButton.addEventListener('click', () => {
-          deferredPrompt.prompt()
-          deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-              console.log('PWA instalada')
-            }
-            deferredPrompt = null
-          })
+            installButton.addEventListener('click', () => {
+                deferredPrompt.prompt()
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('PWA instalada')
+                    }
+                    deferredPrompt = null
+                })
+            })
         })
-      })
     </script>
     <!-- ChatBot -->
     <!-- <script type="text/javascript">
@@ -132,7 +114,8 @@
     </script> -->
 
     <script>
-      const global = globalThis
+        const global = globalThis
     </script>
-  </body>
+</body>
+
 </html>

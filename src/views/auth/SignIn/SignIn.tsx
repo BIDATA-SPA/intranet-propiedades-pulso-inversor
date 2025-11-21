@@ -1,11 +1,10 @@
-import Loading from '@/components/shared/Loading'
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import WhatsAppChat from '@/components/shared/WhatsAppChat'
 import { useEffect, useState } from 'react'
-import Loader from '../../../../public/loader-procanje.gif'
 import SignInForm from './SignInForm'
 
 const SignIn = () => {
-  const [loading, setLoading] = useState(true)
+  const [_, setLoading] = useState(true)
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -14,26 +13,15 @@ const SignIn = () => {
 
     return () => clearTimeout(timer)
   }, [])
-  /* console.log(import.meta.env); */ 
+
   return (
     <>
-      {/* {loading ? ( 
-        <div className="flex justify-center items-center h-screen">
-          <Loading
-            loading={true}
-            customLoader={<img src={Loader} className="w-40 h-40" />}
-          />
-        </div>
-      ) : ( */}
-        <>
-          <div className="mb-8">
-            <h3 className="mb-1">¡Bienvenido de nuevo!</h3>
-            <p>Introduzca sus credenciales para iniciar sesión.</p>
-          </div>
-          <SignInForm disableSubmit={false} />
-          <WhatsAppChat />
-        </>
-      {/* )} */}
+      <div className="mb-8">
+        <h3 className="mb-1">¡Bienvenido Corredor/a!</h3>
+        <p>Introduzca sus credenciales para iniciar sesión.</p>
+      </div>
+      <SignInForm disableSubmit={false} />
+      <WhatsAppChat />
     </>
   )
 }

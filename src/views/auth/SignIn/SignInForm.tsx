@@ -37,7 +37,6 @@ const SignInForm = (props: SignInFormProps) => {
     className,
     forgotPasswordUrl = '/recuperar-contraseña',
     signUpUrl = '/crear-cuenta',
-    signInUrlCustomer = '/crear-cuenta/cliente',
   } = props
   const [signInAdmin, { isLoading, error }] = useSignInAdminMutation()
   const { showNotification } = useNotification()
@@ -237,12 +236,6 @@ const SignInForm = (props: SignInFormProps) => {
               <div className="mt-4 text-center">
                 <span>{`¿Aún no tiene cuenta?`} </span>
                 <ActionLink to={signUpUrl}>Regístrate</ActionLink>
-              </div>
-
-              <div className="mt-1 text-center">
-                <span>{`¿Eres cliente?`} </span>
-
-                <ActionLink to={signInUrlCustomer}>Regístrate</ActionLink>
               </div>
             </FormContainer>
           </Form>

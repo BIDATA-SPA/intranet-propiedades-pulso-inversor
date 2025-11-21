@@ -15,12 +15,6 @@ const authRoute: Routes = [
     authority: [],
   },
   {
-    key: 'signUpCustomer',
-    path: `/crear-cuenta/cliente`,
-    component: lazy(() => import('@/views/auth/SignUpCustomer')),
-    authority: [],
-  },
-  {
     key: 'forgotPassword',
     path: `/recuperar-contraseña`,
     component: lazy(() => import('@/views/auth/ForgotPassword')),

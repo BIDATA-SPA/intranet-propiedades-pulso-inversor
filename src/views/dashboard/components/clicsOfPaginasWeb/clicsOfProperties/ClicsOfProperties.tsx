@@ -3,13 +3,13 @@ import { useGetAllPropertiesQuery } from '@/services/RtkQueryService'
 import { useEffect, useState } from 'react'
 import Chart from 'react-apexcharts'
 import { useAppSelector } from '../../../../my-properties/store'
-import UseDialog from './hooks/useDialog'
 import SeeMoreClicksPropertyDialog from './components/seeMoreClickProperty'
+import UseDialog from './hooks/useDialog'
 
 const ClicsOfProperties = () => {
   const [propertyClick, setPropertyClick] = useState([])
-  const [loading, setLoading] = useState(true)   ;
-  const {openDialog, openSeeDialog, closeDialogs}= UseDialog()
+  const [loading, setLoading] = useState(true)
+  const { openDialog, openSeeDialog, closeDialogs } = UseDialog()
 
   const data = useAppSelector((state) => state.propertiesList)
   const { data: properties, isLoading } = useGetAllPropertiesQuery({
@@ -28,16 +28,16 @@ const ClicsOfProperties = () => {
   }
 
   useEffect(() => {
-    if (properties){
+    if (properties) {
       const clicks = properties?.data.slice(0, 6).map((item) => {
         const clicksTotal =
           (item?.propertyClick?.clickOfExternalLink || 0) +
           (item?.propertyClick?.clickOfOpenContact || 0) +
           (item?.propertyClick?.clickOfSendContact || 0)
-        return clicksTotal 
+        return clicksTotal
       })
 
-      setPropertyClick(clicks);
+      setPropertyClick(clicks)
       setLoading(false)
     }
   }, [properties])
@@ -71,7 +71,6 @@ const ClicsOfProperties = () => {
 
   const hasClicks = propertyClick.reduce((acc, curr) => acc + curr, 0) > 0
 
-
   return (
     <>
       <article className="shadow-md group group-hover:blur-lg h-96 w-full sm:h-full border border-1 rounded-md overflow-hidden overflow-y-auto">
@@ -87,18 +86,16 @@ const ClicsOfProperties = () => {
               target="_blank"
               rel="noreferrer"
             >
-              PulsoInversor
+              Pulso Propiedades
             </a>
           </small>
         </div>
 
-        {
-        loading ? (
+        {loading ? (
           <div className="flex items-center justify-center h-56">
             <p className="text-gray-500 italic">Cargando datos...</p>
           </div>
-        ):
-        hasClicks ? (
+        ) : hasClicks ? (
           <>
             <Chart
               options={{
@@ -130,8 +127,9 @@ const ClicsOfProperties = () => {
             />
             <div className="flex justify-end mx-4 m-1 mb-2 cursor-pointer">
               <p
-              onClick={() => handleDialogOpen()} 
-              className="italic hover:scale-x-105 duration-150 text-lime-400">
+                className="italic hover:scale-x-105 duration-150 text-lime-400"
+                onClick={() => handleDialogOpen()}
+              >
                 Ver más detalles
               </p>
             </div>
@@ -143,17 +141,14 @@ const ClicsOfProperties = () => {
         )}
       </article>
 
-      {
-        openDialog.see && (
-            <SeeMoreClicksPropertyDialog 
-            openDialog={openDialog.see}
-            closeDialogs={closeDialogs}
-            // dataProp={properties.data}
-            dataClicks={properties?.data}
-
-            />
-        )
-      }
+      {openDialog.see && (
+        <SeeMoreClicksPropertyDialog
+          openDialog={openDialog.see}
+          closeDialogs={closeDialogs}
+          // dataProp={properties.data}
+          dataClicks={properties?.data}
+        />
+      )}
     </>
   )
 }

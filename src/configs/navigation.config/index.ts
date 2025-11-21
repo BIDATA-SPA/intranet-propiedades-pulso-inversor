@@ -1,8 +1,5 @@
 import type { NavigationTree } from '@/@types/navigation'
-import {
-  NAV_ITEM_TYPE_COLLAPSE,
-  NAV_ITEM_TYPE_ITEM,
-} from '@/constants/navigation.constant'
+import { NAV_ITEM_TYPE_ITEM } from '@/constants/navigation.constant'
 
 const navigationConfig: NavigationTree[] = [
   {
@@ -25,37 +22,6 @@ const navigationConfig: NavigationTree[] = [
     authority: [],
     subMenu: [],
   },
-  /* {
-    key: 'procanje',
-    path: '/procanje',
-    title: 'Buzón Procanje',
-    translateKey: '',
-    icon: 'buzon',
-    type: NAV_ITEM_TYPE_COLLAPSE,
-    authority: [],
-    subMenu: [
-      {
-        key: 'customers-mailbox',
-        path: '/procanje/buzon-de-clientes',
-        title: 'Buzón de Clientes',
-        translateKey: '',
-        icon: 'userLocation',
-        type: NAV_ITEM_TYPE_ITEM,
-        authority: [],
-        subMenu: [],
-      },
-      {
-        key: 'properties-mailbox',
-        path: '/procanje/buzon-de-propiedades',
-        title: 'Buzón de Propiedades',
-        translateKey: '',
-        icon: '',
-        type: NAV_ITEM_TYPE_ITEM,
-        authority: [],
-        subMenu: [],
-      },
-    ],
-  }, */
   {
     key: 'customers',
     path: '/clientes',
@@ -66,16 +32,6 @@ const navigationConfig: NavigationTree[] = [
     authority: [],
     subMenu: [],
   },
-  /* {
-    key: 'alied-realtor',
-    path: '/corredores-asociados',
-    title: 'Corredores asociados',
-    translateKey: '',
-    icon: 'aliedRealtor',
-    type: NAV_ITEM_TYPE_ITEM,
-    authority: [],
-    subMenu: [],
-  }, */
   {
     key: 'calendar',
     path: '/mi-calendario',
@@ -86,98 +42,6 @@ const navigationConfig: NavigationTree[] = [
     authority: [],
     subMenu: [],
   },
-  /* {
-    key: 'potenciar',
-    path: '/potenciar',
-    title: 'Potencia tu marca',
-    translateKey: '',
-    icon: 'potencial',
-    type: NAV_ITEM_TYPE_COLLAPSE,
-    authority: [],
-    subMenu: [
-      {
-        key: 'ads-campaing',
-        path: '/potenciar/crear-campaña',
-        title: 'Campaña publicitaria',
-        translateKey: '',
-        icon: '',
-        type: NAV_ITEM_TYPE_ITEM,
-        authority: [],
-        subMenu: [],
-      },
-      {
-        key: 'mark-design',
-        path: '/potenciar/diseñar-marca',
-        title: 'Diseña tu marca',
-        translateKey: '',
-        icon: '',
-        type: NAV_ITEM_TYPE_ITEM,
-        authority: [],
-        subMenu: [],
-      },
-      {
-        key: 'web-design',
-        path: '/potenciar/diseñar-web',
-        title: 'Diseña tu web',
-        translateKey: '',
-        icon: '',
-        type: NAV_ITEM_TYPE_ITEM,
-        authority: [],
-        subMenu: [],
-      },
-    ],
-  }, */
-  /* {
-    key: 'external-services',
-    path: '/servicios-externos',
-    title: 'Servicios externos',
-    translateKey: '',
-    icon: 'externalServices',
-    type: NAV_ITEM_TYPE_ITEM,
-    authority: [],
-    subMenu: [],
-  }, */
-  /* {
-    key: 'inbox-requests',
-    path: '/bandeja-de-solicitudes',
-    title: 'Bandeja de solicitudes',
-    translateKey: '',
-    icon: 'inbox',
-    type: NAV_ITEM_TYPE_COLLAPSE,
-    authority: [],
-    subMenu: [
-      {
-        key: 'inbox-contact-request',
-        path: '/solicitudes-de-contacto',
-        title: 'Corredores',
-        translateKey: '',
-        icon: '',
-        type: NAV_ITEM_TYPE_ITEM,
-        authority: [],
-        subMenu: [],
-      },
-      {
-        key: 'inbox-requests-canje-id',
-        path: '/gestion-de-solicitud-de-canjes/inbox',
-        title: 'Mis Canjes',
-        translateKey: '',
-        icon: '',
-        type: NAV_ITEM_TYPE_ITEM,
-        authority: [],
-        subMenu: [],
-      },
-      {
-        key: 'inbox-requests-external-services-id',
-        path: '/gestion-de-solicitud-de-servicios/inbox',
-        title: 'Servicios externos',
-        translateKey: '',
-        icon: '',
-        type: NAV_ITEM_TYPE_ITEM,
-        authority: [],
-        subMenu: [],
-      },
-    ],
-  }, */
   {
     key: 'tools-and-services',
     path: '/mis-recursos',
@@ -198,16 +62,6 @@ const navigationConfig: NavigationTree[] = [
     authority: [],
     subMenu: [],
   },
-  /* {
-    key: 'realtor-ideas',
-    path: '/ideas-corredor',
-    title: 'Ideas Corredor',
-    translateKey: '',
-    icon: 'realtorIdeas',
-    type: NAV_ITEM_TYPE_ITEM,
-    authority: [],
-    subMenu: [],
-  }, */
 ]
 
 const navigationConfigCustomer: NavigationTree[] = [
@@ -221,16 +75,6 @@ const navigationConfigCustomer: NavigationTree[] = [
     authority: [],
     subMenu: [],
   },
-  // {
-  //   key: 'my-properties',
-  //   path: '/mis-propiedades',
-  //   title: 'Mis Propiedades',
-  //   translateKey: '',
-  //   icon: 'properties',
-  //   type: NAV_ITEM_TYPE_ITEM,
-  //   authority: [],
-  //   subMenu: [],
-  // },
 ]
 
 export default navigationConfig
