@@ -33,18 +33,6 @@ const authRoute: Routes = [
     authority: [],
   },
   {
-    key: 'rating',
-    path: `/calificar-corredor/:userId/:customerId`,
-    component: lazy(() => import('@/views/rating')),
-    authority: [],
-  },
-  {
-    key: 'rating-realtor',
-    path: `/califica-a-tu-corredor/:userId`,
-    component: lazy(() => import('@/views/rating-realtor/RatingRealtorForm')),
-    authority: [],
-  },
-  {
     key: 'resend-confirm-email',
     path: '/resend-confirm-email',
     component: lazy(
