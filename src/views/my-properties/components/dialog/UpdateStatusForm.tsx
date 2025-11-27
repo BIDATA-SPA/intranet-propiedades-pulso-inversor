@@ -57,14 +57,16 @@ const UpdateStatusForm = ({ onClose, property }: UpdateStatusFormProps) => {
   const onSubmit = async (e) => {
     e.preventDefault()
 
-    const body = {
-      step2: {
-        propertyStatusId: selectedReason, // property?.propertyStatus?.id
-      },
-    }
+    // const body = {
+    //   step2: {
+    //     propertyStatusId: selectedReason, // property?.propertyStatus?.id
+    //   },
+    // }
 
     try {
-      await updateProperty({ id: property?.id, ...body }).unwrap()
+      await updateProperty({ id: property?.id }).unwrap()
+      //   await updateProperty({ id: property?.id, ...body }).unwrap()
+
       openNotification(
         'success',
         '¡Actualizada!',

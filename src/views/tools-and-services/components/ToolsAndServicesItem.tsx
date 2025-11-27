@@ -44,7 +44,7 @@ const ToolsAndServicesItem = ({ item }) => {
                   <Button
                     variant="plain"
                     size="sm"
-                    className="flex items-center font-semobold text-sky-500 hover:text-sky-400"
+                    className="flex items-center font-semobold text-lime-500 hover:text-sky-400"
                   >
                     Abrir
                     <MdOutlineKeyboardArrowRight className="ml-0.5 text-lg" />

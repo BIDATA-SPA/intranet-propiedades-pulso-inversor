@@ -36,10 +36,10 @@ const RequestsStatistics = ({ dataRequests }: RequestsStatisticsProps) => {
       {percentages.map((item, index) => (
         <article
           key={index}
-          className="flex flex-col items-center p-2 py-3 w-full h-44 sm:h-40 rounded-md border border-sky-500 drop-shadow-2xl hover:scale-105 duration-200"
+          className="flex flex-col items-center p-2 py-3 w-full h-44 sm:h-40 rounded-md border border-lime-500 drop-shadow-2xl hover:scale-105 duration-200"
         >
           <div className="mb-3">
-            <GrHomeRounded className="text-4xl text-sky-500 group-hover:drop-shadow-lg group-hover:-translate-y-2 duration-150" />
+            <GrHomeRounded className="text-4xl text-lime-500 group-hover:drop-shadow-lg group-hover:-translate-y-2 duration-150" />
           </div>
           <h4
             className="text-sm font-semibold text-center mt-2 truncate w-full"
@@ -70,9 +70,7 @@ type MainContentEventProps = {
   dataRequests: TopCity[]
 }
 
-const MainContentEvent = ({
-  dataRequests,
-}: MainContentEventProps) => {
+const MainContentEvent = ({ dataRequests }: MainContentEventProps) => {
   const hasData = dataRequests.length > 0
 
   return (

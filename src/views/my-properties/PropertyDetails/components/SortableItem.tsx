@@ -51,7 +51,7 @@ const SortableItem = ({ id, path, index }) => {
       <img
         src={path}
         alt={`Imagen ${id}`}
-        className="relative w-full h-[150px] rounded-lg object-cover hover:shadow-xl hover:opacity-80 border-4 border-transparent hover:border-sky-500"
+        className="relative w-full h-[150px] rounded-lg object-cover hover:shadow-xl hover:opacity-80 border-4 border-transparent hover:border-lime-500"
         {...listeners}
       />
       <span className="absolute top-1 left-1 py-1 px-3 font-bold bg-white/90 text-black rounded-br-lg rounded-tl-sm">

@@ -1,6 +1,7 @@
 import type { CommonProps } from '@/@types/common'
 import Logo from '@/components/template/Logo'
 import Segment from '@/components/ui/Segment'
+import { APP_NAME } from '@/constants/app.constant'
 import classNames from 'classnames'
 import { cloneElement } from 'react'
 import { HiCheckCircle } from 'react-icons/hi'
@@ -39,8 +40,24 @@ const segmentSelections = [
   },
 ]
 
+const segmentSelectionsWebinar = [
+  {
+    value: 'Registra tus datos',
+    desc: 'Ingresa tu nombre, apellidos y teléfono celular.',
+    disabled: false,
+    icon: <TbUserSquareRounded />,
+  },
+  {
+    value: 'Registra tu correo',
+    desc: 'Recuerda revisar tu correo y confirmar tu asistencia al evento.',
+    disabled: false,
+    icon: <LuMailPlus />,
+  },
+]
+
 const Side = ({ children, content, ...rest }: SideProps) => {
   const urlWb = window.location.pathname
+  const isWebinar = urlWb.includes('webinar')
 
   const switchSideBackground = () => {
     switch (urlWb) {
@@ -61,7 +78,7 @@ const Side = ({ children, content, ...rest }: SideProps) => {
       >
         <Logo
           mode="dark"
-          imgClass="w-auto h-[4.1rem] max-h-[4.1rem] drop-shadow-2xl bg-white/90 rounded-xl p-1.5 border border-white"
+          imgClass="w-auto h-[4.1rem] max-h-[4.1rem] drop-shadow-2xl bg-white/90 rounded-xl p-1.5 shadow-lg"
         />
         <div className="gap-3">
           {urlWb === '/iniciar-sesion' ? null : (
@@ -69,57 +86,59 @@ const Side = ({ children, content, ...rest }: SideProps) => {
               defaultValue={['Registra tus datos']}
               className="gap-2 flex-col mt-3"
             >
-              {segmentSelections.map((item) => (
-                <Segment.Item
-                  key={item.value}
-                  value={item.value}
-                  disabled={item.disabled}
-                >
-                  {({ active, value, onSegmentItemClick, disabled }) => {
-                    return (
-                      <div
-                        className={classNames(
-                          'flex',
-                          'ring-1',
-                          'justify-between',
-                          'border-2',
-                          'rounded-md ',
-                          'border-gray-300',
-                          'py-5 px-4',
-                          'cursor-pointer',
-                          'select-none',
-                          'w-100',
-                          'md:w-[350px]',
-                          '2xl:w-[500px]',
-                          'max-w-[98%]',
-                          'group',
-                          active
-                            ? 'ring-cyan-500 border-cyan-500 group-hover'
-                            : 'ring-transparent',
-                          disabled
-                            ? 'opacity-50 cursor-not-allowed'
-                            : 'hover:ring-cyan-500 hover:border-cyan-500'
-                        )}
-                        onClick={onSegmentItemClick}
-                      >
-                        <div className="text-gray-200 sm:w-72 2xl:w-[380px] max-w-2xl">
-                          <div className="flex flex-row items-center gap-3">
-                            <h4 className="text-gray-200">{value}</h4>
-                            <p className="text-2xl group-hover:scale-125 duration-200">
-                              {item.icon}
-                            </p>
-                          </div>
+              {(isWebinar ? segmentSelectionsWebinar : segmentSelections).map(
+                (item) => (
+                  <Segment.Item
+                    key={item.value}
+                    value={item.value}
+                    disabled={item.disabled}
+                  >
+                    {({ active, value, onSegmentItemClick, disabled }) => {
+                      return (
+                        <div
+                          className={classNames(
+                            'flex',
+                            'ring-1',
+                            'justify-between',
+                            'border-2',
+                            'rounded-md ',
+                            'border-gray-300',
+                            'py-5 px-4',
+                            'cursor-pointer',
+                            'select-none',
+                            'w-100',
+                            'md:w-[350px]',
+                            '2xl:w-[500px]',
+                            'max-w-[98%]',
+                            'group',
+                            active
+                              ? 'ring-cyan-500 border-cyan-500 group-hover'
+                              : 'ring-transparent',
+                            disabled
+                              ? 'opacity-50 cursor-not-allowed'
+                              : 'hover:ring-cyan-500 hover:border-cyan-500'
+                          )}
+                          onClick={onSegmentItemClick}
+                        >
+                          <div className="text-gray-200 sm:w-72 2xl:w-[380px] max-w-2xl">
+                            <div className="flex flex-row items-center gap-3">
+                              <h4 className="text-gray-200">{value}</h4>
+                              <p className="text-2xl group-hover:scale-125 duration-200">
+                                {item.icon}
+                              </p>
+                            </div>
 
-                          <p className="font-medium">{item.desc}</p>
+                            <p className="font-medium">{item.desc}</p>
+                          </div>
+                          {active && (
+                            <HiCheckCircle className="text-gray-50 text-xl" />
+                          )}
                         </div>
-                        {active && (
-                          <HiCheckCircle className="text-gray-50 text-xl" />
-                        )}
-                      </div>
-                    )
-                  }}
-                </Segment.Item>
-              ))}
+                      )
+                    }}
+                  </Segment.Item>
+                )
+              )}
             </Segment>
           )}
         </div>
@@ -134,6 +153,7 @@ const Side = ({ children, content, ...rest }: SideProps) => {
             BIDATA SPA
           </a>{' '}
           &copy; {`${new Date().getFullYear()}`}{' '}
+          <span className="font-semibold">{`${APP_NAME}`}</span>{' '}
         </span>
       </div>
       <div className="col-span-2 flex flex-col justify-center items-center bg-white dark:bg-gray-800">

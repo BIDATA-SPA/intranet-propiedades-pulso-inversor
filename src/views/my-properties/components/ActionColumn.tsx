@@ -3,10 +3,12 @@ import { Dialog, Tooltip } from '@/components/ui'
 import {
   useDeletePropertyMutation,
   useGetMyInfoQuery,
+  useLazyFindPortalPublicationsQuery,
   useUpdatePropertyMutation,
 } from '@/services/RtkQueryService'
 import { useAppSelector } from '@/store'
 import useNotification from '@/utils/hooks/useNotification'
+import { usePdpSecureActions } from '@/utils/hooks/usePdpSecureActions'
 import classNames from 'classnames'
 import { useEffect, useState } from 'react'
 import { FaHandshake, FaRegStar, FaStar } from 'react-icons/fa'
@@ -16,9 +18,6 @@ import { MdFileUpload } from 'react-icons/md'
 import { useNavigate } from 'react-router'
 import UpdateExchangeForm from './dialog/UpdateExchangeForm'
 import UpdateStatusForm from './dialog/UpdateStatusForm'
-import { WEB_URL_PROPERTIES } from '@/constants/web.constant'
-import { TbWorld } from "react-icons/tb";
-import { FaRegFilePdf } from "react-icons/fa";
 
 type TDialogState = {
   updateExchange?: boolean
@@ -67,6 +66,8 @@ const ActionColumn = ({ row, className }) => {
   )
   const navigate = useNavigate()
   const [updateProperty] = useUpdatePropertyMutation()
+
+  // Procanje (propiedad)
   const [
     deleteProperty,
     {
@@ -75,6 +76,13 @@ const ActionColumn = ({ row, className }) => {
       error: deletePropertyError,
     },
   ] = useDeletePropertyMutation()
+
+  // Portal de Portales
+  const [findPortalByCode] = useLazyFindPortalPublicationsQuery()
+
+  // 🔐 hook seguro PDP
+  const { ensureToken, secureDelete } = usePdpSecureActions()
+
   const { showNotification } = useNotification()
   const [selectedItem, setSelectedItem] = useState(null)
   const [dialogState, setDialogState] = useState<TDialogState>({
@@ -82,6 +90,9 @@ const ActionColumn = ({ row, className }) => {
     updateExchange: false,
     deleteProperty: false,
   })
+
+  // loading local para la cascada
+  const [isCascadeDeleting, setIsCascadeDeleting] = useState(false)
 
   const handleUpdateStatus = (item) => {
     setSelectedItem(item)
@@ -131,28 +142,89 @@ const ActionColumn = ({ row, className }) => {
     })
   }
 
+  // 🔥 Eliminación en cascada con token PDP
   const handleConfirm = async () => {
+    const code = String(row?.id) // en tu mapeo, el "code" del portal es el id local
+    setIsCascadeDeleting(true)
     try {
+      // 1) conseguir token PDP válido
+      const pdpToken = await ensureToken()
+
+      // 2) buscar en portal por code usando ese token
+      let uuids: string[] = []
+      try {
+        const found = await findPortalByCode({
+          code,
+          page: 1,
+          page_size: 100,
+          pdpToken,
+        }).unwrap()
+        const items: any[] = Array.isArray(found)
+          ? found
+          : found?.items ?? found?.data ?? []
+        uuids = items
+          .filter(
+            (i) =>
+              String(i?.portal ?? '')
+                .trim()
+                .toLowerCase() === 'pulsoPropiedades' &&
+              typeof i?.uuid === 'string'
+          )
+          .map((i) => i.uuid as string)
+      } catch (e) {
+        // si falla la búsqueda en portal, igual intentamos borrar en pulsoPropiedades
+      }
+
+      // 3) borrar en portal de portales (si hay)
+      if (uuids.length > 0) {
+        const results = await Promise.allSettled(
+          uuids.map((uuid) => secureDelete(uuid))
+        )
+        const ok = results.filter((r) => r.status === 'fulfilled').length
+        const fail = uuids.length - ok
+        if (ok > 0) {
+          showNotification(
+            'success',
+            'Portal de Portales',
+            `Eliminadas ${ok}/${uuids.length} publicaciones en Portal.`
+          )
+        }
+        if (fail > 0) {
+          showNotification(
+            'warning',
+            'Portal de Portales',
+            `No se pudieron eliminar ${fail}/${uuids.length} publicaciones en Portal.`
+          )
+        }
+      }
+
+      // 4) borrar en Procanje
       await deleteProperty(row?.id).unwrap()
+
+      showNotification(
+        'success',
+        'Eliminación completada',
+        'Propiedad eliminada en Procanje y sincronizada con Portal de Portales.'
+      )
+
       setDialogState({
         updateStatus: false,
         updateExchange: false,
         deleteProperty: false,
       })
-      showNotification('success', 'Eliminada exitosamente', '')
-    } catch (error) {
-      setDialogState({
-        updateStatus: false,
-        updateExchange: false,
-        deleteProperty: false,
-      })
+    } catch (error: any) {
       showNotification(
         'danger',
         'Error',
-        `Ha ocurrido un error al eliminar esta propiedad: ${
-          error?.message || 'Error desconocido'
-        }`
+        `Ocurrió un error al eliminar: ${error?.message || 'Error desconocido'}`
       )
+      setDialogState({
+        updateStatus: false,
+        updateExchange: false,
+        deleteProperty: false,
+      })
+    } finally {
+      setIsCascadeDeleting(false)
     }
   }
 
@@ -161,19 +233,12 @@ const ActionColumn = ({ row, className }) => {
     setDialogState({
       updateStatus: false,
       updateExchange: false,
+      deleteProperty: false,
     })
   }
 
   const onUpload = () => {
     navigate(`/mis-propiedades/${row.id}/#scroll-target`)
-    const target = document.getElementById('scroll-target')
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth' })
-    }
-  }
-
-  const onCreatePdf = () => {
-    navigate(`/mis-propiedades/visit/${row.id}/#scroll-target`)
     const target = document.getElementById('scroll-target')
     if (target) {
       target.scrollIntoView({ behavior: 'smooth' })
@@ -220,24 +285,6 @@ const ActionColumn = ({ row, className }) => {
           </span>
         </Tooltip>
 
-        <Tooltip title="Generar Visita">
-          <span
-            className="cursor-pointer p-2 hover:text-green-500  bg-gray-50 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-800 rounded-full"
-            onClick={onCreatePdf}
-          >
-            <FaRegFilePdf  className="text-lg lg:text-xl" />
-          </span>
-        </Tooltip>
-
-        {/* <Tooltip title="Ver Web">
-          <span
-            className="cursor-pointer p-2 hover:text-blue-500 rounded-full bg-gray-50 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-800"
-            onClick={() => window.open(`${WEB_URL_PROPERTIES}${row.id}`, '_blank')}
-          >
-            <TbWorld className="text-lg lg:text-xl" />
-          </span>
-        </Tooltip> */}
-
         <Tooltip title="Ver detalle">
           <span
             className="cursor-pointer p-2 hover:text-blue-500 rounded-full bg-gray-50 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-800"
@@ -262,20 +309,24 @@ const ActionColumn = ({ row, className }) => {
           </Tooltip>
         ) : null}
 
-        {/* {!row?.isExchanged && (
+        {!row?.isExchanged && (
           <Tooltip title="Habilitar para Canje">
             <span
               className="cursor-pointer p-2 hover:text-blue-500 rounded-full bg-gray-50 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-800"
-              onClick={handleUpdateExchange}
+              onClick={() => handleUpdateExchange(row)}
             >
               <FaHandshake className="text-lg lg:text-xl" />
             </span>
           </Tooltip>
-        )} */}
+        )}
 
-        <Tooltip title="Eliminar">
+        <Tooltip title="Eliminar (Pulso Propiedades + Portal de Portales)">
           <span
-            className={`cursor-pointer p-2 hover:text-red-500 rounded-full bg-gray-50 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-800`}
+            className={classNames(
+              'cursor-pointer p-2 hover:text-red-500 rounded-full bg-gray-50 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-800',
+              (isDeletePropertyLoading || isCascadeDeleting) &&
+                'opacity-60 pointer-events-none'
+            )}
             onClick={handleDelete}
           >
             <HiTrash className="text-lg lg:text-xl" />
@@ -307,22 +358,24 @@ const ActionColumn = ({ row, className }) => {
         />
       </Dialog>
 
-      {/* Delete dialog */}
+      {/* Delete dialog (cascada) */}
       <ConfirmDialog
         isOpen={dialogState.deleteProperty}
         type="danger"
         title="Eliminar Propiedad"
         confirmButtonColor="red-600"
-        isLoading={isDeletePropertyLoading}
+        isLoading={isDeletePropertyLoading || isCascadeDeleting}
         onClose={handleCloseDialog}
         onRequestClose={handleCloseDialog}
         onCancel={handleCloseDialog}
         onConfirm={handleConfirm}
       >
-        <p>
-          ¿Está seguro de que desea eliminar esta propiedad? Todos los registros
-          relacionados con esta propiedad también se eliminarán. Esta acción no
-          se puede deshacer.
+        <p className="text-sm">
+          Esta acción eliminará la propiedad en <b>Procanje</b> y también
+          intentará eliminar sus publicaciones vinculadas en
+          <b> Portal de Portales</b> (búsqueda por <code>code</code>).
+          <br />
+          No se puede deshacer.
         </p>
       </ConfirmDialog>
     </div>

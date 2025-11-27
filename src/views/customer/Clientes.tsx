@@ -14,6 +14,7 @@ import {
   useCreateRatingUserSendMailMutation,
   useGetAllCustomersQuery,
   useGetDashboardQuery,
+  useGetMyInfoQuery,
 } from '@/services/RtkQueryService'
 import useNotification from '@/utils/hooks/useNotification'
 import type { ColumnFiltersState } from '@tanstack/react-table'
@@ -35,16 +36,21 @@ import {
   HiOutlineSearch,
   HiOutlineTrash,
   HiOutlineUserAdd,
+  HiViewList,
 } from 'react-icons/hi'
 import { IoMdEye } from 'react-icons/io'
 import { TbChecklist } from 'react-icons/tb'
 import { useNavigate } from 'react-router'
 import { useSearchParams } from 'react-router-dom'
-import { HiViewList } from 'react-icons/hi'
-import { HiOutlineSquares2X2 } from 'react-icons/hi2'
+
+import { useCopyToClipboard } from '@/utils/hooks/useCopyToClipboard'
+import {
+  DEFAULT_TAILWIND_COLORS,
+  getRandomBackgroundColor,
+} from '@/utils/randomColor'
 import classNames from 'classnames'
-import { DEFAULT_TAILWIND_COLORS, getRandomBackgroundColor } from '@/utils/randomColor'
-import { FaUserAlt } from 'react-icons/fa'; 
+import { FaUserAlt } from 'react-icons/fa'
+import { HiOutlineSquares2X2 } from 'react-icons/hi2'
 
 interface DebouncedInputProps
   extends Omit<
@@ -157,11 +163,15 @@ const Clientes = () => {
   const [currentPage, setCurrentPage] = useState(+searchParams.get('page') || 1)
   const [pageSize, setPageSize] = useState(pageSizeOption[0].value)
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('table')
+  const { data: me } = useGetMyInfoQuery()
+
   const { showNotification } = useNotification()
   const [
     createRatingUserSendMail,
     { isError: isErrorEmail, isSuccess: isSuccessEmail },
   ] = useCreateRatingUserSendMailMutation()
+
+  const { copyToClipboard } = useCopyToClipboard()
 
   const { data, isFetching, isLoading, isError, error, refetch } =
     useGetAllCustomersQuery(
@@ -179,6 +189,24 @@ const Clientes = () => {
       refetchOnMountOrArgChange: true,
     }
   )
+
+  const userId = me?.id
+
+  const onClickCopyReviewProfile = (userId: string) => {
+    const origin =
+      typeof window !== 'undefined'
+        ? window.location.origin.replace(/\/$/, '')
+        : 'https://procanje.app'
+
+    const url = `${origin}/califica-a-tu-corredor/${userId}`
+
+    copyToClipboard(url)
+    showNotification(
+      'success',
+      'Enlace copiado',
+      'Comparte este enlace a tu cliente para calificar tu perfil'
+    )
+  }
 
   // Sent Rating form to customer
   const handleSendRatingForm = async (formData) => {
@@ -257,8 +285,8 @@ const Clientes = () => {
         },
       },
       {
-        header: 'RUT',
-        cell: (cellProps: any) => <>{cellProps.row.original.rut || '-'}</>,
+        header: 'alias',
+        cell: (cellProps: any) => <>{cellProps.row.original.alias || '-'}</>,
       },
       {
         header: 'Teléfono/Celular',
@@ -294,7 +322,6 @@ const Clientes = () => {
         header: 'Acciones',
         accessorKey: 'details',
         cell: (cellProps) => {
-          const { original } = cellProps.row
           return (
             <div className="w-100 flex gap-4">
               <Tooltip title="Ver detalles">
@@ -307,25 +334,12 @@ const Clientes = () => {
                   <IoMdEye className="text-xl" />
                 </span>
               </Tooltip>
-
-              <Tooltip
-                title={`Enviar encuesta a ${original?.name} ${original?.lastName}`}
-              >
-                <span
-                  className="font-bold cursor-pointer hover:text-lime-500 transition-colors duration-200"
-                  onClick={() => {
-                    handleSendRatingForm(cellProps.row.original)
-                  }}
-                >
-                  <TbChecklist className="text-xl" />
-                </span>
-              </Tooltip>
             </div>
           )
         },
       },
     ],
-    []
+    [navigate, userId, showNotification]
   )
 
   const table = useReactTable({
@@ -446,9 +460,9 @@ const Clientes = () => {
         <DebouncedInput
           value={search}
           placeholder="Buscar Cliente..."
-          onChange={setSearch}
           toggleViewMode={toggleViewMode}
           viewMode={viewMode}
+          onChange={setSearch}
         />
 
         {viewMode === 'table' ? (
@@ -499,90 +513,113 @@ const Clientes = () => {
           </Table>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-  {data?.data.map((customer) => {
-    const randomColor = getRandomBackgroundColor({ colors: DEFAULT_TAILWIND_COLORS });
+            {data?.data?.map((customer) => {
+              const randomColor = getRandomBackgroundColor({
+                colors: DEFAULT_TAILWIND_COLORS,
+              })
 
-    return (
-      <Card key={customer.id} className="rounded-lg relative border bg-white dark:bg-gray-500 dark:border-gray-600 w-full hover:shadow-xl hover:scale-105 transition-all duration-300 flex flex-col mx-auto shadow-sm overflow-hidden">
-        <div
-          className={classNames(
-            randomColor,
-            'h-16 w-full opacity-80 absolute top-0 left-0 right-0 z-0 rounded-t-lg'
-          )}
-        />
-        <div className="w-full flex m-2 ml-3 text-white relative z-10">
-          <div className="w-12 h-12 p-2 bg-white dark:bg-gray-500 rounded-full flex items-center justify-center">
-            {customer.image ? (
-              <img
-                className="w-12 h-12 rounded-full object-cover"
-                src={customer.image}
-                alt="Customer"
-              />
-            ) : (
-              <FaUserAlt className="w-10 h-10 text-gray-600 dark:text-gray-200" />
-            )}
-          </div>
-          <div className="title mt-2 ml-2 font-bold flex flex-col">
-            <div className="break-words text-white">
-              <p className="text-sm">
-                {customer.name} {customer.lastName}{' '}
-                {customer?.alias && <small>({customer?.alias})</small>}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-col p-3 mt-2 border-t border-gray-200 dark:border-gray-600 flex-grow">
-          <p className="text-xs mb-1">
-            <span className="font-semibold">RUT:</span> {customer.rut || '-'}
-          </p>
-          <p className="text-xs mb-1">
-            <span className="font-semibold">Teléfono/Celular:</span>{' '}
-            {`${customer.dialCode?.dialCode ? `(${customer.dialCode?.dialCode})` : ''} `}
-            {customer.phone || ''}
-          </p>
-          <p className="text-xs mb-">
-            <span className="font-semibold">Correo:</span> {customer.email || '-'}
-          </p>
-          <p className="text-xs mb-1">
-            <span className="font-semibold">Ubicación:</span>{' '}
-            {customer.address?.country?.name}
-            {`, ${customer.address?.internalDbCity?.name}`}
-          </p>
-    
-          <div className="flex flex-col mt-4 p-4 dark:bg-gray-700 rounded-b-lg border-t border-gray-300 dark:border-gray-600 ">
-            <div className="flex gap-4 w-full">
-              <Tooltip title="Ver detalles">
-                <span
-                  className="font-bold cursor-pointer hover:text-lime-500 transition-colors duration-200"
-                  onClick={() => {
-                    navigate(`/clientes/${customer.id}`);
-                  }}
+              return (
+                <Card
+                  key={customer.id}
+                  className="rounded-lg relative border bg-white dark:bg-gray-500 dark:border-gray-600 w-full hover:shadow-xl hover:scale-105 transition-all duration-300 flex flex-col mx-auto shadow-sm overflow-hidden"
                 >
-                  <IoMdEye className="text-xl" />
-                </span>
-              </Tooltip>
+                  <div
+                    className={classNames(
+                      randomColor,
+                      'h-16 w-full opacity-80 absolute top-0 left-0 right-0 z-0 rounded-t-lg'
+                    )}
+                  />
+                  <div className="w-full flex m-2 ml-3 text-white relative z-10">
+                    <div className="w-12 h-12 p-2 bg-white dark:bg-gray-500 rounded-full flex items-center justify-center">
+                      {customer.image ? (
+                        <img
+                          className="w-12 h-12 rounded-full object-cover"
+                          src={customer.image}
+                          alt="Customer"
+                        />
+                      ) : (
+                        <FaUserAlt className="w-10 h-10 text-gray-600 dark:text-gray-200" />
+                      )}
+                    </div>
+                    <div className="title mt-2 ml-2 font-bold flex flex-col">
+                      <div className="break-words text-white">
+                        <p className="text-sm">
+                          {customer.name} {customer.lastName}{' '}
+                          {customer?.alias && (
+                            <small>({customer?.alias})</small>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col p-3 mt-2 border-t border-gray-200 dark:border-gray-600 flex-grow">
+                    <p className="text-xs mb-1">
+                      <span className="font-semibold">RUT:</span>{' '}
+                      {customer.rut || '-'}
+                    </p>
+                    <p className="text-xs mb-1">
+                      <span className="font-semibold">Teléfono/Celular:</span>{' '}
+                      {`${
+                        customer.dialCode?.dialCode
+                          ? `(${customer.dialCode?.dialCode})`
+                          : ''
+                      } `}
+                      {customer.phone || ''}
+                    </p>
+                    <p className="text-xs mb-">
+                      <span className="font-semibold">Correo:</span>{' '}
+                      {customer.email || '-'}
+                    </p>
+                    <p className="text-xs mb-1">
+                      <span className="font-semibold">Ubicación:</span>{' '}
+                      {customer.address?.country?.name}
+                      {`, ${customer.address?.internalDbCity?.name}`}
+                    </p>
 
-              <Tooltip title={`Enviar encuesta a ${customer?.name} ${customer?.lastName}`}>
-                <span
-                  className="font-bold cursor-pointer hover:text-lime-500 transition-colors duration-200"
-                  onClick={() => {
-                    handleSendRatingForm(customer);
-                  }}
-                >
-                  <TbChecklist className="text-xl" />
-                </span>
-              </Tooltip>
-            </div>
+                    <div className="flex flex-col mt-4 p-4 dark:bg-gray-700 rounded-b-lg border-t border-gray-300 dark:border-gray-600 ">
+                      <div className="flex gap-4 w-full">
+                        <Tooltip title="Ver detalles">
+                          <span
+                            className="font-bold cursor-pointer hover:text-lime-500 transition-colors duration-200"
+                            onClick={() => {
+                              navigate(`/clientes/${customer.id}`)
+                            }}
+                          >
+                            <IoMdEye className="text-xl" />
+                          </span>
+                        </Tooltip>
+
+                        <Tooltip
+                          title={`Enviar encuesta a ${customer?.name} ${customer?.lastName}`}
+                        >
+                          <span
+                            className="font-bold cursor-pointer hover:text-lime-500 transition-colors duration-200"
+                            onClick={() => {
+                              handleSendRatingForm(customer)
+                            }}
+                          >
+                            <TbChecklist className="text-xl" />
+                          </span>
+                        </Tooltip>
+
+                        <Tooltip title={`Enviar encuesta para web`}>
+                          <span
+                            className="font-bold cursor-pointer hover:text-lime-500 transition-colors duration-200"
+                            onClick={() => {
+                              handleSendRatingForm(customer)
+                            }}
+                          >
+                            test
+                            <TbChecklist className="text-xl" />
+                          </span>
+                        </Tooltip>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              )
+            })}
           </div>
-        </div>
-      </Card>
-    );
-  })}
-</div>
-
-        
-
-        
         )}
 
         <div className="flex items-center mt-5">

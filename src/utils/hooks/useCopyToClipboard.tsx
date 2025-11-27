@@ -5,7 +5,6 @@ export const useCopyToClipboard = () => {
 
   const copyToClipboard = async (text: string) => {
     if (!navigator.clipboard) {
-      console.warn('Clipboard not supported')
       return
     }
 
@@ -14,7 +13,7 @@ export const useCopyToClipboard = () => {
       setIsCopied(true)
       setTimeout(() => setIsCopied(false), 2000)
     } catch (error) {
-      console.error('Failed to copy: ', error)
+      //
     }
   }
 

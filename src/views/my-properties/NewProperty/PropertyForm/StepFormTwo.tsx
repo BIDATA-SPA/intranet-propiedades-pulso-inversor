@@ -27,7 +27,6 @@ import {
 import ShowDialog from './components/dialogs/ShowDialog'
 import CommercialPremisesFields from './components/fields/CommercialPremisesFields'
 import OfficeFields from './components/fields/OfficeFields'
-import { initialState } from '../../../../store/slices/base/commonSlice'
 
 const StepFormTwo = ({ values, touched, errors, setValues, setFieldValue }) => {
   const [userAuthority] = [useAppSelector((state) => state.auth.session.rol)]
@@ -163,7 +162,7 @@ const StepFormTwo = ({ values, touched, errors, setValues, setFieldValue }) => {
                   field={field}
                   type="text"
                   size="md"
-                  className="mb-2 border-sky-500/60 border-[3px] rounded-lg"
+                  className="mb-2 border-lime-500/60 border-[3px] rounded-lg"
                   placeholder="Ej: https://www.portalinmobiliario.com/detalles-de-mi-publicacion"
                   value={values?.step2?.externalLink}
                   onChange={(e) => {
@@ -301,8 +300,8 @@ const StepFormTwo = ({ values, touched, errors, setValues, setFieldValue }) => {
       )}
 
       <div className="grid grid-cols-1 gap-0 md:grid-cols-2 md:gap-3">
-        <FormItem label="Piso(s)">
-          <Field name="step2.characteristics.floors">
+        <FormItem label="Número de Piso(s)">
+          <Field name="step2.characteristics.numberOfFloors">
             {({ field, form }: FieldProps<FormModel>) => {
               return (
                 <Select
@@ -312,7 +311,8 @@ const StepFormTwo = ({ values, touched, errors, setValues, setFieldValue }) => {
                   placeholder="Seleccionar"
                   value={filterFloors?.filter(
                     (option: TSelect) =>
-                      option.value === values?.step2?.characteristics?.floors
+                      option.value ===
+                      values?.step2?.characteristics?.numberOfFloors
                   )}
                   onChange={(option: TSelect) => {
                     form.setFieldValue(field.name, option?.value)

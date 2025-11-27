@@ -8,9 +8,9 @@ import hooks from '@/components/ui/hooks'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import {
+  useDeleteEventMutation,
   useGetAllCustomersQuery,
   useGetAllPropertiesQuery,
-  useDeleteEventMutation,
 } from '@/services/RtkQueryService'
 import dayjs from 'dayjs'
 import { Field, FieldProps, Form, Formik } from 'formik'
@@ -66,80 +66,11 @@ const colorOptions = [
     label: 'red',
     color: 'bg-red-500',
   },
-  {
-    value: 'orange',
-    label: 'orange',
-    color: 'bg-orange-500',
-  },
-  {
-    value: 'amber',
-    label: 'amber',
-    color: 'bg-amber-500',
-  },
-  {
-    value: 'yellow',
-    label: 'yellow',
-    color: 'bg-yellow-500',
-  },
-  {
-    value: 'lime',
-    label: 'lime',
-    color: 'bg-lime-500',
-  },
+
   {
     value: 'green',
     label: 'green',
     color: 'bg-green-500',
-  },
-  {
-    value: 'emerald',
-    label: 'emerald',
-    color: 'bg-emerald-500',
-  },
-  {
-    value: 'teal',
-    label: 'teal',
-    color: 'bg-teal-500',
-  },
-  {
-    value: 'cyan',
-    label: 'cyan',
-    color: 'bg-cyan-500',
-  },
-  {
-    value: 'sky',
-    label: 'sky',
-    color: 'bg-sky-500',
-  },
-  {
-    value: 'blue',
-    label: 'blue',
-    color: 'bg-blue-500',
-  },
-  {
-    value: 'indigo',
-    label: 'indigo',
-    color: 'bg-indigo-500',
-  },
-  {
-    value: 'purple',
-    label: 'purple',
-    color: 'bg-purple-500',
-  },
-  {
-    value: 'fuchsia',
-    label: 'fuchsia',
-    color: 'bg-fuchsia-500',
-  },
-  {
-    value: 'pink',
-    label: 'pink',
-    color: 'bg-pink-500',
-  },
-  {
-    value: 'rose',
-    label: 'rose',
-    color: 'bg-rose-500',
   },
 ]
 
@@ -263,15 +194,13 @@ const EventDialog = ({ submit }: EventDialogProps) => {
   const handleDelete = async () => {
     if (selected.id) {
       try {
-        await deleteEvent(selected.id) 
-        dispatch(closeDialog()) 
+        await deleteEvent(selected.id)
+        dispatch(closeDialog())
       } catch (error) {
-        console.error('Error al eliminar el evento:', error)
+        //
       }
     }
   }
-
-
 
   return (
     <Dialog
@@ -491,13 +420,13 @@ const EventDialog = ({ submit }: EventDialogProps) => {
                   <FormItem className="text-right">
                     {selected.type !== 'NEW' && (
                       <>
-                         <Button
+                        {/* <Button
                         variant="solid"
                         className="mr-2"
                         onClick={handleDelete}
                       >
                         Eliminar
-                      </Button>
+                      </Button> */}
 
                         <Button variant="solid" type="submit">
                           Actualizar
@@ -509,8 +438,7 @@ const EventDialog = ({ submit }: EventDialogProps) => {
                         Guardar
                       </Button>
                     )}
-                </FormItem>
-
+                  </FormItem>
                 </FormContainer>
               </Form>
             )

@@ -1,30 +1,30 @@
-import { useMemo, useState, useEffect } from 'react'
-import type { InputHTMLAttributes } from 'react'
 import type { ColumnFiltersState } from '@tanstack/react-table'
+import type { InputHTMLAttributes } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
-import { Select, Button, DatePicker } from '@/components/ui'
-import Table from '@/components/ui/Table'
-import Pagination from '@/components/ui/Pagination'
-import {
-  useReactTable,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFacetedMinMaxValues,
-  getPaginationRowModel,
-  flexRender,
-} from '@tanstack/react-table'
-import { HiArrowLeft, HiOutlineCalendar, HiPlusCircle } from 'react-icons/hi'
-import { useNavigate } from 'react-router'
 import { Select as SelectType } from '@/@types/select'
-import { useParams, useSearchParams } from 'react-router-dom'
+import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
+import { Button, DatePicker, Select } from '@/components/ui'
+import Pagination from '@/components/ui/Pagination'
+import Table from '@/components/ui/Table'
 import {
   useGetAllPaymentsQuery,
   useGetCustomerByIdQuery,
 } from '@/services/RtkQueryService'
-import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
+import {
+  flexRender,
+  getCoreRowModel,
+  getFacetedMinMaxValues,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  useReactTable,
+} from '@tanstack/react-table'
 import { format } from 'date-fns'
+import { HiArrowLeft, HiOutlineCalendar, HiPlusCircle } from 'react-icons/hi'
+import { useNavigate } from 'react-router'
+import { useParams, useSearchParams } from 'react-router-dom'
 
 interface DebouncedInputProps
   extends Omit<
@@ -224,7 +224,7 @@ const HistorialPagos = () => {
         <Button
           size="sm"
           variant="solid"
-          color="sky-500"
+          color="lime-500"
           onClick={() => navigate(`/clientes/${customerId}`)}
           icon={<HiArrowLeft />}
         >

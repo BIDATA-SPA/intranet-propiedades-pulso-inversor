@@ -126,9 +126,8 @@ const StepFormFour = ({ values, touched, errors }) => {
 
           <div className="w-full">
             <FormItem label="Descripción de la Propiedad en Canje">
-              {
-                values.propertyDescriptionInExchange && (
-                  <Field name="propertyDescriptionInExchange">
+              {values.propertyDescriptionInExchange && (
+                <Field name="propertyDescriptionInExchange">
                   {({ field, form }: FieldProps<FormModel>) => {
                     return (
                       <RichTextEditor
@@ -141,9 +140,7 @@ const StepFormFour = ({ values, touched, errors }) => {
                     )
                   }}
                 </Field>
-                )
-              }
-       
+              )}
             </FormItem>
           </div>
         </>

@@ -36,16 +36,22 @@ const RequestsStatistics = ({ dataRequests }: RequestsStatisticsProps) => {
       {percentages.map((item, index) => (
         <article
           key={index}
-          className="flex flex-col items-center justify-between p-2 py-3 w-full h-auto min-h-[250px] sm:min-h-[270px] rounded-md border border-sky-500 drop-shadow-2xl hover:scale-105 duration-200"
+          className="flex flex-col items-center justify-between p-2 py-3 w-full h-auto min-h-[250px] sm:min-h-[270px] rounded-md border border-lime-500 drop-shadow-2xl hover:scale-105 duration-200"
         >
           <div className="mb-3">
-            <GrHomeRounded className="text-4xl text-sky-500 group-hover:drop-shadow-lg group-hover:-translate-y-2 duration-150" />
+            <GrHomeRounded className="text-4xl text-lime-500 group-hover:drop-shadow-lg group-hover:-translate-y-2 duration-150" />
           </div>
           <h4
             className="!text-xs text-[8px] font-medium text-center mt-2 w-full whitespace-normal leading-tight"
-            title={item.name === "Metropolitana de Santiago" ? "R.M Santiago" : item.name}
+            title={
+              item.name === 'Metropolitana de Santiago'
+                ? 'R.M Santiago'
+                : item.name
+            }
           >
-            {item.name === "Metropolitana de Santiago" ? "R.M Santiago" : item.name}
+            {item.name === 'Metropolitana de Santiago'
+              ? 'R.M Santiago'
+              : item.name}
           </h4>
           <div className="text-center mt-1 w-full px-3">
             <span className="font-semibold text-gray-600 text-sm">
@@ -62,7 +68,7 @@ const RequestsStatistics = ({ dataRequests }: RequestsStatisticsProps) => {
         </article>
       ))}
     </div>
-  );
+  )
 }
 
 type MainContentEventProps = {
@@ -70,9 +76,7 @@ type MainContentEventProps = {
   dataRequests: TopState[]
 }
 
-const MainContentEvent = ({
-  dataRequests,
-}: MainContentEventProps) => {
+const MainContentEvent = ({ dataRequests }: MainContentEventProps) => {
   const hasData = dataRequests.length > 0
 
   return (

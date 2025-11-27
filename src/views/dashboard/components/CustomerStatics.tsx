@@ -1,14 +1,8 @@
 import Loading from '@/components/shared/Loading'
 import MediaSkeleton from '@/components/shared/loaders/MediaSkeleton'
 import Avatar from '@/components/ui/Avatar'
-import Card from '@/components/ui/Card'
 import { useState, type ReactNode } from 'react'
-import {
-  HiEye,
-  HiOutlineUserAdd,
-  HiOutlineUserGroup,
-  HiOutlineUsers,
-} from 'react-icons/hi'
+import { HiEye, HiOutlineUserAdd, HiOutlineUserGroup } from 'react-icons/hi'
 import { NumericFormat } from 'react-number-format'
 import { dashboardData } from '../data/scheduleData'
 
@@ -77,7 +71,7 @@ const StatisticCard = (props: StatisticCardProps) => {
             <div className="flex items-center duration-500 delay-150 group-hover:bottom-7 2xl:group-hover:bottom-6 group-hover:blur-none -bottom-full left-2 2xl:left-2 absolute z-50 justify-center w-full">
               <div className="flex text-2xl text-white p-1 transition-all duration-500 delay-200 rounded-full ">
                 <a
-                  className="transition-all duration-500 flex items-center font-medium  hover:bg-lime-700 bg-lime-600 p-1 px-2 rounded-full"
+                  className="transition-all duration-500 flex items-center font-medium  hover:bg-[#0891b2] bg-[#06b6d4] p-1 px-2 rounded-full"
                   href={path}
                 >
                   <HiEye className="mx-1" size={24} />
@@ -95,12 +89,12 @@ const CustomerStatistic = () => {
   const [loading] = useState(false)
   const { customerData } = dashboardData
 
-  const { data, isFetching, error, refetch } = useGetDashboardQuery(null, {
+  const { data } = useGetDashboardQuery(null, {
     refetchOnMountOrArgChange: true,
   })
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2 mb-3">
+    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-2 mb-3">
       <StatisticCard
         icon={<HiOutlineUserGroup />}
         avatarClass="bg-lime-500"
@@ -111,16 +105,7 @@ const CustomerStatistic = () => {
         growthRate={customerData?.totalCustomers?.growShrink}
         loading={loading}
       />
-      <StatisticCard
-        icon={<HiOutlineUsers />}
-        avatarClass="bg-lime-500"
-        label="Clientes activos"
-        nameTitle={customerData?.activeCustomers?.nameTitle}
-        value={data?.personalInfo?.customersSearch}
-        path={customerData?.activeCustomers?.path}
-        growthRate={customerData?.activeCustomers?.growShrink}
-        loading={loading}
-      />
+
       <StatisticCard
         icon={<HiOutlineUserAdd />}
         avatarClass="bg-lime-500"

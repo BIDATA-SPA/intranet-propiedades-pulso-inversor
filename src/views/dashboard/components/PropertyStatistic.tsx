@@ -1,15 +1,9 @@
-import GrowShrinkTag from '@/components/shared/GrowShrinkTag'
 import Loading from '@/components/shared/Loading'
 import MediaSkeleton from '@/components/shared/loaders/MediaSkeleton'
 import Avatar from '@/components/ui/Avatar'
-import Card from '@/components/ui/Card'
 import { useState, type ReactNode } from 'react'
+import { BsBuildingFill, BsBuildingFillAdd } from 'react-icons/bs'
 import { HiEye } from 'react-icons/hi'
-import {
-  BsBuildingFillAdd,
-  BsBuildingFillCheck,
-  BsBuildingFill,
-} from 'react-icons/bs'
 import { NumericFormat } from 'react-number-format'
 import { dashboardData } from '../data/scheduleData'
 
@@ -76,7 +70,7 @@ const StatisticCard = (props: StatisticCardProps) => {
           <div className="flex items-center duration-500 delay-150 group-hover:bottom-7 2xl:group-hover:bottom-6 group-hover:blur-none -bottom-full left-2 2xl:left-2 absolute z-50 justify-center w-full">
             <div className="flex text-2xl text-white p-1 transition-all duration-500 delay-200 rounded-full ">
               <a
-                className="transition-all duration-500 flex items-center font-medium  hover:bg-lime-700 bg-lime-600 p-1 px-2 rounded-full"
+                className="transition-all duration-500 flex items-center font-medium  hover:bg-[#0891b2] bg-[#06b6d4] p-1 px-2 rounded-full"
                 href={path}
               >
                 <HiEye className="mx-1" size={24} />
@@ -98,7 +92,7 @@ const PropertyStatistic = () => {
   })
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2 mb-3">
+    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-2 mb-3">
       <StatisticCard
         icon={<BsBuildingFill />}
         avatarClass="bg-lime-500"
@@ -109,16 +103,6 @@ const PropertyStatistic = () => {
         growthRate={propertyData?.totalProperties?.growShrink}
         loading={loading}
       />
-      {/* <StatisticCard
-        icon={<BsBuildingFillCheck />}
-        avatarClass="bg-lime-500"
-        label="Propiedades activas"
-        nameTitle={propertyData?.activeProperties?.nameTitle}
-        value={data?.personalInfo?.totalPropertiesInExchange}
-        path={propertyData?.activeProperties?.path}
-        growthRate={propertyData?.activeProperties?.growShrink}
-        loading={loading}
-      /> */}
       <StatisticCard
         icon={<BsBuildingFillAdd />}
         avatarClass="bg-lime-500"

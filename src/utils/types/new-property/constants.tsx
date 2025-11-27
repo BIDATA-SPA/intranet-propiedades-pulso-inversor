@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { FaHandshake, FaLocationDot } from 'react-icons/fa6'
+import { FaLocationDot } from 'react-icons/fa6'
 import { MdOutlineAddHome } from 'react-icons/md'
 import { RxPencil2 } from 'react-icons/rx'
 import { TSelect } from './selects'
@@ -16,7 +16,6 @@ export const tabsList: {
   },
   { value: 1, children: 'Características', icon: <RxPencil2 /> },
   { value: 2, children: 'Ubicación', icon: <FaLocationDot /> },
-  /* { value: 3, children: 'Procanje', icon: <FaHandshake /> }, */
 ]
 
 export const tabsListEdit: {
@@ -31,8 +30,6 @@ export const tabsListEdit: {
   },
   { value: 1, children: 'Características', icon: <RxPencil2 /> },
   { value: 2, children: 'Ubicación', icon: <FaLocationDot /> },
-  { value: 3, children: 'Procanje', icon: <FaHandshake /> },
-  // { value: 4, children: 'Subir', icon: <HiOutlineCloudUpload /> },
 ]
 
 export const tabsCustomersList: {
@@ -59,6 +56,7 @@ export const listCustomer: TSelect[] = [
 ]
 
 export const filterTypeOfOperation: TSelect[] = [
+  { value: 'Compra', label: 'Compra' },
   { value: 'Venta', label: 'Venta' },
   { value: 'Arriendo', label: 'Arriendo' },
   { value: 'Arriendo temporal', label: 'Arriendo temporal' },
@@ -121,12 +119,28 @@ export const filterBedrooms: TSelect[] = [
   { value: '+5', label: 'Más de 5' },
 ]
 
+export const filterParkingSpaces: TSelect[] = [
+  { value: '1', label: '1' },
+  { value: '2', label: '2' },
+  { value: '3', label: '3' },
+  { value: '4', label: '4' },
+  { value: '5', label: '5' },
+  { value: '+5', label: 'Más de 5' },
+]
+
+// export const filterTypeOfKitchens = [
+//   { value: 'Tipo isla', label: 'Tipo isla' },
+//   { value: 'Tipo forma en U', label: 'Tipo forma en U' },
+//   { value: 'Tipo peninsula', label: 'Tipo peninsula' },
+//   { value: 'Tipo en L', label: 'Tipo en L' },
+//   { value: 'Tipo en linea', label: 'Tipo en linea' },
+// ]
+
 export const filterTypeOfKitchens = [
-  { value: 'Tipo isla', label: 'Tipo isla' },
-  { value: 'Tipo forma en U', label: 'Tipo forma en U' },
-  { value: 'Tipo peninsula', label: 'Tipo peninsula' },
-  { value: 'Tipo en L', label: 'Tipo en L' },
-  { value: 'Tipo en linea', label: 'Tipo en linea' },
+  { value: 'Tradicional', label: 'Tradicional' },
+  { value: 'Abierta', label: 'Abierta' },
+  { value: 'Americana', label: 'Americana' },
+  { value: 'Otro', label: 'Otro' },
 ]
 
 export const filterTypeOfHeating = [
@@ -147,7 +161,7 @@ export const filterTypeOfHeating = [
 ]
 
 export const filterTypeOfSecurity = [
-  { value: 'Portero de Seguridad', label: 'Guardia de Seguridad' },
+  { value: 'Portero de Seguridad', label: 'Portero de Seguridad' },
   {
     value: 'Portón eléctrico y Cámara con altavoz',
     label: 'Portón eléctrico y Cámara con altavoz',

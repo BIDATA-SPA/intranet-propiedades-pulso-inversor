@@ -14,7 +14,7 @@ const NewCustomer = () => {
           <Button
             size="sm"
             variant="solid"
-            color="sky-500"
+            color="lime-500"
             icon={<HiArrowLeft />}
             onClick={() => navigate(-1)}
           >

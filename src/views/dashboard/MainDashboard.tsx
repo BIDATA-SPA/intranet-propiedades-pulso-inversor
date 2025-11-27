@@ -5,18 +5,14 @@ import TabNav from '@/components/ui/Tabs/TabNav'
 import { useGetMyInfoQuery } from '@/services/RtkQueryService'
 import { useAppSelector } from '@/store'
 import AccessDenied from '../access-denied/AccessDenied'
-import DashboardCustomer from '../dashboard-customer'
 import ActivityLog from './components/activityLog/ActivityLog'
 import ClicsOfProperties from './components/clicsOfPaginasWeb/clicsOfProperties/ClicsOfProperties'
 import ClicsOfRealtors from './components/clicsOfPaginasWeb/clicsOfRealtors/ClicsOfRealtors'
 import CountsProperties from './components/CountsProperties/CountsProperties'
 import CustomerStatistic from './components/CustomerStatics'
-import ExchangeRequests from './components/ExchangeRequests/ExchangeRequests'
-import GlobalCustomerStatistic from './components/GlobalCustomerStatics'
-import GlobalPropertyStatistic from './components/GlobalPropertyStatics'
 import MainDashboardHeader from './components/MainDashboardHeader'
 import PropertyStatistic from './components/PropertyStatistic'
-import QuickNavigation from './components/QuickNavigation'
+// import QuickNavigation from './components/QuickNavigation'
 import Schedule from './components/Schedule'
 import TopCitiesMostProperties from './components/TopCitiesMostProperties/TopCitiesMostProperties'
 import TopStatesMostProperties from './components/TopStatesMostProperties/TopStatesMostProperties'
@@ -30,9 +26,6 @@ const MainDashboard = () => {
       {/* Not authorized view */}
       {userAuthority !== 3 && userAuthority !== 2 && <AccessDenied />}
 
-      {/* Customer view */}
-      {userAuthority === 3 && <DashboardCustomer />}
-
       {/* Realtor view */}
       {userAuthority === 2 && (
         <div className="flex flex-col gap-4 h-full">
@@ -44,10 +37,6 @@ const MainDashboard = () => {
                     !data?.name ? '' : data?.name + ' ' + data?.lastName
                   }
                 />
-              </div>
-
-              <div className="flex justify-start xl:justify-center w-full items-center border rounded-full p-2 mb-2.5 xl:mb-0">
-                <QuickNavigation />
               </div>
             </div>
 
@@ -78,9 +67,6 @@ const MainDashboard = () => {
                           <ClicsOfProperties />
                         </div>
                       </div>
-                      {/* <div>
-                        <ExchangeRequests />
-                      </div> */}
                       <div>
                         <ActivityLog />
                       </div>
@@ -96,12 +82,6 @@ const MainDashboard = () => {
                 <TabContent value="tab2">
                   <div className="flex flex-col xl:flex-row gap-4 py-2">
                     <div className="flex flex-col flex-auto">
-                      <div>
-                        <GlobalCustomerStatistic />
-                      </div>
-                      {/* <div>
-                        <GlobalPropertyStatistic />
-                      </div> */}
                       <div>
                         <CountsProperties />
                       </div>

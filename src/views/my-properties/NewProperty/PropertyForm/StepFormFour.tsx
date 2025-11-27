@@ -126,19 +126,17 @@ const StepFormFour = ({ values, touched, errors, setValues }) => {
               className="mb-6"
               labelClass="!justify-start"
             >
-              {values.step4.propertyDescriptionInExchange && (
-                <Field name="step4.propertyDescriptionInExchange">
-                  {({ field, form }: FieldProps) => (
-                    <RichTextEditor
-                      value={field.value}
-                      placeholder="Ingresar una descripción de la propiedad en canje..."
-                      onChange={(val) => {
-                        form.setFieldValue(field.name, val)
-                      }}
-                    />
-                  )}
-                </Field>
-              )}
+              <Field name="step4.propertyDescriptionInExchange">
+                {({ field, form }: FieldProps) => (
+                  <RichTextEditor
+                    value={field.value}
+                    placeholder="Ingresar una descripción de la propiedad en canje..."
+                    onChange={(val) => {
+                      form.setFieldValue(field.name, val)
+                    }}
+                  />
+                )}
+              </Field>
             </FormItem>
           </div>
         )}

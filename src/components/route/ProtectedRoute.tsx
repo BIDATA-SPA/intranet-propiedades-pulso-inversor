@@ -6,11 +6,12 @@ import useAuth from '@/utils/hooks/useAuth'
 const { unAuthenticatedEntryPath } = appConfig
 
 const ProtectedRoute = () => {
-  const { authenticated } = useAuth()
+  const { authenticated } = useAuth();
 
-  const location = useLocation()
+  const location = useLocation();
+  const isWebinarRoute = location.pathname === '/webinar';
 
-  if (!authenticated) {
+  if (!authenticated && !isWebinarRoute) {
     return (
       <Navigate
         replace

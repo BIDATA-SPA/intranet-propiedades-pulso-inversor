@@ -34,6 +34,7 @@ type SignUpFormSchema = {
   email: string
   password: string
   referralCode?: string
+  origin: string
 }
 
 const validationSchema = Yup.object().shape({
@@ -42,6 +43,7 @@ const validationSchema = Yup.object().shape({
   phone: Yup.string().required('Este campo es obligatorio.'),
   dialCodeId: Yup.string().required('Este campo es obligatorio.'),
   referralCode: Yup.string().optional(),
+  origin: Yup.string().optional(),
   email: Yup.string()
     .email('Email no válido.')
     .required('Por favor, introduzca su e-mail.'),
@@ -164,6 +166,7 @@ const SignUpForm = (props: SignUpFormProps) => {
       email: normalizedEmail,
       phone,
       dialCodeId,
+      origin: 'pulsoPropiedades',
       ...(referralCode ? { referralCode } : {}),
     }
 
@@ -197,6 +200,7 @@ const SignUpForm = (props: SignUpFormProps) => {
           password: '',
           confirmPassword: '',
           referralCode: '',
+          origin: 'pulsoPropiedades',
         }}
         validationSchema={validationSchema}
         onSubmit={(values, { setSubmitting }) => {

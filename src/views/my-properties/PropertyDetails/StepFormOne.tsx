@@ -348,7 +348,7 @@ const StepFormOne = ({ values, errors, touched, setValues }) => {
                           false
                         )
                       }
-                      if (option.value !== 'Centro Comercial') {
+                      if (option.value !== 'Local Comercial') {
                         form.setFieldValue('characteristics.officeNumber', '')
                         form.setFieldValue(
                           'characteristics.floorLevelLocation',

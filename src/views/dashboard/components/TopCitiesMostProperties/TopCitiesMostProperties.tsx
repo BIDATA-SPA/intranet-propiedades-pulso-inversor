@@ -70,7 +70,7 @@ const TopCitiesMostProperties = () => {
                     },
                   },
                 },
-                colors: ['#97a822'],
+                colors: ['#1E90FF'],
                 plotOptions: {
                   bar: {
                     borderRadius: 4,

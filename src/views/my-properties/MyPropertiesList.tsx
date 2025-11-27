@@ -1,5 +1,6 @@
 import AdaptableCard from '@/components/shared/AdaptableCard'
 import Skeleton from '@/components/ui/Skeleton'
+import Tabs from '@/components/ui/Tabs'
 import { useGetAllPropertiesQuery } from '@/services/RtkQueryService'
 import { injectReducer, RootState } from '@/store'
 import {
@@ -7,12 +8,16 @@ import {
   setPropertiesData,
 } from '@/views/my-properties/store/propertyListSlice'
 import { useEffect } from 'react'
+import { HiOutlineBuildingOffice2 } from 'react-icons/hi2'
 import { useDispatch, useSelector } from 'react-redux'
+import PortalOfPortals from '../portal-of-portals'
 import PropertiesGrid from './components/PropertiesGrid'
 import PropertiesMeta from './components/PropertiesMeta'
 import PropertiesTable from './components/PropertiesTable'
 import PropertiesTableTools from './components/PropertiesTableTools'
 import reducer from './store'
+
+const { TabNav, TabList, TabContent } = Tabs
 
 injectReducer('propertiesList', reducer)
 
@@ -60,23 +65,43 @@ const MyPropertiesList = () => {
 
   return (
     <AdaptableCard>
-      <div className="lg:flex items-center justify-start mb-4">
-        <h3 className="mb-4 lg:mb-0">Mis Propiedades</h3>
-      </div>
+      <Tabs defaultValue="tab1">
+        <TabList>
+          <TabNav value="tab1" icon={<HiOutlineBuildingOffice2 />}>
+            Mis Propiedades
+          </TabNav>
+          {/* ℹ️ disable-pdp */}
+          {/* <TabNav value="tab2" icon={<FaHouseSignal />}>
+            Portal de Portales
+          </TabNav> */}
+          {/* ℹ️ end disable-pdp */}
+        </TabList>
 
-      <div className="w-full">
-        <PropertiesMeta />
-      </div>
+        <div className="p-4">
+          <TabContent value="tab1">
+            <>
+              <div className="w-full">
+                <PropertiesMeta />
+              </div>
 
-      <div className="flex justify-end flex-col lg:flex-row lg:items-center gap-4 mb-5">
-        <PropertiesTableTools />
-      </div>
+              <div className="flex justify-end flex-col lg:flex-row lg:items-center gap-4 mb-5">
+                <PropertiesTableTools />
+              </div>
 
-      <div>
-        {isPropertiesLoading && <Skeleton />}
-        {viewMode === 'list' && <PropertiesTable />}
-        {viewMode === 'grid' && <PropertiesGrid />}
-      </div>
+              <div>
+                {isPropertiesLoading && <Skeleton />}
+                {viewMode === 'list' && <PropertiesTable />}
+                {viewMode === 'grid' && <PropertiesGrid />}
+              </div>
+            </>
+          </TabContent>
+
+          {/* ! ℹ️ disable-pdp */}
+          <TabContent value="tab2">
+            <PortalOfPortals />
+          </TabContent>
+        </div>
+      </Tabs>
     </AdaptableCard>
   )
 }
