@@ -81,6 +81,7 @@ const PropertyForm = () => {
     try {
       setSubmitting(true)
       await createProperty(body).unwrap()
+
       openNotification('success', 'Creada!', 'Propiedad creada exitosamente', 3)
       setSubmitting(false)
 
@@ -162,7 +163,7 @@ const PropertyForm = () => {
   }, [isError])
 
   useEffect(() => {
-    if (error) openNotification('danger', 'Error', `${error.message}`, 3)
+    if (error) openNotification('danger', 'Error', `Error desconocido`, 3)
   }, [error])
 
   useEffect(() => {
@@ -199,7 +200,7 @@ const PropertyForm = () => {
   }
 
   const isLastStep = () => {
-    return step === 2 // Si tienes 4 pasos (0, 1, 2, 3), el último paso sería el número 3.
+    return step === 3 // Si tienes 4 pasos (0, 1, 2, 3), el último paso sería el número 3.
   }
 
   return (
@@ -225,6 +226,7 @@ const PropertyForm = () => {
             constructedSurface: '',
             surfaceUnit: '',
             floors: '',
+            numberOfFloors: '',
             terraces: '',
             bathrooms: '',
             bedrooms: '',
@@ -235,6 +237,7 @@ const PropertyForm = () => {
             hasAirConditioning: false,
             hasParking: false,
             hasGarage: false,
+            numberOfParkingSpaces: '',
             hasElevator: false,
             hasGym: false,
             hasSwimmingPool: false,
@@ -317,14 +320,14 @@ const PropertyForm = () => {
                         setFieldValue={setFieldValue}
                       />
                     </TabContent>
-                    {/* <TabContent value={3}>
+                    <TabContent value={3}>
                       <StepFormFour
                         values={values}
                         touched={touched}
                         errors={errors}
                         setValues={setValues}
                       />
-                    </TabContent> */}
+                    </TabContent>
                   </FormContainer>
 
                   <div className="flex justify-end gap-4">

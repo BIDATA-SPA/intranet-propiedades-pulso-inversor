@@ -3,31 +3,45 @@ import Badge from '@/components/ui/Badge'
 import Calendar from '@/components/ui/Calendar'
 import Card from '@/components/ui/Card'
 import {
+  useCreateEventMutation,
+  useCreateVisitOrderMutation,
   useGetEventsQuery,
   useGetVisitOrderQuery,
+  usePatchEventMutation,
+  usePatchVisitOrderMutation,
 } from '@/services/RtkQueryService'
+import { injectReducer, useAppDispatch, useAppSelector } from '@/store'
+import useNotification from '@/utils/hooks/useNotification'
 import useThemeClass from '@/utils/hooks/useThemeClass'
-import EditEventDialog from '@/views/calendario/components/EditEventDialog'
+import reducer from '@/views/my-calendar/store'
+import {
+  openDialogSchedule,
+  setSelected,
+} from '@/views/my-calendar/store/calendarSlice'
 import classNames from 'classnames'
 import { useEffect, useState } from 'react'
 import { FaFileSignature } from 'react-icons/fa'
 import { HiDocumentText } from 'react-icons/hi'
 import { LuCalendarPlus } from 'react-icons/lu'
-import { Link } from 'react-router-dom'
-import UseDialog from '../../../views/calendario/hooks/useDialogs'
+import { Link, useNavigate } from 'react-router-dom'
+import EventDialog, { EventParam } from './EventDialog'
+
+injectReducer('crmCalendar', reducer)
 
 type CombinedDataType = {
   id: string
-  date: string
   title: string
   description: string
-  type: string
-  status: []
   color: string
+  type: 'task' | 'ov'
+  start: string
+  startTime: string
+  end: string
+  endTime: string
   customerId?: string
   propertyId?: string
-  customerName: string
-  propertyName: string
+  customerName?: string
+  propertyName?: string
 }
 
 const isToday = (someDate: Date) => {
@@ -73,13 +87,25 @@ const Schedule = () => {
   const [combined, setCombined] = useState<CombinedDataType[]>([])
   const [value, setValue] = useState<Date>(new Date())
   const [filteredEvents, setFilteredEvents] = useState<CombinedDataType[]>([])
-  const [filterTask, setFilterTask] = useState('mensual')
+  const [filterTask, setFilterTask] = useState('Mensual')
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date())
   const [selectedEvent, setSelectedEvent] = useState<CombinedDataType | null>(
     null
   )
   const { textTheme } = useThemeClass()
-  const { openDialog, openUpdateDialog, closeDialogs } = UseDialog()
+  const dispatch = useAppDispatch()
+  const isDialogOpen = useAppSelector(
+    (state) => state.crmCalendar.data.dialogOpenSchedule
+  )
+  const { showNotification } = useNotification()
+  const navigate = useNavigate()
+  const [createEvent] = useCreateEventMutation()
+  const [patchEvent] = usePatchEventMutation()
+  const [createVisitOrder] = useCreateVisitOrderMutation()
+  const [patchVisitOrder] = usePatchVisitOrderMutation()
+
+  const { data: eventData } = useGetEventsQuery()
+  const { data: orderData } = useGetVisitOrderQuery()
 
   const today = new Date()
 
@@ -105,31 +131,75 @@ const Schedule = () => {
     const { startMonth, endMonth } = getStartEndOfMonth()
 
     switch (filtro) {
-      case 'diaria':
+      case 'Diaria':
         return events.filter((event) => {
-          const eventDate = new Date(event.date)
-          return eventDate.toDateString() === today.toDateString()
+          const date = new Date(event.start)
+          return date.toDateString() === today.toDateString()
         })
-      case 'semanal':
+      case 'Semanal':
         return events.filter((event) => {
-          const eventDate = new Date(event.date)
-          return eventDate >= startWeek && eventDate <= endWeek
+          const date = new Date(event.start)
+          return date >= startWeek && date <= endWeek
         })
-      case 'mensual':
+      case 'Mensual':
         return events.filter((event) => {
-          const eventDate = new Date(event.date)
-          return eventDate >= startMonth && eventDate <= endMonth
+          const date = new Date(event.start)
+          return date >= startMonth && date <= endMonth
         })
       default:
         return events
     }
   }
 
-  const { data: eventData } = useGetEventsQuery()
-  const { data: orderData } = useGetVisitOrderQuery()
-
   const handleClickFilter = (filteredSelect: string) => {
     setFilterTask(filteredSelect)
+  }
+
+  const handleEditEvent = (event: CombinedDataType) => {
+    setSelectedEvent(event)
+    dispatch(
+      setSelected({
+        id: event.id,
+        title: event.title,
+        start: event.date,
+        end: event.date,
+        startTime: event.date,
+        endTime: event.date,
+        description: event.description,
+        eventColor: event.color,
+        eventType: event.type === 'ov' ? 'visit order' : 'event',
+        customerId: Number(event.customerId) || null,
+        propertyId: Number(event.propertyId) || null,
+        type: 'UPDATE',
+      })
+    )
+    dispatch(openDialogSchedule())
+  }
+
+  const handleCreateEvent = (date: Date) => {
+    const startDate = new Date(date)
+    startDate.setHours(9, 0, 0)
+
+    const endDate = new Date(date)
+    endDate.setHours(10, 0, 0)
+
+    const newEvent: EventParam = {
+      id: '',
+      title: '',
+      start: startDate.toISOString(),
+      end: endDate.toISOString(),
+      startTime: startDate.toISOString(),
+      endTime: endDate.toISOString(),
+      description: '',
+      eventColor: 'blue',
+      eventType: 'event',
+      customerId: null,
+      propertyId: null,
+      type: 'NEW',
+    }
+
+    dispatch(setSelected(newEvent))
+    dispatch(openDialogSchedule())
   }
 
   const truncate = (str: string, n: number) => {
@@ -138,37 +208,123 @@ const Schedule = () => {
 
   useEffect(() => {
     if (eventData && orderData) {
-      const combined = [
-        ...eventData.map((event) => ({ ...event, type: 'task' })),
+      const unifiedEvents: CombinedDataType[] = [
+        ...eventData.map((event) => ({
+          id: event.id,
+          title: event.title,
+          description: event.description,
+          color: event.color,
+          start: event.start,
+          startTime: event.startTime,
+          end: event.end,
+          endTime: event.endTime,
+          type: 'task',
+          customerId: event.customer?.id || '',
+          propertyId: event.propertyId || '',
+          customerName: event.customer
+            ? `${event.customer.name} ${event.customer.lastName}`
+            : '',
+          propertyName: '', // los "event" no traen objeto property
+        })),
         ...orderData.map((order) => ({
-          ...order,
+          id: order.id,
+          title: order.title,
+          description: order.description,
+          color: order.color,
+          start: order.start,
+          startTime: order.startTime,
+          end: order.end,
+          endTime: order.endTime,
           type: 'ov',
-          customerName: `${order?.customer?.name} ${order?.customer?.lastName}`,
-          propertyName: order?.property?.propertyTitle,
+          customerId: order.customer?.id || '',
+          propertyId: order.propertyId || '',
+          customerName: order.customer
+            ? `${order.customer.name} ${order.customer.lastName}`
+            : '',
+          propertyName: order.property?.propertyTitle || '',
         })),
       ]
-      setCombined(combined)
+
+      setCombined(unifiedEvents)
     }
   }, [eventData, orderData])
 
   useEffect(() => {
-    if (value) {
-      const filtered = combined.filter((event) => {
-        const eventDate = new Date(event.date)
-        return eventDate.toDateString() === value.toDateString()
-      })
-      setFilteredEvents(filtered)
-    }
-  }, [value, combined])
-
-  const handleEditEvent = (event: CombinedDataType) => {
-    setSelectedEvent(event)
-    openUpdateDialog()
-  }
-
-  useEffect(() => {
     setFilteredEvents(filterEvents(combined, filterTask))
   }, [combined, filterTask, selectedDate])
+
+  const onSubmit = async (formData: EventParam, type: string) => {
+    const {
+      eventType,
+      title,
+      start,
+      startTime,
+      end,
+      endTime,
+      description,
+      eventColor,
+      customerId,
+      propertyId,
+    } = formData
+
+    const baseData = {
+      title,
+      start,
+      startTime,
+      end,
+      endTime,
+      description,
+      eventColor,
+      eventType,
+    }
+
+    try {
+      if (eventType === 'event') {
+        if (type === 'NEW') {
+          await createEvent(baseData).unwrap()
+          showNotification('success', 'Exito', 'Evento creado exitosamente')
+          navigate('/mi-calendario')
+        } else if (type === 'UPDATE') {
+          await patchEvent({ id: Number(formData.id), ...baseData }).unwrap()
+          showNotification(
+            'success',
+            'Exito',
+            'Evento actualizado exitosamente'
+          )
+          navigate('/mi-calendario')
+        }
+      } else if (eventType === 'visit order') {
+        const visitOrderData = {
+          ...baseData,
+          customerId,
+          propertyId,
+        }
+
+        if (type === 'NEW') {
+          await createVisitOrder(visitOrderData).unwrap()
+          showNotification(
+            'success',
+            'Exito',
+            'Orden de visita creada correctamente'
+          )
+          navigate('/mi-calendario')
+        } else if (type === 'UPDATE') {
+          await patchVisitOrder({
+            id: Number(formData.id),
+            ...visitOrderData,
+          }).unwrap()
+          showNotification(
+            'success',
+            'Exito',
+            'Orden de visita actualizada correctamente'
+          )
+          navigate('/mi-calendario')
+        }
+      }
+    } catch (error) {
+      showNotification('danger', 'Exito', `${error || 'Ha ocurrido un error'}`)
+    }
+  }
 
   return (
     <Card className="mb-4 shadow-md md:max-h-full 2xl:max-h-[90vh] overflow-hidden pb-2">
@@ -178,23 +334,17 @@ const Schedule = () => {
           value={selectedDate}
           dayClassName={(date, { selected }) => {
             const defaultClass = 'text-base'
-
             if (isToday(date) && !selected) {
               return classNames(defaultClass, textTheme)
             }
-
             if (selected) {
               return classNames(defaultClass, 'text-white')
             }
-
             return defaultClass
           }}
-          dayStyle={() => {
-            return { height: 48 }
-          }}
+          dayStyle={() => ({ height: 48 })}
           renderDay={(date) => {
             const day = date.getDate()
-
             const hasEvents = combined.some((eventDay) => {
               const eventDate = new Date(eventDay.date)
               return (
@@ -203,7 +353,6 @@ const Schedule = () => {
                 eventDate.getFullYear() === date.getFullYear()
               )
             })
-
             return (
               <span className="relative flex justify-center items-center w-full h-full">
                 {day}
@@ -218,45 +367,50 @@ const Schedule = () => {
           }}
           onChange={(val) => {
             setValue(val)
+            setSelectedDate(val)
+            handleCreateEvent(val)
           }}
         />
       </div>
+
       <hr className="my-3" />
-      <div className="flex flex-row justify-between mb-2 items-center">
-        <h5 className="">Mi Agenda</h5>
+      <div className="flex justify-between mb-2 items-center">
+        <h5>Mi Agenda</h5>
         <Link
           to="/mi-calendario"
-          className="bg-lime-200 p-2 rounded-md text-lime-600 hover:scale-105 duration-200 font-medium"
+          className="bg-sky-200 p-2 rounded-md text-sky-600 hover:scale-105 duration-200 font-medium"
         >
           <LuCalendarPlus className="text-lg" title="Ir Calendario" />
         </Link>
       </div>
-      <div className="flex flex-row justify-between  mb-4 items-center">
+
+      <div className="flex justify-between mb-4 items-center">
         <div className="flex items-center">
           <span className="font-medium">Ordenar</span>
           <Dropdown title={filterTask} trigger="hover">
             <Dropdown.Item
-              eventKey="diaria"
-              onSelect={() => handleClickFilter('diaria')}
+              eventKey="Diaria"
+              onSelect={() => handleClickFilter('Diaria')}
             >
-              diarias
+              Diarias
             </Dropdown.Item>
             <Dropdown.Item
-              eventKey="semanal"
-              onSelect={() => handleClickFilter('semanal')}
+              eventKey="Semanal"
+              onSelect={() => handleClickFilter('Semanal')}
             >
-              semanales
+              Semanales
             </Dropdown.Item>
             <Dropdown.Item
-              eventKey="mensual"
-              onSelect={() => handleClickFilter('mensual')}
+              eventKey="Mensual"
+              onSelect={() => handleClickFilter('Mensual')}
             >
-              mensuales
+              Mensuales
             </Dropdown.Item>
           </Dropdown>
         </div>
         <p>{filteredEvents.length} Eventos</p>
       </div>
+
       <div className="h-[300px] 2xl:h-[280px] pr-1 overflow-y-auto">
         {filteredEvents.length !== 0 ? (
           filteredEvents.map((event) => (
@@ -273,17 +427,16 @@ const Schedule = () => {
                   </h6>
                   <div className="flex flex-row gap-1 text-center">
                     <span>
-                      {new Date(event.date).toLocaleDateString('es-ES', {
+                      {new Date(event.start).toLocaleDateString('es-ES', {
                         day: '2-digit',
                         month: 'short',
                         year: 'numeric',
                       })}
                     </span>
                     <span>
-                      {new Date(event.date).toLocaleTimeString('es-ES', {
-                        timeZone: 'UTC',
+                      {new Date(event.start).toLocaleTimeString('es-ES', {
                         hour: '2-digit',
-                        minute: 'numeric',
+                        minute: '2-digit',
                       })}{' '}
                       hrs
                     </span>
@@ -293,13 +446,11 @@ const Schedule = () => {
                     <div className="text-sm">
                       <span>
                         Propiedad:{' '}
-                        {event?.propertyName ||
-                          'Error al obtener nombre propiedad'}
+                        {event?.propertyName || 'Error al obtener nombre'}
                       </span>
                       <span>
                         Cliente:{' '}
-                        {event?.customerName ||
-                          'Error al obtener nombre cliente'}
+                        {event?.customerName || 'Error al obtener cliente'}
                       </span>
                     </div>
                   )}
@@ -308,20 +459,15 @@ const Schedule = () => {
             </div>
           ))
         ) : (
-          <div className="items-center gap-3 mt-7">
-            <h6 className="text-sm font-medium text-center mx-auto">
+          <div className="text-center mt-7">
+            <h6 className="text-sm font-medium">
               No hay eventos creados para este día
             </h6>
           </div>
         )}
       </div>
-      {openDialog.update && (
-        <EditEventDialog
-          openDialog={openDialog.update}
-          closeDialogs={closeDialogs}
-          eventData={selectedEvent}
-        />
-      )}
+
+      {isDialogOpen && <EventDialog submit={onSubmit} />}
     </Card>
   )
 }

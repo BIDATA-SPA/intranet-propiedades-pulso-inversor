@@ -32,7 +32,6 @@ const PropertyDetails = () => {
       start: null,
       end: null,
     },
-    externalLink: '',
     currencyId: '',
     propertyPrice: 0,
     highlighted: false,
@@ -60,6 +59,7 @@ const PropertyDetails = () => {
       surfaceUnit: '',
       constructedSurface: '',
       floors: '',
+      numberOfFloors: '',
       terraces: '',
       bedrooms: '',
       bathrooms: '',
@@ -70,6 +70,7 @@ const PropertyDetails = () => {
       hasAirConditioning: false,
       hasParking: false,
       hasGarage: false,
+      numberOfParkingSpaces: false,
       hasElevator: false,
       hasGym: false,
       hasSwimmingPool: false,
@@ -90,6 +91,7 @@ const PropertyDetails = () => {
       officeNumber: '',
       commonExpenses: '',
     },
+    externalLink: '',
     address: {
       countryId: '',
       stateId: '',
@@ -157,6 +159,7 @@ const PropertyDetails = () => {
           surfaceUnit: data?.characteristics?.surfaceUnit,
           constructedSurface: data?.characteristics?.constructedSurface,
           floors: data?.characteristics?.floors,
+          numberOfFloors: data?.characteristics?.numberOfFloors,
           terraces: data?.characteristics?.terraces,
           bedrooms: data?.characteristics?.bedrooms,
           bathrooms: data?.characteristics?.bathrooms,
@@ -167,6 +170,7 @@ const PropertyDetails = () => {
           hasAirConditioning: data?.characteristics?.hasAirConditioning,
           hasParking: data?.characteristics?.hasParking,
           hasGarage: data?.characteristics?.hasGarage,
+          numberOfParkingSpaces: data?.characteristics?.numberOfParkingSpaces,
           hasElevator: data?.characteristics?.hasElevator,
           hasGym: data?.characteristics?.hasGym,
           hasSwimmingPool: data?.characteristics?.hasSwimmingPool,
@@ -175,7 +179,6 @@ const PropertyDetails = () => {
           locatedInCondominium: data?.characteristics?.locatedInCondominium,
           isFurnished: data?.characteristics?.isFurnished,
           hasBarbecueArea: data?.characteristics?.hasBarbecueArea,
-
           numberOfPrivate: data?.characteristics?.numberOfPrivate,
           numberOfVacantFloors: data?.characteristics?.numberOfVacantFloors,
           numberOfMeetingRooms: data?.characteristics?.numberOfMeetingRooms,
@@ -234,6 +237,7 @@ const PropertyDetails = () => {
           surfaceUnit: '',
           constructedSurface: '',
           floors: '',
+          numberOfFloors: '',
           terraces: '',
           bedrooms: '',
           bathrooms: '',
@@ -244,6 +248,7 @@ const PropertyDetails = () => {
           hasAirConditioning: false,
           hasParking: false,
           hasGarage: false,
+          numberOfParkingSpaces: false,
           hasElevator: false,
           hasGym: false,
           hasSwimmingPool: false,
@@ -311,7 +316,7 @@ const PropertyDetails = () => {
       <div className="container mx-auto">
         <div className="w-full flex flex-col lg:flex-row gap-5">
           <div className="w-full xl:w-1/2">
-            <Card className="w-full lg:w-[100%] border-t-4 border-t-lime-400 dark:border-t-lime-400">
+            <Card className="w-full lg:w-[100%] border-t-4 border-t-sky-400 dark:border-t-sky-400">
               <PropertyForm
                 isEditingFields={isEditingFields}
                 setIsEditingFields={setIsEditingFields}
@@ -328,7 +333,7 @@ const PropertyDetails = () => {
         </div>
         <div id="scroll-target" className="h-0"></div>
         <div id="publicar" className="my-4">
-          <Card className="w-full lg:w-[100%] border-t-4 border-t-lime-400 dark:border-t-lime-400">
+          <Card className="w-full lg:w-[100%] border-t-4 border-t-sky-400 dark:border-t-sky-400">
             <UploadImage images={sortedImages} />
           </Card>
         </div>

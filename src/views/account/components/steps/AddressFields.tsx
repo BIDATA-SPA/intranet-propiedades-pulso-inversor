@@ -41,10 +41,10 @@ const AddressFields: React.FC<AddressFieldsProps> = ({
     null
   )
   const [selectedState, setSelectedState] = useState<StateOption | null>(null)
-  const [selectedCity, setSelectedCity] = useState<{
+  const [selectedCities, setSelectedCities] = useState<{
     value: number
     label: string
-  } | null>(null)
+  }[]>([])
   const [statesOptions, setStatesOptions] = useState<StateOption[]>([])
   const { data: preferredAreas } = useGetPreferredAreasQuery({})
 
@@ -82,23 +82,21 @@ const AddressFields: React.FC<AddressFieldsProps> = ({
   useEffect(() => {
     const countryId = values?.[`${prefix}.countryId`]
     const stateId = values?.[`${prefix}.stateId`]
-    const cityId = values?.[`${prefix}.cityId`]
+    const cityIds = values?.[`${prefix}.cityIds`] || []
 
-    if (
-      countries?.length &&
-      statesOptions?.length &&
-      countryId &&
-      stateId &&
-      cityId
-    ) {
+    if (countries?.length && statesOptions?.length && countryId && stateId) {
       const foundCountry = countries.find((c) => c.value === countryId)
       const foundState = statesOptions.find((s) => s.value === stateId)
-      const foundCity = foundState?.cities?.find((c) => c.id === cityId)
-
+      
       if (foundCountry) setSelectedCountry(foundCountry)
       if (foundState) setSelectedState(foundState)
-      if (foundCity)
-        setSelectedCity({ value: foundCity.id, label: foundCity.name })
+      
+      if (cityIds.length > 0 && foundState?.cities) {
+        const selected = foundState.cities
+          .filter(city => cityIds.includes(city.id))
+          .map(city => ({ value: city.id, label: city.name }))
+        setSelectedCities(selected)
+      }
     }
   }, [countries, statesOptions, values, prefix])
 
@@ -130,9 +128,9 @@ const AddressFields: React.FC<AddressFieldsProps> = ({
                 setSelectedCountry(option)
                 setFieldValue(`${prefix}.countryId`, option.value)
                 setFieldValue(`${prefix}.stateId`, '')
-                setFieldValue(`${prefix}.cityId`, '')
+                setFieldValue(`${prefix}.cityIds`, [])
                 setSelectedState(null)
-                setSelectedCity(null)
+                setSelectedCities([])
               }}
             />
           )}
@@ -165,8 +163,8 @@ const AddressFields: React.FC<AddressFieldsProps> = ({
               onChange={(option: any) => {
                 setSelectedState(option)
                 setFieldValue(`${prefix}.stateId`, option.value)
-                setFieldValue(`${prefix}.cityId`, '')
-                setSelectedCity(null)
+                setFieldValue(`${prefix}.cityIds`, [])
+                setSelectedCities([])
               }}
             />
           )}
@@ -177,10 +175,10 @@ const AddressFields: React.FC<AddressFieldsProps> = ({
       <FormItem
         asterisk
         label="Comuna"
-        errorMessage={getIn(errors, `${prefix}.cityId`)}
-        invalid={!!getIn(errors, `${prefix}.cityId`)}
+        errorMessage={getIn(errors, `${prefix}.cityIds`)}
+        invalid={!!getIn(errors, `${prefix}.cityIds`)}
       >
-        <Field name={`${prefix}.cityId`}>
+        <Field name={`${prefix}.cityIds`}>
           {({ field, form }: FieldProps) => (
             <Select
               placeholder="Seleccionar..."
@@ -193,15 +191,20 @@ const AddressFields: React.FC<AddressFieldsProps> = ({
                   label: city.name,
                 })) || []
               }
-              value={selectedCity}
+              value={selectedCities}
+              isMulti
               noOptionsMessage={() =>
                 !selectedState
                   ? 'Seleccione una región primero'
                   : 'No hay comunas disponibles'
               }
-              onChange={(option: any) => {
-                setSelectedCity(option)
-                setFieldValue(`${prefix}.cityId`, option.value)
+              onChange={(options: any) => {
+                const selectedOptions = options || []
+                setSelectedCities(selectedOptions)
+                setFieldValue(
+                  `${prefix}.cityIds`,
+                  selectedOptions.map((opt: any) => opt.value)
+                )
               }}
             />
           )}

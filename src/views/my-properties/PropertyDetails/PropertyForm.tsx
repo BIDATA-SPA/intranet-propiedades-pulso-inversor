@@ -89,6 +89,7 @@ const PropertyForm = ({
       constructedSurface,
       surfaceUnit,
       floors,
+      numberOfFloors,
       terraces,
       bathrooms,
       bedrooms,
@@ -98,6 +99,7 @@ const PropertyForm = ({
       typeOfHeating,
       hasAirConditioning,
       hasGarage,
+      numberOfParkingSpaces,
       hasParking,
       hasElevator,
       hasGym,
@@ -155,6 +157,7 @@ const PropertyForm = ({
           hasAirConditioning,
           hasParking,
           hasGarage,
+          numberOfParkingSpaces,
           hasElevator,
           hasGym,
           hasSwimmingPool,
@@ -200,6 +203,7 @@ const PropertyForm = ({
 
     try {
       setIsLoading(true)
+
       await updateProperty({ id: propertyId, ...body }).unwrap()
     } catch (error) {
       throw new Error(error.message)
@@ -247,11 +251,11 @@ const PropertyForm = ({
               <TabNav value="tab3" icon={<FaLocationDot />}>
                 Ubicación
               </TabNav>
-              {/* {userAuthority === 2 ? (
+              {userAuthority === 2 ? (
                 <TabNav value="tab4" icon={<FaHandshake />}>
                   Canje
                 </TabNav>
-              ) : null} */}
+              ) : null}
             </TabList>
 
             <div className="flex flex-col h-[550px] overflow-y-scroll px-4 pt-4">
@@ -284,13 +288,13 @@ const PropertyForm = ({
                     />
                   </TabContent>
 
-                  {/* <TabContent value="tab4">
+                  <TabContent value="tab4">
                     <StepFormFour
                       values={values}
                       touched={touched}
                       errors={errors}
                     />
-                  </TabContent> */}
+                  </TabContent>
                   <div className="bottom-0 sticky z-10 w-100 bg-white dark:bg-gray-800 left-2 right-2 pt-5 flex justify-end">
                     <Button
                       type="submit"

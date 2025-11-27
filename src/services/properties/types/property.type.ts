@@ -29,11 +29,13 @@ export type Property = {
     name?: string
     lastName?: string
   }
+  externalLink: string
   characteristics?: {
     surface?: string
     constructedSurface?: string
     surfaceUnit?: string
     floors?: string
+    numberOfFloors?: string
     terraces?: string
     bedrooms?: string
     bathrooms?: string
@@ -44,6 +46,7 @@ export type Property = {
     hasAirConditioning?: boolean
     hasParking?: boolean
     hasGarage?: boolean
+    numberOfParkingSpaces?: string
     hasElevator?: boolean
     hasGym?: boolean
     hasSwimmingPool?: boolean
@@ -77,6 +80,7 @@ export type Property = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string
+  property_portales?: { id: string; name: string }[]
 }
 
 // selected item
@@ -123,6 +127,7 @@ export type TSelectedItem = {
     hasAirConditioning: boolean
     hasParking: boolean
     hasGarage: boolean
+    numberOfParkingSpaces?: string
     hasElevator: boolean
     hasGym: boolean
     hasKitchen: boolean
@@ -180,6 +185,7 @@ export type CreatePropertyBody = {
     highlighted?: boolean
     isActive?: boolean
     observations?: string
+    externalLink?: string
     characteristics: {
       surface?: string
       constructedSurface?: string
@@ -194,6 +200,7 @@ export type CreatePropertyBody = {
       typeOfHeating?: string
       hasAirConditioning?: boolean
       hasGarage?: boolean
+      numberOfParkingSpaces?: string
       hasParking?: boolean
       hasElevator?: boolean
       hasGym?: boolean
@@ -274,6 +281,7 @@ export type CreatePropertyFormModel = {
     typeOfHeating?: string
     hasAirConditioning?: boolean
     hasGarage?: boolean
+    numberOfParkingSpaces?: string
     hasParking?: boolean
     hasElevator?: boolean
     hasGym?: boolean

@@ -75,9 +75,9 @@ const defaultColorList: Record<
     dot: 'bg-cyan-500',
   },
   sky: {
-    bg: 'bg-sky-50 dark:bg-sky-500/10',
-    text: 'text-sky-500 dark:text-sky-100',
-    dot: 'bg-sky-500',
+    bg: 'bg-sky-50 dark:bg-lime-500/10',
+    text: 'text-lime-500 dark:text-sky-100',
+    dot: 'bg-lime-500',
   },
   blue: {
     bg: 'bg-blue-50 dark:bg-blue-500/10',

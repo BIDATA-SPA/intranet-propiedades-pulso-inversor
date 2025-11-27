@@ -20,6 +20,7 @@ export type CalendarState = {
   loading: boolean
   eventList: Events
   dialogOpen: boolean
+  dialogOpenSchedule: boolean
   selected: {
     type: string
   } & Partial<Event>
@@ -31,6 +32,7 @@ const initialState: CalendarState = {
   loading: false,
   eventList: [],
   dialogOpen: false,
+  dialogOpenSchedule: false,
   selected: {
     type: '',
     id: null,
@@ -63,10 +65,22 @@ const calendarSlice = createSlice({
     setSelected: (state, action) => {
       state.selected = action.payload
     },
+    openDialogSchedule: (state) => {
+      state.dialogOpenSchedule = true
+    },
+    closeDialogSchedule: (state) => {
+      state.dialogOpenSchedule = false
+    },
   },
 })
 
-export const { updateEvent, openDialog, closeDialog, setSelected } =
-  calendarSlice.actions
+export const {
+  updateEvent,
+  openDialog,
+  closeDialog,
+  setSelected,
+  openDialogSchedule,
+  closeDialogSchedule,
+} = calendarSlice.actions
 
 export default calendarSlice.reducer

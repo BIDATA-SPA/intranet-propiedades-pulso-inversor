@@ -1,11 +1,11 @@
-import { forwardRef } from 'react'
 import classNames from 'classnames'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useForm } from './context'
+import { AnimatePresence, motion } from 'framer-motion'
+import type { ReactNode } from 'react'
+import { forwardRef } from 'react'
+import type { CommonProps, TypeAttributes } from '../@types/common'
 import { useConfig } from '../ConfigProvider'
 import { CONTROL_SIZES, LAYOUT } from '../utils/constants'
-import type { CommonProps, TypeAttributes } from '../@types/common'
-import type { ReactNode } from 'react'
+import { useForm } from './context'
 
 export interface FormItemProps extends CommonProps {
   asterisk?: boolean

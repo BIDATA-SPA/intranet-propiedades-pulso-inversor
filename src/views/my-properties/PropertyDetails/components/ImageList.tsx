@@ -137,21 +137,23 @@ const ImageList = ({ images }: ImageListProps) => {
               </Button>
             </div>
 
-            <div className="w-full overflow-x-hidden grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
-              {imageOrder?.length > 0 ? (
-                imageOrder?.map((image, index) => (
-                  <SortableItem
-                    key={image.id}
-                    id={image.id}
-                    path={image.path}
-                    index={index}
-                  />
-                ))
-              ) : (
-                <p className="w-full">
-                  Esta propiedad aún no cuenta con imágenes publicadas.
-                </p>
-              )}
+            {!imageOrder?.length && (
+              <div className="flex w-full text-center justify-center">
+                <p>Aún no se han publicado Imágenes de esta propiedad</p>
+              </div>
+            )}
+
+            <div className="w-full overflow-x-hidden grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-4">
+              {imageOrder?.length > 0
+                ? imageOrder?.map((image, index) => (
+                    <SortableItem
+                      key={image.id}
+                      id={image.id}
+                      path={image.path}
+                      index={index}
+                    />
+                  ))
+                : null}
             </div>
           </SortableContext>
         </DndContext>

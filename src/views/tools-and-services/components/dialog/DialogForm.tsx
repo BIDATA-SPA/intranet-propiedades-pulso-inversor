@@ -64,7 +64,6 @@ const DialogForm = ({
         onDialogClose()
         return
       }
-      // ⚠️ handel server error
     }
 
     if (action === 'update') {
@@ -78,7 +77,6 @@ const DialogForm = ({
         onDialogClose()
         return
       }
-      // ⚠️ handel server error
     }
   }
 

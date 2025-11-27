@@ -41,7 +41,7 @@ const _UserDropdown = ({ className }: CommonProps) => {
             textOverflow: 'ellipsis',
             maxWidth: '150px',
           }}
-          title={"${data?.name ?? ''} ${data?.lastName ?? ''}"}
+          title={`${data?.name ?? ''} ${data?.lastName ?? ''}`}
         >
           {!data?.name ? '' : data?.name}{' '}
           {!data?.lastName ? '' : data?.lastName}

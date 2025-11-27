@@ -4,6 +4,7 @@ import { useAppSelector } from '@/store'
 import { format } from 'date-fns'
 import { useEffect, useState } from 'react'
 import { HiArrowLeft } from 'react-icons/hi'
+import { TbWorld } from 'react-icons/tb'
 import { useNavigate, useParams } from 'react-router-dom'
 import UserAvatarForm from './UserAvatarForm'
 import UserForm from './UserForm'
@@ -94,7 +95,7 @@ const UserDetails = () => {
         <Button
           size="sm"
           variant="solid"
-          color="sky-500"
+          color="lime-500"
           icon={<HiArrowLeft />}
           onClick={() => navigate('/')}
         >
@@ -116,18 +117,21 @@ const UserDetails = () => {
                     </h4>
                     <UserAvatarForm data={data} />
 
-                    {userAuthority === 2
-                      ? data?.webPage && (
-                          <a
-                            href={data?.webPage}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="hover:underline"
-                          >
-                            <span className="text-sky-500">{`${data?.webPage}`}</span>
-                          </a>
-                        )
-                      : null}
+                    {data?.webPage && (
+                      <div className="my-4 border w-full rounded-full p-1.5 flex items-center group justify-center hover:bg-lime-100/50 hover:border hover:border-lime-500">
+                        <span>
+                          <TbWorld className="text-xl text-gray-400" />
+                        </span>
+                        <a
+                          href={data?.webPage}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="w-full h-full flex items-center justify-center hover:no-underline hover:text-lime-600"
+                        >
+                          <span className="text-lime-500">{`${data?.webPage}`}</span>
+                        </a>
+                      </div>
+                    )}
                   </>
                 )}
               </div>

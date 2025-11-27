@@ -1,13 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { SignInCredential, SignUpCredential } from '@/@types/auth'
 import appConfig from '@/configs/app.config'
 import { REDIRECT_URL_KEY } from '@/constants/app.constant'
 import { RolesEnum } from '@/enums/roles.enum'
 import {
   apiSignIn,
-  apiSignOut,
   apiSignUp,
   apiSignUpCustomer,
+  apiSignUpWebinar,
 } from '@/services/AuthService'
+import { useGetPdpTokenMutation } from '@/services/RtkQueryService'
 import {
   addRefreshTimeout,
   signInSuccess,
@@ -15,6 +17,7 @@ import {
   useAppDispatch,
   useAppSelector,
 } from '@/store'
+import { setPdpToken } from '@/store/slices/auth/pdpAuthSlice'
 import { useNavigate } from 'react-router-dom'
 import openNotification from '../openNotification'
 import { refreshSession } from '../refresh-session'
@@ -22,36 +25,44 @@ import useQuery from './useQuery'
 
 type Status = 'success' | 'failed'
 
+const ONE_HOUR_MS = 60 * 60 * 1000 // 1 hora
+
 function useAuth() {
   const dispatch = useAppDispatch()
-
   const navigate = useNavigate()
-
   const query = useQuery()
 
-  const { token, signedIn, refreshTimeouts, rol } = useAppSelector(
-    (state) => state.auth.session
-  )
+  const { token, signedIn, rol } = useAppSelector((state) => state.auth.session)
+
+  // servicio que trae el token PDP
+  const [fetchPdpToken] = useGetPdpTokenMutation()
 
   const handleSignOut = () => {
-    for (const timeout of refreshTimeouts) {
-      clearTimeout(timeout)
-    }
-
+    // limpia sesión de PDP
+    dispatch(
+      signInSuccess({
+        access_token: null,
+        refresh_token: null,
+        expirationInSeconds: null,
+        type: null,
+        rol: null,
+        sede: null,
+      })
+    )
     dispatch(signOutSuccess())
 
-    navigate(appConfig.unAuthenticatedEntryPath)
+    // limpia token de PDP
+    dispatch(
+      setPdpToken({
+        token: '',
+        ttlMs: -1,
+      })
+    )
   }
 
   const signIn = async (
     values: SignInCredential
-  ): Promise<
-    | {
-        status: Status
-        message: string
-      }
-    | undefined
-  > => {
+  ): Promise<{ status: Status; message: string } | undefined> => {
     try {
       const resp = await apiSignIn(values)
       if (!resp.data) {
@@ -80,16 +91,28 @@ function useAuth() {
       const timeout = setTimeout(async () => {
         await refreshSession()
       }, expirationInSeconds * 1000)
-
       dispatch(addRefreshTimeout({ timeout }))
+
+      try {
+        const { token: pdpToken } = await fetchPdpToken().unwrap()
+
+        dispatch(
+          setPdpToken({
+            token: pdpToken,
+            ttlMs: ONE_HOUR_MS,
+          })
+        )
+      } catch (pdpErr) {
+        //
+      }
 
       const redirectUrl = query.get(REDIRECT_URL_KEY)
       navigate(redirectUrl ? redirectUrl : appConfig.authenticatedEntryPath)
+
       return {
         status: 'success',
         message: '',
       }
-      // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     } catch (errors: any) {
       return {
         status: 'failed',
@@ -114,11 +137,10 @@ function useAuth() {
         }, 4 * 1000)
 
         return {
-          status: 'success',
+          status: 'success' as const,
           message: 'ok',
         }
       }
-      // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     } catch (errors: any) {
       openNotification(
         'warning',
@@ -132,7 +154,7 @@ function useAuth() {
       }, 4 * 1000)
 
       return {
-        status: 'failed',
+        status: 'failed' as const,
         message:
           errors?.response?.data?.message ||
           errors.toString() ||
@@ -157,11 +179,10 @@ function useAuth() {
         }, 4 * 1000)
 
         return {
-          status: 'success',
+          status: 'success' as const,
           message: 'ok',
         }
       }
-      // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     } catch (errors: any) {
       openNotification(
         'warning',
@@ -175,7 +196,49 @@ function useAuth() {
       }, 4 * 1000)
 
       return {
-        status: 'failed',
+        status: 'failed' as const,
+        message:
+          errors?.response?.data?.message ||
+          errors.toString() ||
+          'Este correo ya se encuentra registrado',
+      }
+    }
+  }
+
+  const signUpWebinar = async (values: SignUpCredential) => {
+    try {
+      const resp = await apiSignUpWebinar(values)
+      if (resp.data) {
+        openNotification(
+          'success',
+          'Registro Completo',
+          '¡Registro exitoso! Redireccionando...',
+          4
+        )
+
+        setTimeout(() => {
+          window.location.href = 'https://procanje.com/evento-webinar'
+        }, 4 * 1000)
+
+        return {
+          status: 'success' as const,
+          message: 'ok',
+        }
+      }
+    } catch (errors: any) {
+      openNotification(
+        'warning',
+        'Error al crear cuenta',
+        'Al parecer este correo ya se encuentra registrado. Por favor, utiliza un correo diferente.',
+        4
+      )
+
+      setTimeout(() => {
+        navigate('/webinar')
+      }, 4 * 1000)
+
+      return {
+        status: 'failed' as const,
         message:
           errors?.response?.data?.message ||
           errors.toString() ||
@@ -185,9 +248,8 @@ function useAuth() {
   }
 
   const signOut = async () => {
-    await apiSignOut()
-
     handleSignOut()
+    navigate('/iniciar-sesion')
   }
 
   return {
@@ -196,9 +258,8 @@ function useAuth() {
     signIn,
     signUp,
     signOut,
-
-    // customer session
     signUpCustomer,
+    signUpWebinar,
   }
 }
 

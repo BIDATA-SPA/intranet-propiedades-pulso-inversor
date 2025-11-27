@@ -1,12 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Select as SelectType } from '@/@types/select'
-import {
-  DatePicker,
-  FormItem,
-  Notification,
-  Select,
-  toast,
-} from '@/components/ui'
+import { DatePicker, FormItem, Select } from '@/components/ui'
 import {
   useGetAllCustomersQuery,
   useGetMyInfoQuery,
@@ -39,10 +33,9 @@ const StepFormOne = ({ values, errors, touched, setValues }) => {
   const [currentPage] = useState(+searchParams.get('page') || 1)
   const [search] = useState(searchParams.get('search') || '')
 
-  const { data: user } = useGetMyInfoQuery(
-    {},
-    { refetchOnMountOrArgChange: true }
-  )
+  const { data: user } = useGetMyInfoQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  })
   const [userAuthority] = [useAppSelector((state) => state.auth.session.rol)]
 
   const { data: filterAllCustomers } = useGetAllCustomersQuery(
@@ -66,44 +59,47 @@ const StepFormOne = ({ values, errors, touched, setValues }) => {
     setSearchParams(queryParams)
   }, [pageSize, currentPage, search])
 
-  const openNotification = (
-    type: 'success' | 'warning' | 'danger' | 'info',
-    title: string,
-    text: string,
-    duration = 5
-  ) => {
-    toast.push(
-      <Notification title={title} type={type} duration={duration * 1000}>
-        {text}
-      </Notification>,
-      { placement: 'top-center' }
-    )
-  }
+  //   const openNotification = (
+  //     type: 'success' | 'warning' | 'danger' | 'info',
+  //     title: string,
+  //     text: string,
+  //     duration = 5
+  //   ) => {
+  //     toast.push(
+  //       <Notification title={title} type={type} duration={duration * 1000}>
+  //         {text}
+  //       </Notification>,
+  //       { placement: 'top-center' }
+  //     )
+  //   }
 
   /** If the type of operation is "sales" and it matches with the type of "parking" property, both fields will be reset. */
-  const showNotMatch = useCallback(() => {
-    const { typeOfOperationId, typeOfPropertyId } = values.step1
+  //   const showNotMatch = useCallback(() => {
+  //     const { typeOfOperationId, typeOfPropertyId } = values.step1
 
-    if (
-      typeOfOperationId === filterTypeOfOperation[0].value &&
-      typeOfPropertyId === filterTypeOfProperty[5].value
-    ) {
-      openNotification(
-        'warning',
-        'Error',
-        'El inmueble de estacionamiento no pertenece a un tipo de operación venta.',
-        4
-      )
-      setValues((prevValues) => ({
-        ...prevValues,
-        step1: {
-          ...prevValues.step1,
-          typeOfOperationId: '',
-          typeOfPropertyId: '',
-        },
-      }))
-    }
-  }, [values?.step1?.typeOfOperationId, values?.step1?.typeOfPropertyId])
+  //     if (
+  //       typeOfOperationId === filterTypeOfOperation[0].value &&
+  //       typeOfPropertyId === filterTypeOfProperty[5].value
+  //     ) {
+  //       openNotification(
+  //         'warning',
+  //         'Error',
+  //         'El inmueble de estacionamiento no pertenece a un tipo de operación venta.',
+  //         4
+  //       )
+  //       setValues((prevValues) => ({
+  //         ...prevValues,
+  //         step1: {
+  //           ...prevValues.step1,
+  //           typeOfOperationId: '',
+  //           typeOfPropertyId: '',
+  //         },
+  //       }))
+  //     }
+  //   }, [values?.step1?.typeOfOperationId, values?.step1?.typeOfPropertyId])
+  //   useEffect(() => {
+  //     showNotMatch()
+  //   }, [values?.step1, setValues])
 
   /** Clears inputs of type date as long as they are different from "Temporary lease" */
   const resetDatePicker = useCallback(() => {
@@ -120,10 +116,6 @@ const StepFormOne = ({ values, errors, touched, setValues }) => {
       }))
     }
   }, [values?.step1?.typeOfOperationId, setValues])
-
-  useEffect(() => {
-    showNotMatch()
-  }, [values?.step1, setValues])
 
   useEffect(() => {
     resetDatePicker()
@@ -240,7 +232,7 @@ const StepFormOne = ({ values, errors, touched, setValues }) => {
                       false
                     )
                   }
-                  if (option.value !== 'Centro Comercial') {
+                  if (option.value !== 'Local Comercial') {
                     form.setFieldValue('step2.characteristics.officeNumber', '')
                     form.setFieldValue(
                       'step2.characteristics.floorLevelLocation',

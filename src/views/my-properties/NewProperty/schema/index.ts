@@ -17,7 +17,11 @@ export const validationSchema = Yup.object().shape({
   }),
   step2: Yup.object().shape({
     highlighted: Yup.boolean().optional(),
-    observations: Yup.string(),
+    observations: Yup.string()
+      .nullable()
+      .notRequired()
+      .trim()
+      .max(5120, 'No puede exceder los 5120 caracteres.'),
     characteristics: Yup.object().shape({
       surface: Yup.string().optional(),
       constructedSurface: Yup.string()
@@ -34,6 +38,7 @@ export const validationSchema = Yup.object().shape({
       // surface: Yup.string().optional(),
       // constructedSurface: Yup.string().optional(),
       floors: Yup.string().optional(),
+      numberOfFloors: Yup.string().optional(),
       terraces: Yup.string().optional(),
       bathrooms: Yup.string().optional(),
       bedrooms: Yup.string().optional(),
@@ -44,6 +49,7 @@ export const validationSchema = Yup.object().shape({
       hasAirConditioning: Yup.boolean().optional(),
       hasParking: Yup.boolean().optional(),
       hasGarage: Yup.boolean().optional(),
+      numberOfParkingSpaces: Yup.string().optional().nullable(),
       hasElevator: Yup.boolean().optional(),
       hasGym: Yup.boolean().optional(),
       hasSwimmingPool: Yup.boolean().optional(),

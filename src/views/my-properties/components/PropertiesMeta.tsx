@@ -1,6 +1,6 @@
 import { Alert, Card, Spinner, Tooltip } from '@/components/ui'
 import { MdErrorOutline } from 'react-icons/md'
-import { TbHomeCheck, TbHomeDollar, TbHomeShare } from 'react-icons/tb'
+import { TbHomeCheck } from 'react-icons/tb'
 import { useMetadata } from '../hooks/use-metadata'
 
 interface MetaCardProps {
@@ -68,26 +68,6 @@ const PropertiesMeta = () => {
           value={metadata?.totalProperties}
           icon={<TbHomeCheck />}
           iconClass="bg-gray-500"
-        />
-
-        {/* <MetaCard
-          isFetching={isMetadataFetching}
-          isError={isMetadataError}
-          errorMessage={isMetadataErrorMsg}
-          title="Propiedades en Canje"
-          value={metadata?.totalPropertiesInExchange}
-          icon={<TbHomeShare />}
-          iconClass="bg-sky-500"
-        /> */}
-
-        <MetaCard
-          isFetching={isMetadataFetching}
-          isError={isMetadataError}
-          errorMessage={isMetadataErrorMsg}
-          title="Propiedades Vendidas"
-          value={metadata?.totalPropertiesSold}
-          icon={<TbHomeDollar />}
-          iconClass="bg-green-500"
         />
       </div>
     </div>

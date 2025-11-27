@@ -59,122 +59,93 @@ const SignInForm = (props: SignInFormProps) => {
     try {
       const result = await signInAdmin({
         username: normalizedEmail,
-        password: values.password,
+        password,
         grant_type: '',
       })
 
-      if ('error' in result) {
-        const { message, statusCode } = result.error.data || {}
-
-        // Mostrar mensaje en un toast
-        if (statusCode === 401) {
-          showNotification(
-            'danger',
-            'Acceso no autorizado',
-            'Usuario o contraseña incorrectos.'
-          )
-        } else {
-          showNotification(
-            'warning',
-            'Error',
-            message || 'Ha ocurrido un problema con el servidor.'
-          )
-        }
+      // CASO 1: Credenciales inválidas
+      if ('error' in result && result.error?.message === 'Unauthorized') {
+        showNotification(
+          'danger',
+          'Credenciales inválidas',
+          'Usuario o contraseña incorrectos.'
+        )
         resetForm({
           values: { username: '', password: '', grant_type: '' },
         })
         return
       }
 
-      const { type, rol }: SignInResponse = result.data
-
-      // User type logic
-      if (type === userTypes[0] && rol === userTypes[0]) {
+      // CASO 2: Usuario no ha confirmado su email
+      if (
+        'error' in result &&
+        result.error?.message?.toLowerCase()?.includes('confirma tu cuenta')
+      ) {
         showNotification(
-          'danger',
-          'Error',
-          'Este usuario no pertenece a esta sesión'
+          'warning',
+          'Cuenta no confirmada',
+          'Debes confirmar tu correo electrónico para poder iniciar sesión.'
         )
         resetForm({
           values: { username: '', password: '', grant_type: '' },
         })
-      } else if (type === userTypes[1] && rol === userTypes[1]) {
-        signIn({ username: normalizedEmail, password })
-        showNotification('success', 'Éxito', 'Sesión iniciada exitosamente.')
-      } else if (type === userTypes[2] && rol === userTypes[2]) {
-        signIn({ username: normalizedEmail, password })
-        showNotification('success', 'Éxito', 'Sesión iniciada exitosamente.')
-      } else {
+        return
+      }
+
+      // CASO 3: Inicio de sesión exitoso
+      if ('data' in result && result.data?.access_token) {
+        const { type, rol }: SignInResponse = result.data
+
+        if (type === userTypes[0] && rol === userTypes[0]) {
+          showNotification(
+            'danger',
+            'Acceso denegado',
+            'Este usuario no pertenece a esta sesión.'
+          )
+          resetForm({
+            values: { username: '', password: '', grant_type: '' },
+          })
+          return
+        }
+
+        if (
+          (type === userTypes[1] && rol === userTypes[1]) ||
+          (type === userTypes[2] && rol === userTypes[2])
+        ) {
+          signIn({ username: normalizedEmail, password })
+          showNotification('success', 'Éxito', 'Sesión iniciada exitosamente.')
+          return
+        }
+
+        // Caso no contemplado de tipo o rol
         showNotification(
           'warning',
           'Advertencia',
-          'Tipo de usuario no reconocido.'
+          'Tipo de usuario no reconocido. Contacta al administrador.'
         )
+        return
       }
-    } catch (err: any) {
+
+      // CASO 4: Error inesperado sin estructura clara
       showNotification(
         'warning',
-        'Error',
-        err?.message || 'Ocurrió un error inesperado.'
+        'Error inesperado',
+        'Ha ocurrido un problema con el servidor. Intenta más tarde.'
+      )
+      resetForm({
+        values: { username: '', password: '', grant_type: '' },
+      })
+    } catch (err: any) {
+      // Errores de red o excepciones no controladas
+      showNotification(
+        'danger',
+        'Error inesperado',
+        err?.message || 'Ocurrió un error inesperado en el servidor.'
       )
     } finally {
       setSubmitting(false)
     }
   }
-
-  // const onSignIn = async (
-  //   values: SignInFormSchema,
-  //   { setSubmitting, resetForm }
-  // ) => {
-  //   if (disableSubmit) {
-  //     setSubmitting(false)
-  //     return
-  //   }
-
-  //   const { username, password } = values
-  //   const normalizedEmail = username.toLowerCase().trim()
-
-  //   try {
-  //     const {
-  //       data: { type, rol },
-  //     }: { data: SignInResponse } | any = await signInAdmin({
-  //       username: normalizedEmail,
-  //       password: values.password,
-  //       grant_type: '',
-  //     })
-
-  //     // Super admin session
-  //     if (type === userTypes[0] && rol === userTypes[0]) {
-  //       resetForm({
-  //         values: { username: '', password: '', grant_type: '' },
-  //       })
-  //       showNotification(
-  //         'danger',
-  //         'Error',
-  //         'Este usuario no pertenece a esta sesión'
-  //       )
-  //     }
-
-  //     // Realtor session
-  //     if (type === userTypes[1] && rol === userTypes[1]) {
-  //       signIn({ username: normalizedEmail, password })
-  //       showNotification('success', 'Éxito', 'Sesión iniciada exitosamente.')
-  //     }
-
-  //     // Customer session
-  //     if (type === userTypes[2] && rol === userTypes[2]) {
-  //       signIn({ username: normalizedEmail, password })
-  //       showNotification('success', 'Éxito', 'Sesión iniciada exitosamente.')
-  //     }
-  //   } catch (err) {
-  //     showNotification('warning', 'Error', `${err && err.message}`)
-  //     resetForm({
-  //       values: { username: '', password: '', grant_type: '' },
-  //     })
-  //   } finally {
-  //     setSubmitting(false)
-  //   }
-  // }
 
   return (
     <div className={className}>

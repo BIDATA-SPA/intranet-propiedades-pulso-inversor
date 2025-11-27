@@ -127,7 +127,7 @@ const ClicsOfProperties = () => {
             />
             <div className="flex justify-end mx-4 m-1 mb-2 cursor-pointer">
               <p
-                className="italic hover:scale-x-105 duration-150 text-lime-400"
+                className="italic hover:scale-x-105 duration-150 text-sky-400"
                 onClick={() => handleDialogOpen()}
               >
                 Ver más detalles

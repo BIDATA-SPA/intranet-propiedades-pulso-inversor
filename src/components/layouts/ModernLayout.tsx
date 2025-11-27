@@ -10,6 +10,7 @@ import { useAppSelector } from '@/store'
 import View from '@/views'
 import { useEffect, useState } from 'react'
 import ConverseDivise from '../Divisas/ConverseDivise'
+import SupportAppChat from '../shared/SupportAppChat'
 import UserAlert from '../shared/UserAlert'
 import WhatsAppChat from '../shared/WhatsAppChat'
 
@@ -110,6 +111,8 @@ const ModernLayout = () => {
           <View />
         </div>
       </div>
+
+      <SupportAppChat />
       <WhatsAppChat />
     </div>
   )

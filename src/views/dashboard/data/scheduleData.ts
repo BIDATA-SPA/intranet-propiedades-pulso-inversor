@@ -1,9 +1,4 @@
 export const dashboardData = {
-  // staticsData: {
-  //     totalCustomers: { value: 2420 , a:1000},
-  //     activeCustomers: { value: 1897 , a:2000},
-  //     newCustomers: { value: 241 , a: 3000},
-  // },
   scheduleData: [
     {
       id: '0',
@@ -56,12 +51,6 @@ export const dashboardData = {
       path: '/clientes',
       growShrink: 1.2,
     },
-    activeCustomers: {
-      nameTitle: 'Oportunidades de clientes',
-      value: 25,
-      path: '/buzon-de-clientes',
-      growShrink: -3.7,
-    },
     newCustomers: {
       nameTitle: 'Nuevos clientes',
       value: 9,
@@ -95,12 +84,6 @@ export const dashboardData = {
       path: '/mis-propiedades',
       growShrink: 17.2,
     },
-    activeProperties: {
-      nameTitle: 'Propiedades de Canje activas',
-      value: 64,
-      path: '/buzon-de-propiedades',
-      growShrink: 32.7,
-    },
     newProperties: {
       nameTitle: 'Nuevas propiedades creadas',
       value: 9,
@@ -113,16 +96,6 @@ export const dashboardData = {
       nameTitle: 'Total propiedades en Canje',
       value: 136,
       growShrink: 17.2,
-    },
-    activeProperties: {
-      nameTitle: 'Propiedades nuevas en Canje',
-      value: 64,
-      growShrink: 32.7,
-    },
-    newProperties: {
-      nameTitle: 'Propiedades similares en Canje',
-      value: 97,
-      growShrink: -2.3,
     },
   },
 

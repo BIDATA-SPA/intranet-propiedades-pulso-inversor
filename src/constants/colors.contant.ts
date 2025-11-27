@@ -72,7 +72,7 @@ export const colorOptions: ColorOption[] = [
   {
     value: 'sky',
     label: 'cielo',
-    color: 'bg-sky-500',
+    color: 'bg-lime-500',
   },
   {
     value: 'blue',

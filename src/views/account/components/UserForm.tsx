@@ -6,20 +6,13 @@ import TabContent from '@/components/ui/Tabs/TabContent'
 import TabList from '@/components/ui/Tabs/TabList'
 import TabNav from '@/components/ui/Tabs/TabNav'
 import { CreateRealtorFormModel } from '@/services/user/types/user.type'
-import { useAppSelector } from '@/store'
 import { Form, Formik } from 'formik'
 import cloneDeep from 'lodash/cloneDeep'
-import { FaKey, FaShareAlt, FaStarHalfAlt } from 'react-icons/fa'
-import { FaMagnifyingGlassLocation } from 'react-icons/fa6'
 import { HiOutlineUserAdd } from 'react-icons/hi'
 import { useNavigate, useParams } from 'react-router-dom'
 import useUpdateUser from '../hooks/useUpdateUser'
 import { validationEditSchema } from '../schema'
-import AddressPreferences from './steps/AddressPreferences'
-import ApiKeyPortal from './steps/ApiKeyPortal'
 import MainInformation from './steps/MainInformation'
-import RatingInformation from './steps/RatingInformation'
-import RefCodeRealtors from './steps/RefCodeRealtors'
 
 type FormModel = Partial<CreateRealtorFormModel>
 
@@ -28,8 +21,7 @@ type UserFormProps = {
   data: any
 }
 
-const UserForm = ({ initialValues, data }: UserFormProps) => {
-  const [userAuthority] = [useAppSelector((state) => state.auth.session.rol)]
+const UserForm = ({ initialValues }: UserFormProps) => {
   const { userId } = useParams<{ userId: string }>()
   const { updateUser, isLoading } = useUpdateUser()
   const navigate = useNavigate()
@@ -53,22 +45,6 @@ const UserForm = ({ initialValues, data }: UserFormProps) => {
         <TabNav value="tab1" icon={<HiOutlineUserAdd />}>
           Información Principal
         </TabNav>
-        {userAuthority === 2 && (
-          <>
-            <TabNav value="tab2" icon={<FaMagnifyingGlassLocation />}>
-              Ubicaciones preferentes de búsqueda
-            </TabNav>
-            <TabNav value="tab3" icon={<FaShareAlt />}>
-              Corredores referidos
-            </TabNav>
-            <TabNav value="tab4" icon={<FaStarHalfAlt />}>
-              Calificaciones
-            </TabNav>
-            <TabNav value="tab5" icon={<FaKey />}>
-              API KEY (SITIO WEB)
-            </TabNav>
-          </>
-        )}
       </TabList>
 
       <div className="p-4">
@@ -113,25 +89,6 @@ const UserForm = ({ initialValues, data }: UserFormProps) => {
               </Form>
             )}
           </Formik>
-        </TabContent>
-
-        {/* TAB 2: Contenido sin formulario */}
-        <TabContent value="tab2">
-          <AddressPreferences />
-        </TabContent>
-
-        {/* TAB 3: Contenido sin formulario */}
-        <TabContent value="tab3">
-          <RefCodeRealtors data={data} />
-        </TabContent>
-
-        {/* TAB 4: Contenido sin formulario */}
-        <TabContent value="tab4">
-          <RatingInformation />
-        </TabContent>
-
-        <TabContent value="tab5">
-          <ApiKeyPortal />
         </TabContent>
       </div>
     </Tabs>

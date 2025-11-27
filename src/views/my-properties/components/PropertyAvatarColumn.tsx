@@ -1,6 +1,8 @@
 import EmblaCarousel from '@/components/shared/embla/EmblaCarousel'
+import { Tooltip } from '@/components/ui'
 import Avatar from '@/components/ui/Avatar'
 import Dialog from '@/components/ui/Dialog'
+import { truncateString } from '@/utils/truncateString'
 import { EmblaOptionsType } from 'embla-carousel'
 import { useState } from 'react'
 import { IoHomeSharp } from 'react-icons/io5'
@@ -42,10 +44,12 @@ const PropertyAvatarColumn = ({ row }) => {
         className="flex items-center rounded w-full cursor-pointer hover:underline"
         onClick={openDialog}
       >
-        <div className="w-[30%]">{avatar}</div>
-        <span className={`ml-2 rtl:mr-2 font-semibold w-[70%]`}>
-          {row?.propertyTitle}
-        </span>
+        <div className="mr-2">{avatar}</div>
+        <Tooltip title={row?.propertyTitle}>
+          <span className={`ml-2 rtl:mr-2 font-semibold text-nowrap`}>
+            {truncateString(row?.propertyTitle, 30)}
+          </span>
+        </Tooltip>
       </div>
 
       <Dialog

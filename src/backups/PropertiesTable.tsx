@@ -295,33 +295,6 @@ const PropertiesTable: React.FC = () => {
         },
       },
       {
-        header: 'Estado de canje',
-        accessorKey: 'statusExchange',
-        cell: (cellProps) => {
-          const { isExchanged } = cellProps.row.original
-          return (
-            <div className="flex items-center justify-start">
-              <span
-                className={classNames(
-                  'badge-dot',
-                  isExchanged && 'bg-sky-500',
-                  !isExchanged && 'bg-gray-500'
-                )}
-              ></span>
-              <span
-                className={classNames(
-                  'ml-2 rtl:mr-2 capitalize font-semibold',
-                  isExchanged && 'text-sky-500',
-                  !isExchanged && 'text-gray-500'
-                )}
-              >
-                {isExchanged ? 'En Canje' : 'Estado no definido'}
-              </span>
-            </div>
-          )
-        },
-      },
-      {
         header: 'Estado de Propiedad',
         accessorKey: 'statusProperty',
         cell: (cellProps) => {

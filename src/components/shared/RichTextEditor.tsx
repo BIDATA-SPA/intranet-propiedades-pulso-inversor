@@ -1,15 +1,15 @@
-import React, {
-  forwardRef,
-  useImperativeHandle,
-  useState,
-  useEffect,
-  useRef,
-} from 'react'
-import { EditorState, convertToRaw, ContentState } from 'draft-js'
-import { Editor } from 'react-draft-wysiwyg'
-import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
+import { EditorState } from 'draft-js'
 import { stateToHTML } from 'draft-js-export-html'
 import { stateFromHTML } from 'draft-js-import-html'
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useState,
+} from 'react'
+import { Editor } from 'react-draft-wysiwyg'
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 
 type RichTextEditorProps = {
   value?: string
@@ -21,31 +21,45 @@ export type RichTextEditorRef = {
   getEditorState: () => EditorState
 }
 
+const normalizeHtml = (html: string) =>
+  (html || '').replace(/\s+/g, ' ').replace(/>\s+</g, '><').trim()
+
 const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(
   ({ value = '', placeholder, onChange }, ref) => {
-    const [editorState, setEditorState] = useState(() =>
-      value
-        ? EditorState.createWithContent(stateFromHTML(value))
-        : EditorState.createEmpty()
+    const initialEditorState = useMemo(
+      () =>
+        value
+          ? EditorState.createWithContent(stateFromHTML(value))
+          : EditorState.createEmpty(),
+      []
     )
+    const [editorState, setEditorState] =
+      useState<EditorState>(initialEditorState)
 
     useImperativeHandle(ref, () => ({
       getEditorState: () => editorState,
     }))
 
     useEffect(() => {
-      let isMounted = true
-      if (value && isMounted) {
-        setEditorState(EditorState.createWithContent(stateFromHTML(value)))
+      const currentHtml = normalizeHtml(
+        stateToHTML(editorState.getCurrentContent())
+      )
+      const incomingHtml = normalizeHtml(value)
+
+      if (incomingHtml === currentHtml) return
+
+      if (!incomingHtml) {
+        setEditorState(EditorState.createEmpty())
+      } else {
+        setEditorState(
+          EditorState.createWithContent(stateFromHTML(incomingHtml))
+        )
       }
-      return () => {
-        isMounted = false
-      }
-    }, [])
-    
+    }, [value])
+
     const handleEditorStateChange = (state: EditorState) => {
+      setEditorState(state)
       if (onChange) {
-        setEditorState(state)
         const contentState = state.getCurrentContent()
         const htmlString = stateToHTML(contentState).replace(/\n/g, '')
         onChange(htmlString)
@@ -60,8 +74,12 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(
           wrapperClassName="wrapperClassName"
           editorClassName="editorClassName"
           placeholder={placeholder}
+          editorStyle={{
+            border: '1px solid #f1f1f1',
+            minHeight: '200px',
+            padding: '1rem',
+          }}
           onEditorStateChange={handleEditorStateChange}
-          editorStyle={{ border: '1px solid #f1f1f1', minHeight: '200px' }}
         />
       </div>
     )
@@ -69,5 +87,4 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(
 )
 
 RichTextEditor.displayName = 'RichTextEditor'
-
 export default RichTextEditor

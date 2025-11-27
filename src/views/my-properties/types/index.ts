@@ -53,6 +53,7 @@ interface Characteristics {
   surface: string
   constructedSurface: string
   floors: string
+  numberOfFloors: string
   terraces: string
   bedrooms: string
   bathrooms: string
@@ -62,6 +63,7 @@ interface Characteristics {
   hasAirConditioning: boolean
   hasParking: boolean
   hasGarage: boolean
+  numberOfParkingSpaces: string
   hasElevator: boolean
   hasGym: boolean
   hasKitchen: boolean
