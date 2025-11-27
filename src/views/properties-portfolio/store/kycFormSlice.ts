@@ -241,7 +241,7 @@ export const initialState: KycFormState = {
       addressPublic: '',
     },
     financialInformation: {
-      isExchanged: true,
+      isExchanged: false,
       timeInExchange: {
         start: null,
         end: null,
