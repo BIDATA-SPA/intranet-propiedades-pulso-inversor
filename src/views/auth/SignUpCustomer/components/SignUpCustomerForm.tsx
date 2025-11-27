@@ -127,6 +127,7 @@ const SignUpCustomerForm = (props: SignUpFormProps) => {
         stateId: null,
         cityId: null,
       },
+      origin: 'pulsoPropiedades',
     }
 
     try {
@@ -147,16 +148,6 @@ const SignUpCustomerForm = (props: SignUpFormProps) => {
       )
     }
   }
-  // development.fullstack.2025@gmail.com
-  // 21323_324few@J
-
-  // prueba como cliente
-  // axelrodcas7@gmail.com
-
-  // 21323_324few@J
-
-  // cliente.demo@gmail.com
-  // 21323_324few@J1
 
   return (
     <div className={className}>
@@ -169,6 +160,7 @@ const SignUpCustomerForm = (props: SignUpFormProps) => {
           email: '',
           password: '',
           confirmPassword: '',
+          origin: 'pulsoPropiedades',
         }}
         validationSchema={validationSchema}
         onSubmit={(values, { setSubmitting }) => {

@@ -32,7 +32,9 @@ export function getCustomersQuery(builder: EndpointBuilderType) {
           return (baseQueryReturnValue as unknown as Customer[]).map(
             (item) => ({
               value: parseInt(item.id),
-              label: `${item.name} ${item.lastName}`,
+              label: `${item.name} ${item.lastName} ${
+                item?.alias && `(${item.alias})`
+              }`,
             })
           )
         }

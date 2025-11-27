@@ -1,37 +1,11 @@
 import RtkQueryService from '@/services/RtkQueryService'
-import aliedRealtorList, {
-  AliedRealtorListState,
-} from '@/views/alied-realtor/store'
-import ratingUserList, { RatingUserListState } from '@/views/rating-user/store'
-
-import propertiesResumeList, {
-  PropertiesResumeListState,
-} from '@/views/dashboard-customer/components/dashboard-tabs/dashboard-content/properties/store/resumePropertySlice'
-import serviceList, {
-  ServiceListState,
-} from '@/views/external-services/store/serviceListSlice'
-import aliedRealtorRequestList, {
-  AliedRealtorRequestListState,
-} from '@/views/inbox-request/contact-managment/store'
-import campaignsList, {
-  CampaignsListState,
-} from '@/views/mark-potencial/ads-campaing/store/campaignListSlice'
-import brandsList, {
-  BrandsListState,
-} from '@/views/mark-potencial/mark-design/store/brandListSlice'
-import webDesignsList, {
-  WebDesignsListState,
-} from '@/views/mark-potencial/web-design/store/webDesignListSlice'
+import pdpAuth, { PdpAuthState } from '@/store/slices/auth/pdpAuthSlice'
 import propertiesList, {
   PropertiesListState,
 } from '@/views/my-properties/store/propertyListSlice'
-import referredRealtorList, {
-  ReferredRealtorListState,
-} from '@/views/referred-realtor/store'
 import toolsAndServices, {
   ToolsAndServicesState,
 } from '@/views/tools-and-services/store/toolsAndServicesSlice'
-
 import { AnyAction, CombinedState, Reducer, combineReducers } from 'redux'
 import auth, { AuthState } from './slices/auth'
 import base, { BaseState } from './slices/base'
@@ -47,21 +21,10 @@ export type RootState = CombinedState<{
   base: CombinedState<BaseState>
   locale: LocaleState
   theme: ThemeState
-
-  // Modules
-  serviceList: ServiceListState
   toolsAndServices: ToolsAndServicesState
   propertiesList: PropertiesListState
-  propertiesResumeList: PropertiesResumeListState
-  brandsList: BrandsListState
-  campaignsList: CampaignsListState
-  webDesignsList: WebDesignsListState
-  aliedRealtorList: AliedRealtorListState
-  aliedRealtorRequestList: AliedRealtorRequestListState
-  referredRealtorList: ReferredRealtorListState
   crmCalendar: CalendarState
-  ratingUserList: RatingUserListState
-
+  pdpAuth: PdpAuthState
   /* eslint-disable @typescript-eslint/no-explicit-any */
   [RtkQueryService.reducerPath]: any
 }>
@@ -75,18 +38,10 @@ const staticReducers = {
   base,
   locale,
   theme,
-  serviceList,
   toolsAndServices,
   propertiesList,
-  propertiesResumeList,
-  brandsList,
-  campaignsList,
-  webDesignsList,
-  aliedRealtorList,
-  aliedRealtorRequestList,
-  referredRealtorList,
   crmCalendar,
-  ratingUserList,
+  pdpAuth,
   [RtkQueryService.reducerPath]: RtkQueryService.reducer,
 }
 

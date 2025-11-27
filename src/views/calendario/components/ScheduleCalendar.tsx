@@ -21,8 +21,12 @@ import EditEventDialog from './EditEventDialog'
 
 import UseDialogVisitOrd from '../hooks/useDialogVisitOr'
 
+import { injectReducer } from '@/store'
+import reducer from '@/views/my-calendar/store'
 import CreateVisitOrderDialog from '../visitOrder/components/CreateVisitOrder'
 import EditVisitOrderDialog from '../visitOrder/components/EditVisitOrder'
+
+injectReducer('crmCalendar', reducer)
 
 type CombinedDataType = {
   id: string
@@ -395,7 +399,7 @@ const ScheduleCalendar = () => {
             </div>
             <div className="flex mb-2 gap-4">
               <button
-                className="flex gap-2 p-2 px-2 items-center bg-sky-500 hover:scale-105 duration-200 text-gray-50 rounded-md mx-auto"
+                className="flex gap-2 p-2 px-2 items-center bg-lime-500 hover:scale-105 duration-200 text-gray-50 rounded-md mx-auto"
                 onClick={() => handleShowCreate(selectedDate)}
               >
                 <FaPlus />

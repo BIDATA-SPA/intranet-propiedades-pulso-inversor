@@ -243,7 +243,7 @@ const EditVisitOrderDialog = ({
                 type="submit"
                 variant="solid"
                 loading={patchVisitOrderLoading}
-                className="bg-sky-500 text-white w-full"
+                className="bg-lime-500 text-white w-full"
               >
                 Guardar
               </Button>

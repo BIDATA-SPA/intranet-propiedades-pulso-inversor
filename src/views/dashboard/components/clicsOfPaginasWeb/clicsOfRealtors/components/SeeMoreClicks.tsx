@@ -27,9 +27,9 @@ const StadisticsClicks = ({ dataClicks }) => {
   return (
     <>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 overflow-hidden my-2 mt-4 sm:mx-5 p-4 sm:p-2">
-        <article className="flex flex-col group items-center p-2 py-3 w-full h-44 sm:h-40 rounded-md border border-sky-500 drop-shadow-2xl hover:scale-105 duration-200">
+        <article className="flex flex-col group items-center p-2 py-3 w-full h-44 sm:h-40 rounded-md border border-lime-500 drop-shadow-2xl hover:scale-105 duration-200">
           <div className="mb-3">
-            <TbUserSquareRounded className="text-4xl text-sky-500 group-hover:drop-shadow-lg group-hover:-translate-y-2 duration-150" />
+            <TbUserSquareRounded className="text-4xl text-lime-500 group-hover:drop-shadow-lg group-hover:-translate-y-2 duration-150" />
           </div>
           <div className="text-center mt-3">
             <span className="font-semibold  ">
@@ -41,9 +41,9 @@ const StadisticsClicks = ({ dataClicks }) => {
             </div>
           </div>
         </article>
-        <article className="flex flex-col group items-center p-2 py-3 w-full h-44 sm:h-40 rounded-md border border-sky-500 drop-shadow-2xl hover:scale-105 duration-200">
+        <article className="flex flex-col group items-center p-2 py-3 w-full h-44 sm:h-40 rounded-md border border-lime-500 drop-shadow-2xl hover:scale-105 duration-200">
           <div className="mb-3">
-            <MdOutlineConnectWithoutContact className="text-4xl text-sky-500 group-hover:drop-shadow-lg group-hover:-translate-y-2 duration-150" />
+            <MdOutlineConnectWithoutContact className="text-4xl text-lime-500 group-hover:drop-shadow-lg group-hover:-translate-y-2 duration-150" />
           </div>
           <div className="text-center mt-3">
             <span className="font-semibold">
@@ -57,9 +57,9 @@ const StadisticsClicks = ({ dataClicks }) => {
             </div>
           </div>
         </article>
-        <article className="flex flex-col group items-center p-2 py-3 w-full h-44 sm:h-40 rounded-md border border-sky-500 drop-shadow-2xl hover:scale-105 duration-200">
+        <article className="flex flex-col group items-center p-2 py-3 w-full h-44 sm:h-40 rounded-md border border-lime-500 drop-shadow-2xl hover:scale-105 duration-200">
           <div className="mb-3">
-            <GrContactInfo className="text-4xl text-sky-500 group-hover:drop-shadow-lg group-hover:-translate-y-2 duration-150" />
+            <GrContactInfo className="text-4xl text-lime-500 group-hover:drop-shadow-lg group-hover:-translate-y-2 duration-150" />
           </div>
           <div className="text-center mt-3">
             <span className="font-semibold">
@@ -73,9 +73,9 @@ const StadisticsClicks = ({ dataClicks }) => {
             </div>
           </div>
         </article>
-        <article className="flex flex-col group items-center p-2 py-3 w-full h-44 sm:h-40 rounded-md border border-sky-500 drop-shadow-2xl hover:scale-105 duration-200">
+        <article className="flex flex-col group items-center p-2 py-3 w-full h-44 sm:h-40 rounded-md border border-lime-500 drop-shadow-2xl hover:scale-105 duration-200">
           <div className="mb-3">
-            <FaWpforms className="text-4xl text-sky-500 group-hover:drop-shadow-lg group-hover:-translate-y-2 duration-150" />
+            <FaWpforms className="text-4xl text-lime-500 group-hover:drop-shadow-lg group-hover:-translate-y-2 duration-150" />
           </div>
           <div className="text-center mt-3">
             <span className="font-semibold">
@@ -89,9 +89,9 @@ const StadisticsClicks = ({ dataClicks }) => {
             </div>
           </div>
         </article>
-        <article className="flex flex-col group items-center p-2 py-3 w-full h-44 sm:h-40 rounded-md border border-sky-500 drop-shadow-2xl hover:scale-105 duration-200">
+        <article className="flex flex-col group items-center p-2 py-3 w-full h-44 sm:h-40 rounded-md border border-lime-500 drop-shadow-2xl hover:scale-105 duration-200">
           <div className="mb-3">
-            <MdWeb className="text-4xl text-sky-500 group-hover:drop-shadow-lg group-hover:-translate-y-2 duration-150" />
+            <MdWeb className="text-4xl text-lime-500 group-hover:drop-shadow-lg group-hover:-translate-y-2 duration-150" />
           </div>
           <div className="text-center mt-3">
             <span className="font-semibold">
@@ -119,11 +119,11 @@ const MainContentEvent = ({ closeDialogs, dataClicks }) => {
           en la web oficial{' '}
           <a
             className="text-sky-600 underline underline-offset-1 italic"
-            href="https://pulsopropiedades.cl/"
+            href="https://procanje.com/portal-corredores"
             target="_blank"
             rel="noreferrer"
           >
-            Pulsopropiedades.cl
+            Procanje.com
           </a>
         </small>
       </div>

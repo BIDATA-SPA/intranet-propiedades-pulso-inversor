@@ -14,7 +14,7 @@ interface CustomCardProp {
 }
 
 export const CustomCard = ({
-  color = 'bg-sky-500',
+  color = 'bg-lime-500',
   icon = <MdEmail />,
   title = 'Titulo tarjeta',
   value = 0,
@@ -51,7 +51,7 @@ const Meta = () => {
     <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
       <Tooltip title="Total de corredores referidos.">
         <CustomCard
-          color="bg-sky-500"
+          color="bg-lime-500"
           icon={<RiShareFill />}
           title="Total de Corredores Referidos"
           value={isError ? <MdOutlineDangerous /> : metadata?.countSendingTotal}

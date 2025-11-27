@@ -14,6 +14,7 @@ import {
   HiOutlineCog8Tooth,
 } from 'react-icons/hi2'
 import { MdMarkunreadMailbox } from 'react-icons/md'
+import { RiUserStarLine } from 'react-icons/ri'
 
 export type NavigationIcons = Record<string, JSX.Element>
 
@@ -31,6 +32,7 @@ const navigationIcon: NavigationIcons = {
   realtorIdeas: <FaRegLightbulb />,
   buzon: <MdMarkunreadMailbox />,
   inbox: <FaMailBulk />,
+  realtorReview: <RiUserStarLine />,
 }
 
 export default navigationIcon

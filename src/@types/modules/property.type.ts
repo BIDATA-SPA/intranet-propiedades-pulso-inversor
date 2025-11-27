@@ -1,5 +1,6 @@
 // src/types/property.type.ts
 export interface Property {
+  property_portales: any
   id: string
   propertyTitle: string
   propertyDescription: string
@@ -17,6 +18,7 @@ export interface Property {
   propertyDescriptionInExchange: string
   createdAt: string
   updatedAt: string
+  externalLink: string
   user: {
     id: string
     name: string
@@ -32,10 +34,17 @@ export interface Property {
   }
   disabledReason?: string | null
   characteristics: {
+    commonExpenses: any
+    locatedFacingTheStreet: any
+    locatedInGallery: any
+    floorLevelLocation: any
+    officeNumber: any
     surface: string
     constructedSurface: string
     floors: string
+    numberOfFloors: string
     terraces: string
+    terraceM2: string
     bedrooms: string
     bathrooms: string
     typeOfKitchen: string
@@ -44,6 +53,7 @@ export interface Property {
     hasAirConditioning: boolean
     hasParking: boolean
     hasGarage: boolean
+    numberOfParkingSpaces: string
     hasElevator: boolean
     hasGym: boolean
     hasKitchen: boolean
@@ -53,8 +63,16 @@ export interface Property {
     locatedInCondominium: boolean
     isFurnished: boolean
     hasBarbecueArea: boolean
+    numberOfPrivate: number | null
+    numberOfVacantFloors: number | null
+    numberOfMeetingRooms: number | null
+    hasKitchenet: boolean
+    hasHouse: boolean
   }
   address: {
+    lng: any
+    lat: any
+    addressPublic: any
     address: string | null
     letter: string
     number: string

@@ -1,8 +1,8 @@
-import Badge from '@/components/ui/Badge'
-import ExchangeRateServices from '@/services/convert-currency/ConvertCurrency.service'
-import { formatPrice } from '@/utils/format-price'
+// src/components/GridCard.tsx
+import { getFormattedPrices } from '@/utils/currency'
+import { useUFRate } from '@/utils/hooks/useUFRate'
 import { truncateString } from '@/utils/truncateString'
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 import { FaBath, FaBed, FaRuler, FaStar } from 'react-icons/fa'
 import { FaHouseMedicalCircleCheck } from 'react-icons/fa6'
 import { HiMiniBuildingStorefront } from 'react-icons/hi2'
@@ -12,7 +12,27 @@ import { RiMapPinFill } from 'react-icons/ri'
 import { Link } from 'react-router-dom'
 import ActionColumn from './ActionColumn'
 
-const MainCardProperties = ({ typeOfProperty, property }) => {
+type Property = {
+  id: string
+  propertyTitle?: string
+  typeOfOperationId?: string
+  typeOfPropertyId?: string
+  currencyId: 'CLP' | 'UF'
+  propertyPrice: string
+  highlighted?: boolean
+  isExchanged?: boolean
+  images?: { path: string }[]
+  address?: { city?: { name?: string }; state?: { name?: string } }
+  characteristics?: any
+}
+
+const MainCardProperties = ({
+  typeOfProperty,
+  property,
+}: {
+  typeOfProperty?: string
+  property: Property
+}) => {
   switch (typeOfProperty) {
     case 'Local Comercial':
       return (
@@ -21,7 +41,7 @@ const MainCardProperties = ({ typeOfProperty, property }) => {
             <HiMiniBuildingStorefront className="text-lg text-gray-500" />
             <div className="flex items-center dark:text-gray-400">
               {property?.characteristics?.locatedInGallery ? (
-                <span>En Galeria</span>
+                <span>En Galería</span>
               ) : (
                 <span>No</span>
               )}{' '}
@@ -117,7 +137,7 @@ const MainCardProperties = ({ typeOfProperty, property }) => {
               {property?.characteristics?.hasHouse ? (
                 <span>Incluye propiedad</span>
               ) : (
-                <span>No Incluye propiedad</span>
+                <span>No incluye propiedad</span>
               )}{' '}
             </span>
           </div>
@@ -183,37 +203,13 @@ const MainCardProperties = ({ typeOfProperty, property }) => {
   }
 }
 
-const GridCard = ({ property }) => {
-  const [ufValue, setUfValue] = useState<number | null>(null)
-  const [formattedPrice, setFormattedPrice] = useState({
-    priceInUF: '-',
-    priceInCLP: '-',
-  })
+const GridCard = ({ property }: { property: Property }) => {
+  const { uf, loading, error } = useUFRate()
 
-  useEffect(() => {
-    const fetchValueUF = async () => {
-      try {
-        const response = await ExchangeRateServices.getExchangeRateUF()
-        const ufValue = parseFloat(response?.UFs?.[0]?.Valor.replace(',', '.'))
-        setUfValue(ufValue)
-      } catch (error) {
-        throw new Error(error)
-      }
-    }
-
-    fetchValueUF()
-  }, [])
-
-  useEffect(() => {
-    if (ufValue && property?.currencyId && property?.propertyPrice) {
-      const price = formatPrice(
-        property.currencyId,
-        parseFloat(property.propertyPrice),
-        ufValue
-      )
-      setFormattedPrice(price)
-    }
-  }, [ufValue, property])
+  const formatted = useMemo(() => {
+    // Si la UF aún no está lista o hay error, devolvemos placeholders
+    return getFormattedPrices(property?.propertyPrice, property?.currencyId, uf)
+  }, [property?.propertyPrice, property?.currencyId, uf])
 
   return (
     <div
@@ -227,7 +223,7 @@ const GridCard = ({ property }) => {
             src={
               property?.images?.[0]?.path || 'img/not-found/not-found-image.png'
             }
-            alt={property?.propertyTitle}
+            alt={property?.propertyTitle || 'Propiedad'}
             className="absolute hover:cursor-pointer inset-0 w-full h-full object-cover transition-transform duration-500 ease-in-out hover:scale-110"
           />
         </Link>
@@ -238,7 +234,7 @@ const GridCard = ({ property }) => {
           </span>
         )}
 
-        <span className="absolute top-0 left-2 mt-3 mr-3 inline-flex bg-lime-600 text-white px-2 py-1 text-xs font-semibold rounded-full">
+        <span className="absolute top-0 left-2 mt-3 mr-3 inline-flex bg-blue-500 text-white px-2 py-1 text-xs font-semibold rounded-full">
           {property?.typeOfPropertyId}
         </span>
       </div>
@@ -269,30 +265,28 @@ const GridCard = ({ property }) => {
                 Precio en UF
               </small>
               <p className="text-primary font-semibold text-xl lg:text-2xl text-gray-700 dark:text-white">
-                {formattedPrice.priceInUF}
+                {formatted.priceInUF}
               </p>
 
-              {formattedPrice.priceInCLP && (
+              {formatted.priceInCLP !== '-' && (
                 <small className="font-normal text-sm w-full">
-                  {formattedPrice.priceInCLP} CLP
+                  {formatted.priceInCLP}
+                </small>
+              )}
+
+              {/* Estado de carga/errores de UF (opcional visual) */}
+              {loading && (
+                <small className="block text-xs text-gray-400 mt-1">
+                  Actualizando UF...
+                </small>
+              )}
+              {error && (
+                <small className="block text-xs text-red-500 mt-1">
+                  Sin UF del día
                 </small>
               )}
             </div>
           </div>
-
-          {/* {property?.isExchanged ? (
-            <Badge
-              className="font-bold block w-[78px] uppercase my-1"
-              content="En canje"
-              innerClass="bg-sky-50 text-sky-500"
-            />
-          ) : (
-            <Badge
-              className="font-bold block w-[80px] uppercase my-1"
-              content="Sin canje"
-              innerClass="bg-gray-100 text-gray-500"
-            />
-          )} */}
         </div>
 
         {/* Property Title */}
@@ -311,7 +305,7 @@ const GridCard = ({ property }) => {
       </div>
 
       {/* Characteristics */}
-      <div className="p-4 flex justify-start items-center text-gray-800">
+      <div className="p-4 flex justify-start items-center text-gray-8 00">
         <MainCardProperties
           typeOfProperty={property?.typeOfPropertyId}
           property={property}

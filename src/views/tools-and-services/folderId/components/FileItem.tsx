@@ -31,7 +31,7 @@ const FileItem = ({ file, onSelect, isSelected }) => {
         <div
           className={`${
             isSelected
-              ? 'hover:bg-sky-300/30 text-sky-500'
+              ? 'hover:bg-sky-300/30 text-lime-500'
               : 'hover:bg-gray-400/30'
           } rounded-full mr-2`}
         >

@@ -37,7 +37,7 @@ const FolderList = () => {
           Aún no se han creado carpetas.{' '}
           <span
             role="button"
-            className="text-sky-400 hover:text-sky-500 mx-2"
+            className="text-sky-400 hover:text-lime-500 mx-2"
             onClick={goToPrevPage}
           >
             Volver

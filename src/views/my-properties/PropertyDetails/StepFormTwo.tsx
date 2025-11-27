@@ -128,11 +128,11 @@ const StepFormTwo = ({ values, touched, errors, setValues }) => {
                   field={field}
                   type="text"
                   size="md"
-                  className="mb-2 border-sky-500/60 border-[3px] rounded-lg"
+                  className="mb-2 border-lime-500/60 border-[3px] rounded-lg"
                   placeholder="Ej: https://www.portalinmobiliario.com/detalles-de-mi-publicacion"
                   value={values?.step2?.externalLink}
                   onChange={(e) => {
-                    form.setFieldValue(field.name, e.target.value)
+                    form.setFieldValue('step2.externalLink', e.target.value)
                   }}
                 />
               )
@@ -268,13 +268,14 @@ const StepFormTwo = ({ values, touched, errors, setValues }) => {
       )}
       <div className="grid grid-cols-1 gap-0 md:grid-cols-2 md:gap-3">
         <FormItem
-          label="Piso(s)"
+          label="Número de Piso(s)"
           invalid={
-            errors.characteristics?.floors && touched.characteristics?.floors
+            errors.characteristics?.numberOfFloors &&
+            touched.characteristics?.numberOfFloors
           }
-          errorMessage={errors.characteristics?.floors}
+          errorMessage={errors.characteristics?.numberOfFloors}
         >
-          <Field name="characteristics.floors">
+          <Field name="characteristics.numberOfFloors">
             {({ field, form }: FieldProps<FormModel>) => {
               return (
                 <Select
@@ -284,7 +285,7 @@ const StepFormTwo = ({ values, touched, errors, setValues }) => {
                   placeholder="Seleccionar"
                   value={filterFloors?.filter(
                     (option: TSelect) =>
-                      option.value === values.characteristics?.floors
+                      option.value === values.characteristics?.numberOfFloors
                   )}
                   onChange={(option: TSelect) => {
                     form.setFieldValue(field.name, option?.value)

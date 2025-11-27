@@ -13,4 +13,5 @@ export type SignUpFormSchema = {
   email: string
   password: string
   referralCode?: string
+  origin?: string
 }

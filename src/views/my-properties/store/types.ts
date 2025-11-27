@@ -17,6 +17,7 @@ export type Characteristics = {
   surface: string
   constructedSurface: string
   floors: string
+  numberOfFloors: string
   terraces: string
   bedrooms: string
   bathrooms: string
@@ -26,6 +27,7 @@ export type Characteristics = {
   hasAirConditioning: boolean
   hasParking: boolean
   hasGarage: boolean
+  numberOfParkingSpaces: boolean
   hasElevator: boolean
   hasGym: boolean
   hasKitchen: boolean
@@ -62,6 +64,7 @@ export type Property = {
     id: string
     name: string
   }
+  externalLink: string
   isActive?: boolean
   propertyTitle: string
   propertyDescription: string
@@ -87,6 +90,7 @@ export type Property = {
   characteristics: Characteristics
   address: Address
   images: string[]
+  property_portales: { id: string; name: string }[]
 }
 
 export type Properties = Property[]

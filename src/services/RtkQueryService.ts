@@ -6,7 +6,6 @@ import { createApi } from '@reduxjs/toolkit/query/react'
 import type { AxiosError, AxiosRequestConfig } from 'axios'
 import BaseService from './BaseService'
 import { getActivitiesLog } from './activities-log/ActivitiesLog.service'
-import { getAliedRealtorQuery } from './alied-realtor/AliedRealtor.service'
 import { getApiKeyPortalQuery } from './api-key-portal/ApiKeyPortal.service'
 import { getAuthSignInQuery } from './auth/sign-in/SignIn.service'
 import { getCalendarEventsQuery } from './calendar/Calendar.service'
@@ -20,12 +19,6 @@ import { getCustomersQuery } from './customers/Customer.service'
 import { getDashboardQuery } from './dashboard/Dashboard.service'
 import { getDialCodesQuery } from './dial-codes/DialCodes.service'
 import { getDisabledReasonsQuery } from './disabled-reasons/DisabledReasons.service'
-import { getBannerAdvertisingQuery } from './external-services/BannerAdvertising.service'
-import { getExternalServicesQuery } from './external-services/ExternalServices.service'
-import { getEmailRequestsQuery } from './inbox-request/InboxRequest.service'
-import { getAliedRealtorRequestQuery } from './inbox-request/InboxRequestContact.service'
-import { getInboxRequestStatusesQuery } from './inbox-request/InboxRequestStatuses.service'
-import { getEmailRequestsMetadataQuery } from './inbox-request/Metadata.service'
 import { getLocationQuery } from './location/Location.service'
 import { getMarketingSelectsQuery } from './marketing/brand/Selects.service'
 import { getAddressPreferencesQuery } from './me/AddressPreferences.service'
@@ -36,16 +29,15 @@ import { getPropertiesMetadataQuery } from './metadata/properties/properties.ser
 import { getPropertySearchMetadataQuery } from './metadata/properties/property-search.service'
 import { getReferralRealtorMetadataQuery } from './metadata/referred-realtor/ReferredRealtor.service'
 import { getNotificationsQuery } from './notification/notification.service'
+import { getPdpAuthQuery } from './pdp/PdpAuth.service'
+import { getPortalPublicationsQuery } from './portal/portaPublicationsApi'
 import { getPropertiesQuery } from './properties/Property.service'
-import { getPropertiesSearchQuery } from './property-search/PropertySearch.service'
 import { getUserRatingQuery } from './rating-user/RatingUser.service'
-import { getRealtorIdeasQuery } from './realtor-ideas/RealtorIdeas.service'
 import { getReferredRealtorQuery } from './referred-realtor/ReferredRealtor.service'
 import { getSupportRequestQuery } from './support/SupportRequest.service'
 import { getToolsAndServicesQuery } from './tools-and-services/ToolsAndServices.service'
 import { getUserImageQuery } from './user-image/UserImage.service'
 import { getUsersQuery } from './user/User.service'
-import { getOpportunitiesQuery } from './yokanjeo/YoKanjeo.service'
 
 const axiosBaseQuery =
   (): BaseQueryFn<
@@ -118,6 +110,7 @@ const RtkQueryService = createApi({
     'UserRating',
     'PreferredAreas',
     'ApiKeyPortal',
+    'PortalPublication',
   ],
   endpoints: (builder: EndpointBuilderType) => ({
     ...getUsersQuery(builder),
@@ -125,16 +118,10 @@ const RtkQueryService = createApi({
     ...getMeQuery(builder),
     ...getCountriesQuery(builder),
     ...getPropertiesQuery(builder),
-    ...getOpportunitiesQuery(builder),
     ...getCustomersSearchQuery(builder),
     ...getDisabledReasonsQuery(builder),
     ...getPropertiesMetadataQuery(builder),
-    ...getExternalServicesQuery(builder),
-    ...getEmailRequestsQuery(builder),
     ...getToolsAndServicesQuery(builder),
-    ...getInboxRequestStatusesQuery(builder),
-    ...getEmailRequestsMetadataQuery(builder),
-    ...getPropertiesSearchQuery(builder),
     ...getCalendarEventsQuery(builder),
     ...getDashboardQuery(builder),
     ...getSupportRequestQuery(builder),
@@ -143,23 +130,21 @@ const RtkQueryService = createApi({
     ...getConfirmAccountQuery(builder),
     ...getVisitOrderQuery(builder),
     ...getNotificationsQuery(builder),
-    ...getRealtorIdeasQuery(builder),
     ...getCustomerSearchMetadataQuery(builder),
     ...getPropertySearchMetadataQuery(builder),
     ...getExternalServiceMetadataQuery(builder),
     ...getUserImageQuery(builder),
     ...getActivitiesLog(builder),
     ...getMarketingSelectsQuery(builder),
-    ...getAliedRealtorQuery(builder),
     ...getDialCodesQuery(builder),
-    ...getAliedRealtorRequestQuery(builder),
     ...getReferredRealtorQuery(builder),
     ...getReferralRealtorMetadataQuery(builder),
     ...getUserRatingQuery(builder),
-    ...getBannerAdvertisingQuery(builder),
     ...deleteEventService(builder),
     ...getAddressPreferencesQuery(builder),
     ...getApiKeyPortalQuery(builder),
+    ...getPortalPublicationsQuery(builder),
+    ...getPdpAuthQuery(builder),
 
     validateSession: builder.query<ValidateSessionResponse, void>({
       query: () => {
@@ -187,12 +172,7 @@ const RtkQueryService = createApi({
 export default RtkQueryService
 export const {
   useValidateSessionQuery,
-
-  //countries
   useGetAllCountriesQuery,
-  //end countries
-
-  //users
   useGetAllUsersQuery,
   useGetAllUsersMetaDataQuery,
   useGetUserByIdQuery,
@@ -203,17 +183,11 @@ export const {
   useDisableUserMutation,
   useGetUserRolesQuery,
   useGetUserStatusesQuery,
-  //end users
-
-  //customers
   useGetAllCustomersQuery,
   useGetCustomerByIdQuery,
   useCreateCustomerMutation,
   useUpdateCustomerMutation,
   useDeleteCustomerMutation,
-  //end customers
-
-  // properties
   useGetAllPropertiesQuery,
   useLazyGetAllPropertiesQuery,
   useGetPropertyByIdQuery,
@@ -223,75 +197,23 @@ export const {
   useCreatePropertyImagesMutation,
   useDeletePropertyImageMutation,
   useUpdateImageOrderMutation,
-  // end properties
-
-  // customer-search
   useGetAllCustomersSearchQuery,
   useGetCustomerSearchByIdQuery,
   useCreateCustomerSearchMutation,
   useUpdateCustomerSearchMutation,
   useUpdateCustomerSearchRefreshMutation,
-  // end customer-search
-
-  // property-search
-  useGetAllPropertiesSearchQuery,
-  useGetPropertySearchByIdQuery,
-  // end property-search
-
-  // properties - disabled reasons
   useGetAllDisabledReasonsQuery,
-  // end properties - disabled reasons
-
-  // metadata
-  // Properties
   useGetPropertiesMetadataQuery,
-
-  // End Properties
-
-  // end metadata
-
-  // External services
-  useGetAllExternalServicesQuery,
-  useGetExternalServiceByIdQuery,
-  useGetAllServicesByFolderQuery,
-  // Banner
-  useGetAllBannersQuery,
-  useGetBannerByIdQuery,
-  useGetBannerImageByNameQuery,
-  // End External services
-
-  // me
   useGetMyInfoQuery,
   useGetPreferredAreasQuery,
   useSendPreferredAreasMutation,
-  // end me
-
-  // yoKanjeo
-  useCreateOpportunityMutation,
-  // yoKanjeo
   useResetPasswordMutation,
   useRecoverPasswordMutation,
-
-  // inbox requests
-  // YoKanjeo email requests
-  useGetExchangeEmailRequestQuery,
-  useSendExchangeEmailRequestMutation,
-  useSendExternalServicesEmailRequestMutation,
-  useGetExternalServicesEmailRequestQuery,
-  useGetExchangeEmailInboxQuery,
-  useGetAllStatusesQuery,
-  useUpdateKanjeoRequestsStatusMutation,
-  useGetInboxMetadataQuery,
-  useGetRequestMetadataQuery,
-
-  // tools and services
   useGetAllRootFoldersQuery,
   useCreateRootFolderMutation,
   useGetRootFolderByIdQuery,
   useCreateRootFileMutation,
   useUpdateRootFolderMutation,
-
-  // CALENDAR
   useCreateEventMutation,
   usePatchEventMutation,
   useGetEventsQuery,
@@ -299,76 +221,24 @@ export const {
   usePatchVisitOrderMutation,
   useGetVisitOrderQuery,
   useDeleteEventMutation,
-
-  // useCreateEventCalendarMutation,
-  // useGetEventCalendarQuery,
-  // usePatchEventCalendarMutation,
-  // CALENDAR VISIT ORDER
-  // useCreateVisitOrderMutation,
-  // usePatchVisitOrderMutation,
-  // useGetVisitOrderQuery,
-
-  //Dashboard
   useGetDashboardQuery,
-
-  //Activities Log
   useGetActivitiesQuery,
-
-  // Support
   useGetSupportRequestQuery,
   useSendSupportRequestMutation,
   useGetSupportCategoriesQuery,
-  // End Support
-
-  // Sign-in
   useSignInAdminMutation,
-  // end Sign-in
-
-  // location selects
   useLazyGetAllCountriesQuery,
   useGetAllStatesQuery,
-  // end location select
-
-  // confirm account
   useSendConfirmAccountTokenMutation,
-  // end confirm account
-
-  // signature contract
-  useRequestApplicantSignatureMutation,
-  // end signature contract
-
-  // notifications
   useGetNotificationsQuery,
   useMarkNotificationAsReadMutation,
   useMarkAllNotificationsAsReadMutation,
-  // end notifications
-
-  // realtor ideas
-  useGetRealtorIdeasQuery,
-  useSendRealtorIdeaMutation,
-  useUpdateRealtorIdeaMutation,
-  // end realtor ideas
-
-  // customer search metadata
   useGetCustomerSearchMetadataQuery,
-  // end customer search metadata
-
-  // property search metadata
   useGetPropertySearchMetadataQuery,
-  // end search metadata
-
-  // external services metadata
   useGetExternalServicesMetadataQuery,
-  // end external services metadata
-
-  // user image
   useGetUserImageQuery,
   useCreateUserImageMutation,
   useDeleteUserImageMutation,
-  // end user image
-
-  //** MARKETING HOOKS */
-  // service requet
   useGetServiceRequestPricesQuery,
   useGetServiceRequestTypesQuery,
   useGetServiceRequestDatesQuery,
@@ -376,43 +246,23 @@ export const {
   useSendServiceRequestBrandMutation,
   useGetServiceRequestBrandQuery,
   useDeleteServiceRequestBrandMutation,
-
-  // Publicity campaign
   useGetServiceRequestBrandPublicityCampaignQuery,
   useGetServiceRequestBrandWebDesignQuery,
-  // end service requet
-
-  // Alied realtor
-  useGetAllAliedRealtorQuery,
-  useCreateContactEmailAliedRealtorMutation,
-  // end Alied realtor
-
-  // Dial Code
   useGetAllDialCodesQuery,
-  // End Dial Code
-
-  // Alied Realtor Request
-  useGetAllAliedRealtorRequestQuery,
-  // End Alied Realtor Request
-
-  // Referred Realtors
   useGetAllReferredRealtorQuery,
-  // End Referred Realtors
-
-  // Referred Realtors metadata
   useGetReferralRealtorMetadataQuery,
-  // End Referred Realtors metadata
-
-  // User Rating
   useGetAllRatingUsersQuery,
   useCreateRatingUserMutation,
   useCreateRatingUserByCustomerMutation,
   useCreateRatingUserSendMailMutation,
   useResendConfirmEmailMutation,
-  // End User Rating
-
-  //   User Api Key
   usePatchApiKeyGenerateMutation,
   usePatchApiKeyDeactivateMutation,
-  //   End User Api Key
+  useGetPortalPublicationByIdQuery,
+  useFindPortalPublicationsQuery,
+  useCreatePortalPublicationMutation,
+  useUpdatePortalPublicationByIdMutation,
+  useDeletePortalPublicationByIdMutation,
+  useLazyFindPortalPublicationsQuery,
+  useGetPdpTokenMutation,
 } = RtkQueryService

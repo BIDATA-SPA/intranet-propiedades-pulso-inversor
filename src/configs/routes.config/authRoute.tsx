@@ -39,6 +39,12 @@ const authRoute: Routes = [
     authority: [],
   },
   {
+    key: 'rating-realtor',
+    path: `/califica-a-tu-corredor/:userId`,
+    component: lazy(() => import('@/views/rating-realtor/RatingRealtorForm')),
+    authority: [],
+  },
+  {
     key: 'resend-confirm-email',
     path: '/resend-confirm-email',
     component: lazy(
@@ -50,6 +56,18 @@ const authRoute: Routes = [
     key: 'signUp-customer',
     path: '/crear-cuenta/cliente',
     component: lazy(() => import('@/views/auth/SignUpCustomer')),
+    authority: [],
+  },
+  {
+    key: 'signUp-webinar',
+    path: `/webinar`,
+    component: lazy(() => import('@/views/auth/SignUpWebinar')),
+    authority: [],
+  },
+  {
+    key: 'signUp-webinar2',
+    path: `/iniciar-sesion?redirectUrl=/webinar`,
+    component: lazy(() => import('@/views/auth/SignUpWebinar')),
     authority: [],
   },
 ]

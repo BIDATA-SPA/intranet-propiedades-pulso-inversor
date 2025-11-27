@@ -375,44 +375,41 @@ const MainInformation = ({ values, errors, touched, setFieldValue }) => {
         <>
           <FormItem
             label="Página web"
-            invalid={errors.webPage && touched.webPage}
-            errorMessage={errors.webPage}
+            invalid={Boolean(touched.webPage && errors.webPage)}
+            errorMessage={touched.webPage ? (errors.webPage as string) : ''}
           >
             <Field name="webPage">
-              {({ field, form }: FieldProps<FormModel>) => {
-                return (
-                  <Input
-                    type="text"
-                    field={field}
-                    size="md"
-                    placeholder="Ej: https://www.mi-web.com"
-                    value={values.webPage}
-                    onChange={(e) => {
-                      form.setFieldValue(field.name, e.target.value)
-                    }}
-                  />
-                )
-              }}
+              {({ field, form }: FieldProps<FormModel>) => (
+                <Input
+                  type="text"
+                  field={field}
+                  size="md"
+                  placeholder="Ej: https://mi-empresa.cl"
+                  value={form.values.webPage ?? ''}
+                  onChange={(e) =>
+                    form.setFieldValue(field.name, e.target.value)
+                  }
+                  onBlur={() => form.setFieldTouched(field.name, true)}
+                />
+              )}
             </Field>
           </FormItem>
 
           <FormItem
-            label="Sobre mí xd"
+            label="Sobre mí"
             className="mb-4"
             labelClass="justify-start"
             invalid={errors.about && touched.about}
             errorMessage={errors.about}
           >
-            {values.about && (
-              <Field name="about">
-                {({ field, form }: FieldProps) => (
-                  <RichTextEditor
-                    value={field.value}
-                    onChange={(val) => form.setFieldValue(field.name, val)}
-                  />
-                )}
-              </Field>
-            )}
+            <Field name="about">
+              {({ field, form }: FieldProps) => (
+                <RichTextEditor
+                  value={field.value}
+                  onChange={(val) => form.setFieldValue(field.name, val)}
+                />
+              )}
+            </Field>
           </FormItem>
 
           <div className="mb-4">
@@ -474,7 +471,7 @@ const MainInformation = ({ values, errors, touched, setFieldValue }) => {
                   <Button
                     type="button"
                     variant="solid"
-                    color="sky-500"
+                    color="lime-500"
                     aria-label="Agregar primera empresa"
                     onClick={() => push('')}
                   >

@@ -6,6 +6,7 @@ interface ICharacteristics {
   surface?: string
   constructedSurface?: string
   floors?: string
+  numberOfFloors?: string
   terraces?: string
   bathrooms?: string
   bedrooms?: string
@@ -15,6 +16,7 @@ interface ICharacteristics {
   typeOfHeating?: string
   hasAirConditioning?: boolean
   hasGarage?: boolean
+  numberOfParkingSpaces?: string
   hasParking?: boolean
   hasElevator?: boolean
   hasGym?: boolean
@@ -58,6 +60,7 @@ const useGeneratePropertyDescription = (
         surface,
         constructedSurface,
         floors,
+        numberOfFloors,
         terraces,
         bathrooms,
         bedrooms,
@@ -67,6 +70,7 @@ const useGeneratePropertyDescription = (
         typeOfHeating,
         hasAirConditioning,
         hasGarage,
+        numberOfParkingSpaces,
         hasParking,
         hasElevator,
         hasGym,
@@ -95,7 +99,7 @@ const useGeneratePropertyDescription = (
       surface && constructedSurface
         ? `Superficie de ${surface} m² y construcción de ${constructedSurface} m².`
         : '',
-      floors ? `Distribuida en ${floors} piso(s).` : '',
+      numberOfFloors ? `Distribuida en ${numberOfFloors} piso(s).` : '',
       terraces === 'Ambas' ? 'Terrazas en ambos lados.' : '',
       bathrooms || bedrooms
         ? `Cuenta con ${bathrooms || '0'} baño(s) y ${
@@ -106,6 +110,7 @@ const useGeneratePropertyDescription = (
       hasHeating && `Sistema de calefacción ${typeOfHeating || ''}.`,
       hasAirConditioning ? 'Aire acondicionado.' : '',
       hasGarage ? 'Garaje.' : '',
+      numberOfParkingSpaces ? 'Estacionamientos.' : '',
       hasParking ? 'Estacionamiento.' : '',
       hasElevator ? 'Ascensor.' : '',
       hasGym ? 'Gimnasio.' : '',
