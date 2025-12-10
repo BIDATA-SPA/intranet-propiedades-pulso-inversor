@@ -6,10 +6,11 @@ import useAuth from '@/utils/hooks/useAuth'
 const { unAuthenticatedEntryPath } = appConfig
 
 const ProtectedRoute = () => {
-  const { authenticated } = useAuth();
+  const { authenticated } = useAuth()
+  const location = useLocation()
 
-  const location = useLocation();
-  const isWebinarRoute = location.pathname === '/webinar';
+  // excepción para webinar pública
+  const isWebinarRoute = location.pathname === '/webinar'
 
   if (!authenticated && !isWebinarRoute) {
     return (
