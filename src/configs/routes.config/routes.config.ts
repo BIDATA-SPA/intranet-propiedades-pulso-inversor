@@ -4,17 +4,23 @@ import authRoute from './authRoute'
 
 export const publicRoutes: Routes = [...authRoute]
 
-export const protectedRoutes = [
+export const protectedRoutes: Routes = [
   {
-    key: 'my-properties',
+    key: 'my-properties-create',
     path: '/mis-propiedades/crear-propiedad',
     component: lazy(() => import('@/views/properties-portfolio')),
     authority: [],
   },
   {
-    key: 'my-properties',
+    key: 'my-properties-detail',
     path: '/mis-propiedades/:propertyId',
     component: lazy(() => import('@/views/properties-portfolio')),
+    authority: [],
+  },
+  {
+    key: 'visit-order',
+    path: '/mis-propiedades/visit/:id',
+    component: lazy(() => import('@/views/visit')),
     authority: [],
   },
   {
