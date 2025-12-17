@@ -331,10 +331,14 @@ const PropertyDetails = () => {
             <PropertyResume data={data} />
           </div>
         </div>
+
         <div id="scroll-target" className="h-0"></div>
         <div id="publicar" className="my-4">
           <Card className="w-full lg:w-[100%] border-t-4 border-t-sky-400 dark:border-t-sky-400">
-            <UploadImage images={sortedImages} />
+            <UploadImage
+              images={sortedImages}
+              propertyType={data?.typeOfPropertyId ?? ''}
+            />
           </Card>
         </div>
       </div>

@@ -264,6 +264,8 @@ const PropertiesPortfolio = () => {
     }
   })
 
+  console.log('formData', formData)
+
   return (
     <Container className="h-full">
       <Tabs
@@ -355,6 +357,10 @@ const PropertiesPortfolio = () => {
 
                       {currentStep === 4 && (
                         <UploadImage
+                          propertyType={
+                            formData?.personalInformation?.typeOfPropertyId ??
+                            ''
+                          }
                           images={sortedImages}
                           onNextChange={() => {
                             dispatch(
