@@ -11,7 +11,7 @@ import useNotification from '@/utils/hooks/useNotification'
 import { usePdpSecureActions } from '@/utils/hooks/usePdpSecureActions'
 import classNames from 'classnames'
 import { useEffect, useState } from 'react'
-import { FaHandshake, FaRegStar, FaStar } from 'react-icons/fa'
+import { FaHandshake, FaRegStar, FaStar, FaRegFilePdf } from 'react-icons/fa'
 import { FaBuildingUser, FaHouseCircleCheck } from 'react-icons/fa6'
 import { HiOutlineEye, HiTrash } from 'react-icons/hi'
 import { MdFileUpload } from 'react-icons/md'
@@ -27,7 +27,7 @@ type TDialogState = {
 
 const ProcanjeRealtorIcon = ({ row }) => {
   const { data: userInfo } = useGetMyInfoQuery(
-    {},
+    undefined,
     { refetchOnMountOrArgChange: true }
   )
 
@@ -56,12 +56,14 @@ const ProcanjeRealtorIcon = ({ row }) => {
       </div>
     )
   }
+
+  return null
 }
 
 const ActionColumn = ({ row, className }) => {
   const [userAuthority] = [useAppSelector((state) => state.auth.session.rol)]
   const { data: userInfo } = useGetMyInfoQuery(
-    {},
+    undefined,
     { refetchOnMountOrArgChange: true }
   )
   const navigate = useNavigate()
@@ -117,13 +119,18 @@ const ActionColumn = ({ row, className }) => {
       } else {
         showNotification('success', 'Guardada como destacada', '')
       }
-    } catch (error) {
+    } catch (error: any) {
       showNotification('danger', 'Error', `Error: ${error?.message}`)
       throw new Error(error.message)
     }
   }
 
   const handleView = () => navigate(`/mis-propiedades/${row.id}`)
+
+  const handleGenerateVisit = () => {
+    const propertyId = row?.id
+    navigate(`/mis-propiedades/visit/${propertyId}`)
+  }
 
   const handleUpdateExchange = (item) => {
     setSelectedItem(item)
@@ -159,15 +166,17 @@ const ActionColumn = ({ row, className }) => {
           page_size: 100,
           pdpToken,
         }).unwrap()
+
         const items: any[] = Array.isArray(found)
           ? found
-          : found?.items ?? found?.data ?? []
+          : found?.items ?? []
+
         uuids = items
           .filter(
             (i) =>
               String(i?.portal ?? '')
                 .trim()
-                .toLowerCase() === 'pulsoPropiedades' &&
+                .toLowerCase() === 'pulsopropiedades' &&
               typeof i?.uuid === 'string'
           )
           .map((i) => i.uuid as string)
@@ -247,15 +256,16 @@ const ActionColumn = ({ row, className }) => {
 
   useEffect(() => {
     if (isDeletePropertyError) {
+      const apiError = deletePropertyError as any
       showNotification(
         'danger',
         'Error',
         `Ha ocurrido un error al eliminar esta propiedad: ${
-          deletePropertyError?.data?.message || 'Error desconocido'
+          apiError?.data?.message || 'Error desconocido'
         }`
       )
     }
-  }, [isDeletePropertyError, deletePropertyError])
+  }, [isDeletePropertyError, deletePropertyError, showNotification])
 
   return (
     <div className="flex items-center flex-row justify-around">
@@ -291,6 +301,15 @@ const ActionColumn = ({ row, className }) => {
             onClick={handleView}
           >
             <HiOutlineEye className="text-lg lg:text-xl" />
+          </span>
+        </Tooltip>
+
+        <Tooltip title="Generar Visita">
+          <span
+            className="cursor-pointer p-2 hover:text-green-500 bg-gray-50 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-800 rounded-full"
+            onClick={handleGenerateVisit}
+          >
+            <FaRegFilePdf className="text-lg lg:text-xl" />
           </span>
         </Tooltip>
 
