@@ -1,17 +1,17 @@
 // utils/propertyDescriptionGenerator.ts
 type FormData = {
-  personalInformation: any
-  identification: any
+  informacionPrincipal: any
+  caracteristicas: any
   addressInformation: any
 }
 
 export function generatePropertyDescription(formData: FormData): string {
-  const { personalInformation, identification, addressInformation } = formData
-  const c = identification.characteristics
+  const { informacionPrincipal, caracteristicas, addressInformation } = formData
+  const c = caracteristicas.characteristics
   const lines: string[] = []
 
-  const tipoProp = personalInformation?.typeOfPropertyId ?? 'Propiedad'
-  const tipoOperacion = personalInformation?.typeOfOperationId ?? 'Operación'
+  const tipoProp = informacionPrincipal?.typeOfPropertyId ?? 'Propiedad'
+  const tipoOperacion = informacionPrincipal?.typeOfOperationId ?? 'Operación'
 
   lines.push(
     `En ${tipoOperacion.toLowerCase()}: ${tipoProp.toLowerCase()} ideal para quienes buscan confort y funcionalidad.`
@@ -89,12 +89,12 @@ export function generatePropertyDescription(formData: FormData): string {
     lines.push(`Ubicación: ${direccion}.`)
   }
 
-  if (personalInformation?.propertyPrice && personalInformation?.currencyId) {
+  if (informacionPrincipal?.propertyPrice && informacionPrincipal?.currencyId) {
     const formatter = new Intl.NumberFormat('es-CL')
-    const price = formatter.format(personalInformation.propertyPrice)
+    const price = formatter.format(informacionPrincipal.propertyPrice)
     lines.push(
       `Precio de ${tipoOperacion.toLowerCase()}: ${price} ${
-        personalInformation.currencyId
+        informacionPrincipal.currencyId
       }`
     )
   }

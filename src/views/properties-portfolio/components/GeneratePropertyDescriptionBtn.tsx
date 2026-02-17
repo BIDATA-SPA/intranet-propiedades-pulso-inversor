@@ -48,8 +48,8 @@ export default function GeneratePropertyDescriptionBtn({
 }: Props) {
   const onGenerate = () => {
     // ---- 1) Desestructurar con defaults seguros
-    const pi = formData?.personalInformation ?? {}
-    const id = formData?.identification ?? {}
+    const pi = formData?.informacionPrincipal ?? {}
+    const id = formData?.caracteristicas ?? {}
     const ch = id?.characteristics ?? {}
     const fi = formData?.financialInformation ?? {}
     const pp = formData?.portalOfPortals ?? {}

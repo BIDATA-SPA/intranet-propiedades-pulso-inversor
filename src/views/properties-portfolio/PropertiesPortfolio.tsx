@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 import AdaptableCard from '@/components/shared/AdaptableCard'
 import Container from '@/components/shared/Container'
 import Tabs from '@/components/ui/Tabs'
@@ -16,9 +17,9 @@ import FormStep from './components/FormStep'
 import { usePathChangeEffect } from './hooks/use-patch-change-effect'
 import reducer, {
   Address,
+  Caracteristicas as CaracteristicasType,
   FinancialInformation as FinancialInformationType,
-  Identification as IdentificationType,
-  PersonalInformation as PersonalInformationType,
+  InformacionPrincipal as InformacionPrincipalType,
   PortalOfPortals as PortalOfPortalsType,
   resetFormState,
   setCurrentStep,
@@ -32,12 +33,15 @@ const { TabNav, TabList, TabContent } = Tabs
 
 injectReducer('accountDetailForm', reducer)
 
-const PersonalInformation = lazy(
-  () => import('./components/PersonalInformation')
+const InformacionPrincipal = lazy(
+  () => import('./components/InformacionPrincipal')
 )
-const Identification = lazy(() => import('./components/Identification'))
+const Caracteristicas = lazy(() => import('./components/Caracteristicas'))
 const AddressInfomation = lazy(() => import('./components/AddressInfomation'))
-const AccountReview = lazy(() => import('./components/AccountReview'))
+const FinancialInformation = lazy(
+  () => import('./components/FinancialInformation')
+)
+const CreacionPropiedad = lazy(() => import('./components/CreacionPropiedad'))
 const PortaOfPropertyOverview = lazy(
   () => import('../portal-of-portals/components/property-details/Overview')
 )
@@ -54,11 +58,9 @@ const normalizePropertyPortales = (
       (p) =>
         String(p?.portalName ?? '')
           .trim()
-          .toLowerCase() === 'pulsoPropiedades'
+          .toLowerCase() === 'procanje'
     )
-  return hasProcanje
-    ? [{ id: 'pulsoPropiedades', name: 'Pulso Propiedades' }]
-    : []
+  return hasProcanje ? [{ id: 'procanje', name: 'Procanje' }] : []
 }
 
 const ResetKycFormOnRouteChange = () => {
@@ -113,8 +115,8 @@ const PropertiesPortfolio = () => {
 
   const handleNextChange = (
     values:
-      | PersonalInformationType
-      | IdentificationType
+      | InformacionPrincipalType
+      | CaracteristicasType
       | Address
       | FinancialInformationType
       | PortalOfPortalsType,
@@ -149,7 +151,7 @@ const PropertiesPortfolio = () => {
     const apiLng = property?.address?.lng
 
     const editedData = {
-      personalInformation: {
+      informacionPrincipal: {
         customerId: Number(property?.customer?.id),
         typeOfOperationId: property?.typeOfOperationId,
         typeOfPropertyId: property?.typeOfPropertyId,
@@ -160,7 +162,7 @@ const PropertiesPortfolio = () => {
           end: isoUtcToLocalDate(property?.timeAvailableEnd),
         },
       },
-      identification: {
+      caracteristicas: {
         externalLink: property?.externalLink,
         highlighted: property?.highlighted,
         observations: property?.observations,
@@ -216,6 +218,7 @@ const PropertiesPortfolio = () => {
         references: property?.address?.references ?? '',
         address: property?.address?.address ?? '',
         addressPublic: property?.address?.addressPublic ?? '',
+        // Coordenadas: string si hay valor; '' si no hay
         lat: apiLat ? String(apiLat) : '',
         lng: apiLng ? String(apiLng) : '',
       },
@@ -243,7 +246,7 @@ const PropertiesPortfolio = () => {
     const hasImages =
       Array.isArray(property?.images) && property.images.length > 0
 
-    dispatch(setCurrentStep(4)) // Tu lógica original dejaba 5 igualmente
+    dispatch(setCurrentStep(5)) // Tu lógica original dejaba 5 igualmente
     dispatch(
       setStepStatus({
         0: { status: 'complete' },
@@ -263,8 +266,6 @@ const PropertiesPortfolio = () => {
       refetch()
     }
   })
-
-  console.log('formData', formData)
 
   return (
     <Container className="h-full">
@@ -292,7 +293,7 @@ const PropertiesPortfolio = () => {
             <ResetKycFormOnRouteChange />
             <AdaptableCard className="h-full" bodyClass="h-full">
               <div className="grid lg:grid-cols-5 xl:grid-cols-3 2xl:grid-cols-5 gap-4 h-full">
-                {currentStep !== 6 && (
+                {currentStep !== 7 && (
                   <div className="2xl:col-span-1 xl:col-span-1 lg:col-span-2 py-2 bg-gray-100 border rounded-lg">
                     <FormStep
                       currentStep={currentStep}
@@ -303,23 +304,23 @@ const PropertiesPortfolio = () => {
                 )}
                 <div
                   className={
-                    currentStep !== 6
+                    currentStep !== 7
                       ? '2xl:col-span-4 lg:col-span-3 xl:col-span-2'
                       : 'lg:col-span-5'
                   }
                 >
-                  <div className="p-4 lg:p-5 border rounded-lg h-[700px] overflow-y-scroll">
+                  <div className="p-4 lg:p-5 border rounded-lg h-[650px] max-h-[650px] overflow-y-scroll">
                     <Suspense fallback={<></>}>
                       {currentStep === 0 && (
-                        <PersonalInformation
-                          data={formData.personalInformation}
+                        <InformacionPrincipal
+                          data={formData.informacionPrincipal}
                           currentStepStatus={currentStepStatus}
                           onNextChange={handleNextChange}
                         />
                       )}
                       {currentStep === 1 && (
-                        <Identification
-                          data={formData.identification}
+                        <Caracteristicas
+                          data={formData.caracteristicas}
                           currentStepStatus={currentStepStatus}
                           onNextChange={handleNextChange}
                           onBackChange={handleBackChange}
@@ -335,12 +336,20 @@ const PropertiesPortfolio = () => {
                       )}
 
                       {currentStep === 3 && (
-                        <AccountReview
+                        <FinancialInformation
+                          data={formData.financialInformation}
+                          currentStepStatus={currentStepStatus}
+                          onNextChange={handleNextChange}
+                          onBackChange={handleBackChange}
+                        />
+                      )}
+                      {currentStep === 4 && (
+                        <CreacionPropiedad
                           data={formData}
                           onSuccess={(data) => {
                             if (data?.id) {
                               navigate(`/mis-propiedades/${data.id}`)
-                              dispatch(setCurrentStep(4))
+                              dispatch(setCurrentStep(5))
                               dispatch(
                                 setStepStatus({
                                   4: { status: 'complete' },
@@ -355,12 +364,8 @@ const PropertiesPortfolio = () => {
                         />
                       )}
 
-                      {currentStep === 4 && (
+                      {currentStep === 5 && (
                         <UploadImage
-                          propertyType={
-                            formData?.personalInformation?.typeOfPropertyId ??
-                            ''
-                          }
                           images={sortedImages}
                           onNextChange={() => {
                             dispatch(
@@ -369,7 +374,7 @@ const PropertiesPortfolio = () => {
                                 6: { status: 'current' },
                               })
                             )
-                            dispatch(setCurrentStep(5))
+                            dispatch(setCurrentStep(6))
                           }}
                         />
                       )}

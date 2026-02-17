@@ -21,10 +21,11 @@ const BASE_STEPS = [
   { label: 'Información Principal', value: 0 },
   { label: 'Características', value: 1 },
   { label: 'Ubicación', value: 2 },
-  { label: 'Publicar Propiedad', value: 3 },
+  { label: 'Configurar Canje', value: 3 },
+  { label: 'Publicar Propiedad', value: 4 },
 ] as const
 
-const EXTRA_STEPS = [{ label: 'Subir Imágenes', value: 4 }] as const
+const EXTRA_STEPS = [{ label: 'Subir Imágenes', value: 5 }] as const
 
 const FormStep = ({
   currentStep,

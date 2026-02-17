@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-export type PersonalInformation = {
+export type InformacionPrincipal = {
   customerId: number | null
   typeOfOperationId: string | null
   typeOfPropertyId: string | null
@@ -12,7 +12,7 @@ export type PersonalInformation = {
   propertyPrice: number
 }
 
-export type Identification = {
+export type Caracteristicas = {
   externalLink: string | null
   highlighted: boolean
   observations: string | null
@@ -158,8 +158,8 @@ export type PortalOfPortals = {
 }
 
 type FormData = {
-  personalInformation: PersonalInformation
-  identification: Identification
+  informacionPrincipal: InformacionPrincipal
+  caracteristicas: Caracteristicas
   addressInformation: Address
   financialInformation: FinancialInformation
   portalOfPortals: PortalOfPortals
@@ -177,7 +177,7 @@ export const SLICE_NAME = 'accountDetailForm'
 
 export const initialState: KycFormState = {
   formData: {
-    personalInformation: {
+    informacionPrincipal: {
       customerId: null,
       typeOfOperationId: null,
       typeOfPropertyId: null,
@@ -188,7 +188,7 @@ export const initialState: KycFormState = {
       currencyId: 'CLP',
       propertyPrice: 0,
     },
-    identification: {
+    caracteristicas: {
       externalLink: '',
       highlighted: false,
       observations: '',
@@ -241,7 +241,7 @@ export const initialState: KycFormState = {
       addressPublic: '',
     },
     financialInformation: {
-      isExchanged: false,
+      isExchanged: true,
       timeInExchange: {
         start: null,
         end: null,

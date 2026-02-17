@@ -21,7 +21,7 @@ export default function MapVisibilityBadge({
       aria-live="polite"
     >
       {/* Borde superior acento */}
-      <div className="h-1 w-full bg-gradient-to-r from-sky-600 via-lime-500 to-cyan-400" />
+      <div className="h-1 w-full bg-gradient-to-r from-sky-600 via-sky-500 to-cyan-400" />
 
       <div className="flex items-start gap-3 p-4">
         {/* Icono principal */}
@@ -41,8 +41,7 @@ export default function MapVisibilityBadge({
             <span className="font-medium text-slate-800">
               búsqueda más eficiente
             </span>{' '}
-            en Pulso Propiedades y en el Portal de Portales. Al indicar la
-            ubicación,{' '}
+            en Procanje y en el Portal de Portales. Al indicar la ubicación,{' '}
             <span className="font-semibold text-slate-800 underline">
               aumentas la visibilidad
             </span>{' '}
@@ -70,7 +69,7 @@ export default function MapVisibilityBadge({
           <div className="mt-3">
             <button
               type="button"
-              className="inline-flex items-center justify-center rounded-lg bg-sky-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-lime-500 focus:ring-offset-1"
+              className="inline-flex items-center justify-center rounded-lg bg-sky-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-1"
               onClick={onCtaClick}
             >
               Indicar ubicación ahora
