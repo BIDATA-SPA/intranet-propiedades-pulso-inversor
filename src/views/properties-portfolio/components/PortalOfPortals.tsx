@@ -78,7 +78,7 @@ const documentTypes: {
   label: string
   desc: string
   disabled?: boolean
-}[] = [{ value: 'procanje', label: 'Procanje', desc: '' }]
+}[] = [{ value: 'pulsoPropiedades', label: 'Pulso Propiedades', desc: '' }]
 
 const DocumentTypeIcon = ({ type }: { type: string }) => {
   switch (type) {

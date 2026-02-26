@@ -11,12 +11,11 @@ import useNotification from '@/utils/hooks/useNotification'
 import { usePdpSecureActions } from '@/utils/hooks/usePdpSecureActions'
 import classNames from 'classnames'
 import { useEffect, useState } from 'react'
-import { FaHandshake, FaRegStar, FaStar, FaRegFilePdf } from 'react-icons/fa'
-import { FaBuildingUser, FaHouseCircleCheck } from 'react-icons/fa6'
+import { FaRegFilePdf, FaRegStar, FaStar } from 'react-icons/fa'
+import { FaHouseCircleCheck } from 'react-icons/fa6'
 import { HiOutlineEye, HiTrash } from 'react-icons/hi'
 import { MdFileUpload } from 'react-icons/md'
 import { useNavigate } from 'react-router'
-import UpdateExchangeForm from './dialog/UpdateExchangeForm'
 import UpdateStatusForm from './dialog/UpdateStatusForm'
 
 type TDialogState = {
@@ -25,51 +24,21 @@ type TDialogState = {
   deleteProperty?: boolean
 }
 
-const ProcanjeRealtorIcon = ({ row }) => {
-  const { data: userInfo } = useGetMyInfoQuery(
-    undefined,
-    { refetchOnMountOrArgChange: true }
-  )
-
-  if (
-    userInfo?.session?.type?.name === 'corredor' &&
-    userInfo?.session?.email === 'procanje@procanje.com'
-  ) {
-    return (
-      <div>
-        <Tooltip
-          title={
-            <div>
-              <strong className="text-sky-400">Publicante:</strong>
-              {row?.customer && (
-                <ul>
-                  <li>{`${row?.customer?.name} ${row?.customer?.lastName}`}</li>
-                </ul>
-              )}
-            </div>
-          }
-        >
-          <span className="cursor-pointer p-2 hover:text-blue-500  bg-gray-50 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-800 rounded-full">
-            <FaBuildingUser className="text-lg lg:text-xl" />
-          </span>
-        </Tooltip>
-      </div>
-    )
-  }
-
-  return null
+const PulsoRealtorIcon = ({ row }) => {
+  const { data: userInfo } = useGetMyInfoQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  })
 }
 
 const ActionColumn = ({ row, className }) => {
   const [userAuthority] = [useAppSelector((state) => state.auth.session.rol)]
-  const { data: userInfo } = useGetMyInfoQuery(
-    undefined,
-    { refetchOnMountOrArgChange: true }
-  )
+  const { data: userInfo } = useGetMyInfoQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  })
   const navigate = useNavigate()
   const [updateProperty] = useUpdatePropertyMutation()
 
-  // Procanje (propiedad)
+  // Pulso (propiedad)
   const [
     deleteProperty,
     {
@@ -167,9 +136,7 @@ const ActionColumn = ({ row, className }) => {
           pdpToken,
         }).unwrap()
 
-        const items: any[] = Array.isArray(found)
-          ? found
-          : found?.items ?? []
+        const items: any[] = Array.isArray(found) ? found : found?.items ?? []
 
         uuids = items
           .filter(
@@ -207,13 +174,13 @@ const ActionColumn = ({ row, className }) => {
         }
       }
 
-      // 4) borrar en Procanje
+      // 4) borrar en Pulso
       await deleteProperty(row?.id).unwrap()
 
       showNotification(
         'success',
         'Eliminación completada',
-        'Propiedad eliminada en Procanje y sincronizada con Portal de Portales.'
+        'Propiedad eliminada en Pulso Propiedades y sincronizada con Portal de Portales.'
       )
 
       setDialogState({
@@ -269,7 +236,7 @@ const ActionColumn = ({ row, className }) => {
 
   return (
     <div className="flex items-center flex-row justify-around">
-      <ProcanjeRealtorIcon row={row} />
+      <PulsoRealtorIcon row={row} />
 
       <div
         className={classNames(
@@ -328,17 +295,6 @@ const ActionColumn = ({ row, className }) => {
           </Tooltip>
         ) : null}
 
-        {!row?.isExchanged && (
-          <Tooltip title="Habilitar para Canje">
-            <span
-              className="cursor-pointer p-2 hover:text-blue-500 rounded-full bg-gray-50 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-800"
-              onClick={() => handleUpdateExchange(row)}
-            >
-              <FaHandshake className="text-lg lg:text-xl" />
-            </span>
-          </Tooltip>
-        )}
-
         <Tooltip title="Eliminar (Pulso Propiedades + Portal de Portales)">
           <span
             className={classNames(
@@ -363,20 +319,6 @@ const ActionColumn = ({ row, className }) => {
         <UpdateStatusForm property={selectedItem} onClose={handleCloseDialog} />
       </Dialog>
 
-      {/* Update exchange dialog */}
-      <Dialog
-        width={700}
-        isOpen={dialogState.updateExchange}
-        onClose={handleCloseDialog}
-        onRequestClose={handleCloseDialog}
-      >
-        <h5 className="mb-4">Habilitar para canje</h5>
-        <UpdateExchangeForm
-          property={selectedItem}
-          onClose={handleCloseDialog}
-        />
-      </Dialog>
-
       {/* Delete dialog (cascada) */}
       <ConfirmDialog
         isOpen={dialogState.deleteProperty}
@@ -390,8 +332,8 @@ const ActionColumn = ({ row, className }) => {
         onConfirm={handleConfirm}
       >
         <p className="text-sm">
-          Esta acción eliminará la propiedad en <b>Procanje</b> y también
-          intentará eliminar sus publicaciones vinculadas en
+          Esta acción eliminará la propiedad en <b>Pulso Propiedades</b> y
+          también intentará eliminar sus publicaciones vinculadas en
           <b> Portal de Portales</b> (búsqueda por <code>code</code>).
           <br />
           No se puede deshacer.

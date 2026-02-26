@@ -1,5 +1,3 @@
-import LogoProcanje from '../../../public/img/portals/svg-procanje.svg'
-
 export type PortalCoordinates = { lat: number; lng: number }
 
 export type PortalLocation = {
@@ -138,11 +136,9 @@ export type PortalId = 'pulsoPropiedades'
 export const PORTAL_OPTIONS: Array<{
   value: PortalId
   label: string
-  logo: string
 }> = [
   {
     value: 'pulsoPropiedades',
     label: 'pulsoPropiedades',
-    logo: LogoProcanje,
   },
 ]

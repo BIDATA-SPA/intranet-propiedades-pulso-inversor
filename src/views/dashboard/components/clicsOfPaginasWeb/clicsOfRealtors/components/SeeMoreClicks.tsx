@@ -5,8 +5,6 @@ import { MdOutlineConnectWithoutContact, MdWeb } from 'react-icons/md'
 import { TbUserSquareRounded } from 'react-icons/tb'
 
 const StadisticsClicks = ({ dataClicks }) => {
-  // console.log('contador', dataClicks)
-
   const parseToPercent = () => {
     const totalClicks = Object.values(dataClicks).reduce(
       (acc, val) => acc + val,
@@ -114,16 +112,16 @@ const MainContentEvent = ({ closeDialogs, dataClicks }) => {
   return (
     <>
       <div className="text-center mb-4 sm:mb-2 mt-4 sm:mt-2 sm:mx-14">
-        <h3 className="text-2xl">Estadísticas completas como corredor</h3>
+        <h3 className="text-2xl">Nosotros</h3>
         <small>
           en la web oficial{' '}
           <a
             className="text-sky-600 underline underline-offset-1 italic"
-            href="https://procanje.com/portal-corredores"
+            href="https://pulsopropiedades.cl/#nosotros"
             target="_blank"
             rel="noreferrer"
           >
-            Procanje.com
+            Pulso Propiedades
           </a>
         </small>
       </div>

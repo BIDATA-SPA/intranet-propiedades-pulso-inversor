@@ -248,8 +248,8 @@ const StadisticsClicks = ({ dataClicks }) => {
       </div>
       <div className="flex justify-end mx-4 m-1 mb-2 cursor-pointer mt-3">
         <p
-          onClick={toggleMoreProp}
           className="italic hover:scale-x-105 duration-150 text-sky-400"
+          onClick={toggleMoreProp}
         >
           {moreProp ? 'Ver menos' : 'Ver más propiedades'}
         </p>
@@ -267,11 +267,11 @@ const MainContentEvent = ({ closeDialogs, dataClicks }) => {
           en la web oficial{' '}
           <a
             className="text-sky-600 underline underline-offset-1 italic"
-            href="https://procanje.com/portal-propiedades"
+            href="https://pulsopropiedades.cl/propiedades/"
             target="_blank"
             rel="noreferrer"
           >
-            Procanje.com
+            Pulso Propiedades
           </a>
         </small>
       </div>
@@ -286,7 +286,7 @@ const SeeMoreClicksPropertyDialog = ({
   dataClicks,
 }) => {
   return (
-    <Dialog isOpen={openDialog} onClose={closeDialogs} width={650}>
+    <Dialog isOpen={openDialog} width={650} onClose={closeDialogs}>
       <MainContentEvent closeDialogs={closeDialogs} dataClicks={dataClicks} />
     </Dialog>
   )

@@ -91,7 +91,9 @@ const ActivityLog = () => {
         <div className="max-h-[750px] max-w-[850px] 2xl:w-[815px] overflow-x-auto sm:overscroll-none overflow-y-auto">
           <div className="mx-2 m-2 mb-4">
             <h4 className="text-gray-600">Actividad reciente</h4>
-            <small className="text-sm">realizada dentro de Procanje App</small>
+            <small className="text-sm">
+              realizada dentro de Pulso Propiedades App
+            </small>
           </div>
           <Timeline>
             {filteredData && filteredData?.length > 0 ? (

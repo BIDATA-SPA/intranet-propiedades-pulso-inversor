@@ -384,7 +384,7 @@ const AddressInfomation = ({
   )
 
   // ------------------------
-  // Notifications (PROCANJE)
+  // Notifications (Pulso)
   // ------------------------
   const notifySearchingOnce = (msg?: string) => {
     if (isSearchToastOpenRef.current) return

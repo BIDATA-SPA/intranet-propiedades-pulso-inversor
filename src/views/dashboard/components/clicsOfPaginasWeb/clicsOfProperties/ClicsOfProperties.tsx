@@ -82,7 +82,7 @@ const ClicsOfProperties = () => {
             realizados en portal propiedades en página web oficial{' '}
             <a
               className="underline underline-offset-1 italic"
-              href="https://procanje.com/portal-propiedades"
+              href="https://pulsopropiedades.cl/propiedades"
               target="_blank"
               rel="noreferrer"
             >

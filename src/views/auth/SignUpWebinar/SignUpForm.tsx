@@ -171,7 +171,7 @@ const SignUpForm = (props: SignUpFormProps) => {
           name: searchParams.get('name') ?? '',
           lastName: searchParams.get('lastName') ?? '',
           phone: '',
-          dialCodeId: '43',
+          dialCodeId: '',
           email: searchParams.get('email') ?? '',
           password: '',
           confirmPassword: '',

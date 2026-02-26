@@ -192,22 +192,6 @@ const Clientes = () => {
 
   const userId = me?.id
 
-  const onClickCopyReviewProfile = (userId: string) => {
-    const origin =
-      typeof window !== 'undefined'
-        ? window.location.origin.replace(/\/$/, '')
-        : 'https://procanje.app'
-
-    const url = `${origin}/califica-a-tu-corredor/${userId}`
-
-    copyToClipboard(url)
-    showNotification(
-      'success',
-      'Enlace copiado',
-      'Comparte este enlace a tu cliente para calificar tu perfil'
-    )
-  }
-
   // Sent Rating form to customer
   const handleSendRatingForm = async (formData) => {
     const {
@@ -224,7 +208,7 @@ const Clientes = () => {
     const data = {
       mail: email || '',
       cc: [''],
-      subject: 'Calificar corredor - Procanje',
+      subject: 'Calificar corredor - Pulso Propiedades',
       link: urlCalificacion,
     }
 

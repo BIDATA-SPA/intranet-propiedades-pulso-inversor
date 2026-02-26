@@ -54,8 +54,8 @@ const UserDetails = () => {
         name: data?.name,
         lastName: data?.lastName,
         rut: data?.rut,
-        phone: data?.phone,
-        dialCodeId: data?.dialCode?.id, // data?.dialCode
+        phone: '', // data?.phone
+        dialCodeId: '', // data?.dialCode
         webPage: data?.webPage,
         about: data?.about,
         companies: data?.companies,

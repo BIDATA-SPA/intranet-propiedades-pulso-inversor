@@ -1,23 +1,14 @@
 import type { CommonProps } from '@/@types/common'
 import ActionLink from '@/components/shared/ActionLink'
 import PasswordInput from '@/components/shared/PasswordInput'
-import { InputGroup } from '@/components/ui'
 import Button from '@/components/ui/Button'
 import { FormContainer, FormItem } from '@/components/ui/Form'
-import type { InputProps } from '@/components/ui/Input'
 import Input from '@/components/ui/Input'
-import Select from '@/components/ui/Select'
-import { countryList } from '@/constants/countries.constant'
 import useAuth from '@/utils/hooks/useAuth'
 import useNotification from '@/utils/hooks/useNotification'
 import useTimeOutMessage from '@/utils/hooks/useTimeOutMessage'
-import type { FieldInputProps } from 'formik'
-import { Field, FieldProps, Form, Formik } from 'formik'
-import { ComponentType } from 'react'
-import { HiCheck } from 'react-icons/hi'
-import { NumericFormat, NumericFormatProps } from 'react-number-format'
+import { Field, Form, Formik } from 'formik'
 import { useParams, useSearchParams } from 'react-router-dom'
-import type { OptionProps, SingleValueProps } from 'react-select'
 import { components } from 'react-select'
 import * as Yup from 'yup'
 
@@ -37,16 +28,26 @@ type SignUpFormSchema = {
   origin: string
 }
 
+const COMPANY_DOMAIN = '@pulsopropiedades.cl'
+const EMAIL_DOMAIN_REGEX = /^[^\s@]+@pulsopropiedades\.cl$/i
+
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Este campo es obligatorio.'),
   lastName: Yup.string().required('Este campo es obligatorio.'),
-  phone: Yup.string().required('Este campo es obligatorio.'),
-  dialCodeId: Yup.string().required('Este campo es obligatorio.'),
+  phone: Yup.string().optional(),
+  dialCodeId: Yup.string().optional(),
   referralCode: Yup.string().optional(),
   origin: Yup.string().optional(),
+
   email: Yup.string()
+    .transform((v) => (v ? v.trim().toLowerCase() : v))
     .email('Email no válido.')
-    .required('Por favor, introduzca su e-mail.'),
+    .required('Por favor, introduzca su e-mail.')
+    .matches(
+      EMAIL_DOMAIN_REGEX,
+      'El correo o dominio no pertenece a Pulso Propiedades'
+    ),
+
   password: Yup.string()
     .min(8, 'Debe tener al menos 8 caracteres')
     .matches(/[a-z]/, 'Debe contener al menos una letra minúscula')
@@ -61,6 +62,7 @@ const validationSchema = Yup.object().shape({
       'No debe ser una palabra común o muy predecible'
     )
     .required('La contraseña es obligatoria'),
+
   confirmPassword: Yup.string().oneOf(
     [Yup.ref('password')],
     'Tus contraseñas no coinciden.'
@@ -75,65 +77,6 @@ type CountryOption = {
 
 const { SingleValue } = components
 
-const PhoneSelectOption = ({
-  innerProps,
-  data,
-  isSelected,
-}: OptionProps<CountryOption>) => {
-  return (
-    <div
-      className={`cursor-pointer flex items-center justify-between p-2 ${
-        isSelected
-          ? 'bg-gray-100 dark:bg-gray-500'
-          : 'hover:bg-gray-50 dark:hover:bg-gray-600'
-      }`}
-      {...innerProps}
-    >
-      <div className="flex items-center gap-2">
-        <span>
-          {`${data?.label}`} {`(${data?.dialCode})`}
-        </span>
-        {isSelected && <HiCheck className="text-emerald-500 text-xl" />}
-      </div>
-    </div>
-  )
-}
-
-const PhoneControl = (props: SingleValueProps<CountryOption>) => {
-  const selected = props.getValue()[0]
-  return (
-    <SingleValue {...props}>
-      {selected && (
-        <span>
-          {selected?.label} {`(${selected?.dialCode})`}
-        </span>
-      )}
-    </SingleValue>
-  )
-}
-const NumberInput = (props: InputProps) => {
-  return <Input {...props} value={props.field.value} />
-}
-
-const NumericFormatInput = ({
-  onValueChange,
-  ...rest
-}: Omit<NumericFormatProps, 'form'> & {
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  form: any
-  field: FieldInputProps<unknown>
-}) => {
-  return (
-    <NumericFormat
-      customInput={Input as ComponentType}
-      type="text"
-      autoComplete="off"
-      onValueChange={onValueChange}
-      {...rest}
-    />
-  )
-}
-
 const SignUpForm = (props: SignUpFormProps) => {
   const {
     disableSubmit = false,
@@ -145,12 +88,6 @@ const SignUpForm = (props: SignUpFormProps) => {
   const [_, setMessage] = useTimeOutMessage()
   const { referralCode } = useParams()
   const { showNotification } = useNotification()
-
-  const countryOptions = countryList?.map((option) => ({
-    value: `${option.id}`,
-    label: `${option.country}`,
-    dialCode: `${option.dialCode}`,
-  }))
 
   const onSignUp = async (
     values: SignUpFormSchema,
@@ -195,7 +132,7 @@ const SignUpForm = (props: SignUpFormProps) => {
           name: searchParams.get('name') ?? '',
           lastName: searchParams.get('lastName') ?? '',
           phone: '',
-          dialCodeId: '43',
+          dialCodeId: '',
           email: searchParams.get('email') ?? '',
           password: '',
           confirmPassword: '',
@@ -244,55 +181,6 @@ const SignUpForm = (props: SignUpFormProps) => {
                 </FormItem>
               </div>
 
-              {/* new phone */}
-              <FormItem
-                label="Teléfono celular"
-                invalid={
-                  (errors.dialCodeId && touched.dialCodeId) ||
-                  (errors.phone && touched.phone)
-                }
-                errorMessage={errors.phone}
-              >
-                <InputGroup>
-                  <Field name="dialCodeId">
-                    {({ field, form }: FieldProps) => (
-                      <Select<CountryOption>
-                        className="min-w-[180px]"
-                        placeholder="Cód. País"
-                        components={{
-                          Option: PhoneSelectOption,
-                          SingleValue: PhoneControl,
-                        }}
-                        field={field}
-                        form={form}
-                        options={countryOptions}
-                        value={countryOptions?.find(
-                          (country) => country.value === values?.dialCodeId
-                        )}
-                        onChange={(country) =>
-                          form.setFieldValue(field.name, country?.value)
-                        }
-                      />
-                    )}
-                  </Field>
-                  <Field name="phone">
-                    {({ field, form }: FieldProps) => {
-                      return (
-                        <NumericFormatInput
-                          form={form}
-                          field={field}
-                          customInput={NumberInput as ComponentType}
-                          placeholder="Teléfono celular"
-                          onValueChange={(e) => {
-                            form.setFieldValue(field.name, e.value)
-                          }}
-                        />
-                      )
-                    }}
-                  </Field>
-                </InputGroup>
-              </FormItem>
-
               {/* End phone */}
               <FormItem
                 label="Correo electrónico (E-mail de acceso)"
@@ -303,7 +191,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                   type="email"
                   autoComplete="off"
                   name="email"
-                  placeholder="Ingresar e-mail"
+                  placeholder={`usuario${COMPANY_DOMAIN}`}
                   component={Input}
                 />
               </FormItem>

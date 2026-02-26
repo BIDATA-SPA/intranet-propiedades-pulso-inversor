@@ -128,19 +128,169 @@ export const filterParkingSpaces: TSelect[] = [
   { value: '+5', label: 'Más de 5' },
 ]
 
-// export const filterTypeOfKitchens = [
-//   { value: 'Tipo isla', label: 'Tipo isla' },
-//   { value: 'Tipo forma en U', label: 'Tipo forma en U' },
-//   { value: 'Tipo peninsula', label: 'Tipo peninsula' },
-//   { value: 'Tipo en L', label: 'Tipo en L' },
-//   { value: 'Tipo en linea', label: 'Tipo en linea' },
-// ]
+export const filterGeography: TSelect[] = [
+  { value: 'Campo', label: 'Campo' },
+  { value: 'Ciudad', label: 'Ciudad' },
+  { value: 'Lago', label: 'Lago' },
+  { value: 'Montaña', label: 'Montaña' },
+  { value: 'Mar', label: 'Mar' },
+  { value: 'Río', label: 'Río' },
+]
+
+export const filterLandShape: TSelect[] = [
+  { value: 'Plano', label: 'Plano' },
+  { value: 'Casi plano', label: 'Casi plano' },
+  { value: 'Semi plano', label: 'Semi plano' },
+  { value: 'Pendiente suave', label: 'Pendiente suave' },
+  { value: 'Pendiente moderada', label: 'Pendiente moderada' },
+  { value: 'Pendiente pronunciada', label: 'Pendiente pronunciada' },
+  { value: 'Quebrado / irregular', label: 'Quebrado / irregular' },
+  { value: 'Ondulado', label: 'Ondulado' },
+  { value: 'En terrazas', label: 'En terrazas' },
+  { value: 'Ladera', label: 'Ladera' },
+  { value: 'Cima / cumbre', label: 'Cima / cumbre' },
+  { value: 'Valle', label: 'Valle' },
+  { value: 'Hondonada / depresión', label: 'Hondonada / depresión' },
+  { value: 'Relleno (terreno nivelado)', label: 'Relleno (terreno nivelado)' },
+]
+
+export const filterLandShapeGround: TSelect[] = [
+  { value: 'Regular', label: 'Regular' },
+  { value: 'Irregular', label: 'Irregular' },
+  { value: 'Plano', label: 'Plano' },
+]
+
+export const filterTypeOfFarm: TSelect[] = [
+  { value: 'Frutícola', label: 'Frutícola' },
+  { value: 'Agrícola', label: 'Agrícola' },
+  { value: 'Chacra', label: 'Chacra' },
+  { value: 'Criadero', label: 'Criadero' },
+  { value: 'Tambero', label: 'Tambero' },
+  { value: 'Floricultura', label: 'Floricultura' },
+  { value: 'Forestal', label: 'Forestal' },
+  { value: 'Ganadero', label: 'Ganadero' },
+  { value: 'Haras', label: 'Haras' },
+  { value: 'Otro', label: 'Otro' },
+]
+
+export const filterStorageCount: TSelect[] = [
+  { value: '1', label: '1' },
+  { value: '2', label: '2' },
+  { value: '3', label: '3' },
+  { value: '4', label: '4' },
+  { value: '5', label: '5' },
+  { value: '+5', label: 'Más de 5' },
+]
+
+export const filterTypeOfBuilding: TSelect[] = [
+  { value: 'Casa Comercial', label: 'Casa Comercial' },
+  { value: 'Edificio Antiguo', label: 'Edificio Antiguo' },
+  { value: 'Edificio Moderno', label: 'Edificio Moderno' },
+  { value: 'Edificio Nuevo', label: 'Edificio Nuevo' },
+]
+
+export const filterCeilingType: TSelect[] = [
+  { value: 'Cielo Falso', label: 'Cielo Falso' },
+  { value: 'Cielo Losa', label: 'Cielo Losa' },
+  { value: 'Pizarreño', label: 'Pizarreño' },
+  { value: 'Teja', label: 'Teja' },
+  { value: 'Teja Alerce', label: 'Teja Alerce' },
+  { value: 'Teja Chilena', label: 'Teja Chilena' },
+  { value: 'Zinc', label: 'Zinc' },
+]
+
+export const filterFlooringType: TSelect[] = [
+  { value: 'Alfombrado', label: 'Alfombrado' },
+  { value: 'Baldosas', label: 'Baldosas' },
+  { value: 'Baldosín Cerámico', label: 'Baldosín Cerámico' },
+  { value: 'Cerámica', label: 'Cerámica' },
+  { value: 'Cubre Pisos', label: 'Cubre Pisos' },
+  { value: 'Flexit', label: 'Flexit' },
+  { value: 'Cemento Afinado', label: 'Cemento Afinado' },
+  { value: 'Mármol ', label: 'Mármol' },
+  { value: 'Mixto', label: 'Mixto' },
+  { value: 'Piso Flotante', label: 'Piso Flotante' },
+  { value: 'Porcelanato', label: 'Porcelanato' },
+  { value: 'Parquet', label: 'Parquet' },
+  { value: 'Piedra Pizarra', label: 'Piedra Pizarra' },
+]
+export const filterTypeOfHouse: TSelect[] = [
+  { value: 'Dúplex ', label: 'Dúplex' },
+  { value: 'Ph', label: 'Ph' },
+  { value: 'Triplex', label: 'Triplex' },
+  { value: 'Cabaña', label: 'Cabaña' },
+  { value: 'Casa', label: 'Casa' },
+  { value: 'Chalet', label: 'Chalet' },
+]
+
+export const filterUnitHeight: TSelect[] = [
+  { value: 'm', label: 'm' },
+  { value: 'cm', label: 'cm' },
+]
+
+export const filterUnitPricePerArea: TSelect[] = [
+  { value: '$/ha', label: '$/ha' },
+  { value: '$/m2', label: '$/m2' },
+]
+
+export const filterUnitFloorStand: TSelect[] = [
+  { value: 't/m2', label: 't/m2' },
+]
+
+export const filterUnitCoveredHullAread: TSelect[] = [
+  { value: 'm2', label: 'm2' },
+]
+
+export const filterTypeOfWinery: TSelect[] = [
+  { value: 'Terreno', label: 'Terreno' },
+  { value: 'Bodega', label: 'Bodega' },
+  { value: 'Galpón', label: 'Galpón' },
+  { value: 'Bodega Comercial', label: 'Bodega Comercial' },
+  { value: 'Nave Industrial', label: 'Nave Industrial' },
+  { value: 'Almacen', label: 'Almacen' },
+]
+
+export const filterOrientation: TSelect[] = [
+  { value: 'DESCONOCIDA', label: 'Desconocida (No Usa)' },
+  { value: 'NO', label: 'NO' },
+  { value: 'SO', label: 'SO' },
+  { value: 'SP', label: 'SP' },
+  { value: 'NOSP', label: 'NOSP' },
+  { value: 'S', label: 'S' },
+  { value: 'P', label: 'P' },
+  { value: 'O', label: 'O' },
+]
 
 export const filterTypeOfKitchens = [
   { value: 'Tradicional', label: 'Tradicional' },
   { value: 'Abierta', label: 'Abierta' },
   { value: 'Americana', label: 'Americana' },
   { value: 'Otro', label: 'Otro' },
+]
+
+export const filterAccessToParking = [
+  { value: 'Rampa Fija', label: 'Rampa Fija' },
+  { value: 'Rampa Móvil', label: 'Rampa Móvil' },
+  { value: 'Ascensor', label: 'Ascensor' },
+  { value: 'Horizontal', label: 'Horizontal' },
+]
+
+export const filterAccessToParkingCoverage = [
+  { value: 'Semi Cubierta', label: 'Semi Cubierta' },
+  { value: 'Cubierta', label: 'Cubierta' },
+  { value: 'Descubierta', label: 'Descubierta' },
+]
+
+export const filterDepartmentType = [
+  { value: 'Semi Piso', label: 'Semi Piso' },
+  { value: 'Triplex', label: 'Triplex' },
+  { value: 'Loft', label: 'Loft' },
+  { value: 'Penthouse', label: 'OPenthouseo' },
+  { value: 'Departamento', label: 'Departamento' },
+  { value: 'Dúplex ', label: 'Dúplex' },
+  { value: 'Monoambiente', label: 'Monoambiente' },
+  { value: 'Ph', label: 'Ph' },
+  { value: 'Piso', label: 'OPisoo' },
 ]
 
 export const filterTypeOfHeating = [

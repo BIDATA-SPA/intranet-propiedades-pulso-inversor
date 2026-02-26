@@ -10,7 +10,6 @@ import { formatThousands } from '@/utils/formatCurrency'
 import useNotification from '@/utils/hooks/useNotification'
 import useThemeClass from '@/utils/hooks/useThemeClass'
 import { stripHtml } from '@/utils/stripHTML'
-import UpdateExchangeForm from '@/views/my-properties/components/dialog/UpdateExchangeForm'
 import UpdateStatusForm from '@/views/my-properties/components/dialog/UpdateStatusForm'
 import { DialogState, useDialog } from '@/views/my-properties/hooks/use-dialog'
 import type { ColumnDef, ColumnSort } from '@tanstack/react-table'
@@ -20,14 +19,7 @@ import React, {
   useMemo,
   useState,
 } from 'react'
-import {
-  FaBath,
-  FaBed,
-  FaHandshake,
-  FaRegStar,
-  FaRuler,
-  FaStar,
-} from 'react-icons/fa'
+import { FaBath, FaBed, FaRegStar, FaRuler, FaStar } from 'react-icons/fa'
 import { FaHouseCircleCheck } from 'react-icons/fa6'
 import { HiOutlineEye } from 'react-icons/hi'
 import { RiMapPinFill } from 'react-icons/ri'
@@ -245,19 +237,6 @@ function _DataTableCanvas<T>(
                           </button>
                         </Tooltip>
 
-                        {/* If property isn't in exchange, it will show action */}
-                        {!property?.isExchanged && (
-                          <Tooltip title="Habilitar para Canje">
-                            <button
-                              type="button"
-                              className="cursor-pointer p-2 hover:text-blue-500"
-                              onClick={() => onUpdateExchangeOpen(property)}
-                            >
-                              <FaHandshake className="text-xl" />
-                            </button>
-                          </Tooltip>
-                        )}
-
                         <Tooltip
                           title={
                             property?.highlighted
@@ -317,19 +296,6 @@ function _DataTableCanvas<T>(
           />
         </div>
       </Loading>
-
-      <Dialog
-        width={700}
-        isOpen={dialogState.updateExchange}
-        onClose={closeUpdateExchangeDialog}
-        onRequestClose={closeUpdateExchangeDialog}
-      >
-        <h5 className="mb-4">Habilitar para canje</h5>
-        <UpdateExchangeForm
-          property={selectedItem}
-          onClose={closeUpdateExchangeDialog}
-        />
-      </Dialog>
 
       <Dialog
         isOpen={dialogState.updateStatus}

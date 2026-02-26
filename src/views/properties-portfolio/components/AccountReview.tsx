@@ -24,7 +24,6 @@ import {
   toISOOrNull,
   toNum,
   toStr,
-  toStrOrNull,
 } from '@/utils/parsing-types'
 import { Field, FieldProps, Form, Formik } from 'formik'
 import { useRef, useState } from 'react'
@@ -41,7 +40,7 @@ type AccountReviewProps = {
 }
 
 const computeExternalLink = (id: string | number) =>
-  `https://procanje.com/propiedades/${id}`
+  `https://pulsopropiedades.cl/propiedades/${id}`
 
 const PORTAL_TAG = { id: 'pulsoPropiedades', name: 'pulsoPropiedades' }
 
@@ -84,70 +83,82 @@ const AccountReview = ({ data, onSuccess, onError }: AccountReviewProps) => {
     }
 
     const step2 = {
+      externalLink: toStr(values?.identification?.externalLink),
       highlighted: toBool(values?.identification?.highlighted),
-      propertyStatusId: null,
-      disableReason: null,
-      observations: toStrOrNull(values?.identification?.observations),
+      propertyStatusId: toNum(values?.identification?.propertyStatusId),
+      observations: toStr(values?.identification?.observations),
+      disableReason: toStr(values?.identification?.disableReason),
+
       characteristics: {
-        numberOfPrivate: toStr(
-          values?.identification?.characteristics?.numberOfPrivate
+        rol: toStr(values?.identification?.characteristics?.rol),
+
+        locatedInCondominium: toBool(
+          values?.identification?.characteristics?.locatedInCondominium
         ),
-        officeNumber: toStr(
-          values?.identification?.characteristics?.officeNumber
-        ),
+
         numberOfVacantFloors: toStr(
           values?.identification?.characteristics?.numberOfVacantFloors
         ),
         numberOfMeetingRooms: toStr(
           values?.identification?.characteristics?.numberOfMeetingRooms
         ),
+
         hasKitchenet: toBool(
           values?.identification?.characteristics?.hasKitchenet
         ),
-        locatedInGallery: toBool(
-          values?.identification?.characteristics?.locatedInGallery
-        ),
-        locatedFacingTheStreet: toBool(
-          values?.identification?.characteristics?.locatedFacingTheStreet
+        hasHouse: toBool(values?.identification?.characteristics?.hasHouse),
+
+        officeNumber: toStr(
+          values?.identification?.characteristics?.officeNumber
         ),
         floorLevelLocation: toStr(
           values?.identification?.characteristics?.floorLevelLocation
         ),
+
         commonExpenses: toStr(
           values?.identification?.characteristics?.commonExpenses
         ),
-        hasHouse: toBool(values?.identification?.characteristics?.hasHouse),
-        surface: toStr(values?.identification?.characteristics?.surface),
-        constructedSurface: toStr(
-          values?.identification?.characteristics?.constructedSurface
-        ),
-        floors: toStr(values?.identification?.characteristics?.floors),
-        terraces: toStr(values?.identification?.characteristics?.terraces),
-        terraceM2: toStr(values?.identification?.characteristics?.terraceM2),
+
         numberOfFloors: toStr(
           values?.identification?.characteristics?.numberOfFloors
         ),
+
+        terraces: toStr(values?.identification?.characteristics?.terraces),
+        terraceM2: toStr(values?.identification?.characteristics?.terraceM2),
+
         bathrooms: toStr(values?.identification?.characteristics?.bathrooms),
-        surfaceUnit: toStrOrNull(
+        bedrooms: toStr(values?.identification?.characteristics?.bedrooms),
+
+        surfaceUnit: toStr(
           values?.identification?.characteristics?.surfaceUnit
         ),
-        bedrooms: toStr(values?.identification?.characteristics?.bedrooms),
-        hasKitchen: toBool(values?.identification?.characteristics?.hasKitchen),
-        typeOfKitchen: toStrOrNull(
+        typeOfKitchen: toStr(
           values?.identification?.characteristics?.typeOfKitchen
         ),
+
         hasHeating: toBool(values?.identification?.characteristics?.hasHeating),
-        typeOfHeating: toStrOrNull(
-          values?.identification?.characteristics?.typeOfHeating
+        hasSecurity: toBool(
+          values?.identification?.characteristics?.hasSecurity
         ),
+
+        typeOfSecurity: Array.isArray(
+          values?.identification?.characteristics?.typeOfSecurity
+        )
+          ? values.identification.characteristics.typeOfSecurity
+              .map((x: any) => toStr(x?.value ?? x))
+              .filter(Boolean)
+          : [],
+
+        isFurnished: toBool(
+          values?.identification?.characteristics?.isFurnished
+        ),
+
         hasAirConditioning: toBool(
           values?.identification?.characteristics?.hasAirConditioning
         ),
-        hasParking: toBool(values?.identification?.characteristics?.hasParking),
+
         hasGarage: toBool(values?.identification?.characteristics?.hasGarage),
-        numberOfParkingSpaces: toStrOrNull(
-          values?.identification?.characteristics?.numberOfParkingSpaces
-        ),
+        hasParking: toBool(values?.identification?.characteristics?.hasParking),
         hasElevator: toBool(
           values?.identification?.characteristics?.hasElevator
         ),
@@ -155,33 +166,194 @@ const AccountReview = ({ data, onSuccess, onError }: AccountReviewProps) => {
         hasSwimmingPool: toBool(
           values?.identification?.characteristics?.hasSwimmingPool
         ),
-        hasSecurity: toBool(
-          values?.identification?.characteristics?.hasSecurity
-        ),
-        typeOfSecurity: Array.isArray(
-          values?.identification?.characteristics?.typeOfSecurity
-        )
-          ? values.identification.characteristics.typeOfSecurity
-              .map((x: any) => toStr(x.value))
-              .filter(Boolean)
-          : [],
-        locatedInCondominium: toBool(
-          values?.identification?.characteristics?.locatedInCondominium
-        ),
-        isFurnished: toBool(
-          values?.identification?.characteristics?.isFurnished
-        ),
         hasBarbecueArea: toBool(
           values?.identification?.characteristics?.hasBarbecueArea
         ),
+
         propertyTitle: toStr(
           values?.identification?.characteristics?.propertyTitle
         ),
         propertyDescription: toStr(
           values?.identification?.characteristics?.propertyDescription
         ),
+
+        hasKitchen: toBool(values?.identification?.characteristics?.hasKitchen),
+
+        surface: toStr(values?.identification?.characteristics?.surface),
+        constructedSurface: toStr(
+          values?.identification?.characteristics?.constructedSurface
+        ),
+
+        hasServiceRoom: toBool(
+          values?.identification?.characteristics?.hasServiceRoom
+        ),
+        hasLivingRoom: toBool(
+          values?.identification?.characteristics?.hasLivingRoom
+        ),
+
+        geography: toStr(values?.identification?.characteristics?.geography),
+        storageCount: toNum(
+          values?.identification?.characteristics?.storageCount
+        ),
+
+        ceilingType: toStr(
+          values?.identification?.characteristics?.ceilingType
+        ),
+        flooringType: toStr(
+          values?.identification?.characteristics?.flooringType
+        ),
+
+        hasHomeOffice: toBool(
+          values?.identification?.characteristics?.hasHomeOffice
+        ),
+        hasDiningRoom: toBool(
+          values?.identification?.characteristics?.hasDiningRoom
+        ),
+        hasYard: toBool(values?.identification?.characteristics?.hasYard),
+        hasGuestBathroom: toBool(
+          values?.identification?.characteristics?.hasGuestBathroom
+        ),
+        hasSuite: toBool(values?.identification?.characteristics?.hasSuite),
+        hasWalkInCloset: toBool(
+          values?.identification?.characteristics?.hasWalkInCloset
+        ),
+        hasPlayRoom: toBool(
+          values?.identification?.characteristics?.hasPlayRoom
+        ),
+        hasFireplace: toBool(
+          values?.identification?.characteristics?.hasFireplace
+        ),
+        hasPlayground: toBool(
+          values?.identification?.characteristics?.hasPlayground
+        ),
+        hasPaddleCourt: toBool(
+          values?.identification?.characteristics?.hasPaddleCourt
+        ),
+        hasPartyRoom: toBool(
+          values?.identification?.characteristics?.hasPartyRoom
+        ),
+        hasSoccerField: toBool(
+          values?.identification?.characteristics?.hasSoccerField
+        ),
+        hasTennisCourt: toBool(
+          values?.identification?.characteristics?.hasTennisCourt
+        ),
+        hasBasketballCourt: toBool(
+          values?.identification?.characteristics?.hasBasketballCourt
+        ),
+
+        contactHours: toStr(
+          values?.identification?.characteristics?.contactHours
+        ),
+        yearOfConstruction: toNum(
+          values?.identification?.characteristics?.yearOfConstruction
+        ),
+
+        hasJacuzzi: toBool(values?.identification?.characteristics?.hasJacuzzi),
+        hasHorseStable: toBool(
+          values?.identification?.characteristics?.hasHorseStable
+        ),
+        landShape: toStr(values?.identification?.characteristics?.landShape),
+        distanceToAsphalt: toNum(
+          values?.identification?.characteristics?.distanceToAsphalt
+        ),
+
+        has24hConcierge: toBool(
+          values?.identification?.characteristics?.has24hConcierge
+        ),
+        hasInternetAccess: toBool(
+          values?.identification?.characteristics?.hasInternetAccess
+        ),
+        hasNaturalGas: toBool(
+          values?.identification?.characteristics?.hasNaturalGas
+        ),
+        hasRunningWater: toBool(
+          values?.identification?.characteristics?.hasRunningWater
+        ),
+        hasTelephoneLine: toBool(
+          values?.identification?.characteristics?.hasTelephoneLine
+        ),
+        hasSewerConnection: toBool(
+          values?.identification?.characteristics?.hasSewerConnection
+        ),
+        hasElectricity: toBool(
+          values?.identification?.characteristics?.hasElectricity
+        ),
+
+        hasMansard: toBool(values?.identification?.characteristics?.hasMansard),
+        hasBalcony: toBool(values?.identification?.characteristics?.hasBalcony),
+        hasClosets: toBool(values?.identification?.characteristics?.hasClosets),
+        hasVisitorParking: toBool(
+          values?.identification?.characteristics?.hasVisitorParking
+        ),
+        hasGreenAreas: toBool(
+          values?.identification?.characteristics?.hasGreenAreas
+        ),
+        hasMultiSportsCourt: toBool(
+          values?.identification?.characteristics?.hasMultiSportsCourt
+        ),
+        hasRefrigerator: toBool(
+          values?.identification?.characteristics?.hasRefrigerator
+        ),
+        hasCinemaArea: toBool(
+          values?.identification?.characteristics?.hasCinemaArea
+        ),
+        hasSauna: toBool(values?.identification?.characteristics?.hasSauna),
+
+        houseType: toStr(values?.identification?.characteristics?.houseType),
+
+        // DEPTOS
+        floorNumber: toNum(
+          values?.identification?.characteristics?.floorNumber
+        ),
+        unitNumber: toStr(values?.identification?.characteristics?.unitNumber),
+        apartmentType: toStr(
+          values?.identification?.characteristics?.apartmentType
+        ),
+        unitsPerFloor: toNum(
+          values?.identification?.characteristics?.unitsPerFloor
+        ),
+        hasLaundryRoom: toBool(
+          values?.identification?.characteristics?.hasLaundryRoom
+        ),
+        hasMultipurposeRoom: toBool(
+          values?.identification?.characteristics?.hasMultipurposeRoom
+        ),
+        petsAllowed: toBool(
+          values?.identification?.characteristics?.petsAllowed
+        ),
+        isCommercialUseAllowed: toBool(
+          values?.identification?.characteristics?.isCommercialUseAllowed
+        ),
+        condominiumClosed: toBool(
+          values?.identification?.characteristics?.condominiumClosed
+        ),
+        hasConcierge: toBool(
+          values?.identification?.characteristics?.hasConcierge
+        ),
+        hasWasherConnection: toBool(
+          values?.identification?.characteristics?.hasWasherConnection
+        ),
+        hasElectricGenerator: toBool(
+          values?.identification?.characteristics?.hasElectricGenerator
+        ),
+        hasSolarEnergy: toBool(
+          values?.identification?.characteristics?.hasSolarEnergy
+        ),
+        hasCistern: toBool(values?.identification?.characteristics?.hasCistern),
+        hasBolier: toBool(values?.identification?.characteristics?.hasBolier),
+
+        // LOCAL COMERCIAL
+        buildingName: toStr(
+          values?.identification?.characteristics?.buildingName
+        ),
+        buildingType: toStr(
+          values?.identification?.characteristics?.buildingType
+        ),
+        hasSecondLevel: toBool(
+          values?.identification?.characteristics?.hasSecondLevel
+        ),
       },
-      externalLink: toStrOrNull(values?.identification?.externalLink),
     }
 
     const step3 = {
@@ -210,7 +382,7 @@ const AccountReview = ({ data, onSuccess, onError }: AccountReviewProps) => {
     action: 'create' | 'update'
   ) => {
     try {
-      // 1) traer la propiedad de Procanje
+      // 1) traer la propiedad de Pulso Propiedades
       const spcRes = await ApiService.fetchData<any, any>({
         url: `properties/${localId}`,
         method: 'get',
@@ -340,7 +512,7 @@ const AccountReview = ({ data, onSuccess, onError }: AccountReviewProps) => {
             const payload = buildPayload(values)
 
             if (hasPropertyId) {
-              // UPDATE ProCanje
+              // UPDATE Pulso
               await updateProperty({ id, ...payload }).unwrap()
               openNotification(
                 'success',
@@ -355,7 +527,7 @@ const AccountReview = ({ data, onSuccess, onError }: AccountReviewProps) => {
               dispatch(resetFormState())
               onSuccess?.({ id, action: 'update' })
             } else {
-              // CREATE ProCanje
+              // CREATE Pulso
               const created = await createProperty(payload as any).unwrap()
               openNotification(
                 'success',
@@ -366,7 +538,7 @@ const AccountReview = ({ data, onSuccess, onError }: AccountReviewProps) => {
 
               const newId = created?.id
               if (newId != null) {
-                // actualizar externalLink en Procanje
+                // actualizar externalLink en Pulso
                 const fastLink = computeExternalLink(newId)
                 try {
                   await updateProperty({

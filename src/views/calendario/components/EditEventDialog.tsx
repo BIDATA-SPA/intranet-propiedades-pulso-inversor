@@ -102,7 +102,7 @@ const EditEventDialog = ({ openDialog, closeDialogs, eventData }) => {
       delete updatedEvent.status
       delete updatedEvent.type
       await patchEvent(updatedEvent)
-      // console.log('evento actualizado', updatedEvent)
+
       closeDialogs()
       openNotification(
         'success',

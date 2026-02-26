@@ -41,7 +41,8 @@ export default function MapVisibilityBadge({
             <span className="font-medium text-slate-800">
               búsqueda más eficiente
             </span>{' '}
-            en Procanje y en el Portal de Portales. Al indicar la ubicación,{' '}
+            en Pulos Propiedades y en el Portal de Portales. Al indicar la
+            ubicación,{' '}
             <span className="font-semibold text-slate-800 underline">
               aumentas la visibilidad
             </span>{' '}

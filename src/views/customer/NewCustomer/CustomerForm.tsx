@@ -179,7 +179,7 @@ const CustomerForm = () => {
         rut: '',
         alias: '',
         phone: '',
-        dialCodeId: '43', //Default Code Chile
+        dialCodeId: '', //Default Code Chile
         email: '',
         address: {
           countryId: null,

@@ -1,28 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { RichTextEditor } from '@/components/shared'
-import { Input, InputGroup, Select, Switcher } from '@/components/ui'
 import Button from '@/components/ui/Button'
-import { FormContainer, FormItem } from '@/components/ui/Form'
-import Addon from '@/components/ui/InputGroup/Addon'
+import { FormContainer } from '@/components/ui/Form'
 import { injectReducer } from '@/store'
-import {
-  filterBathrooms,
-  filterBedrooms,
-  filterFloors,
-  filterParkingSpaces,
-  filterTerraces,
-  filterTypeOfHeating,
-  filterTypeOfKitchens,
-  filterTypeOfSecurity,
-} from '@/utils/types/new-property/constants'
-import { Field, FieldProps, Form, Formik } from 'formik'
-import { TbWorldSearch } from 'react-icons/tb'
+import { Form, Formik } from 'formik'
 import * as Yup from 'yup'
 import type { Caracteristicas as CaracteristicasType } from '../store'
 import reducer, { useAppSelector } from '../store'
-import CommercialPremisesFields from './CommercialPremisesFields'
-import OfficeFields from './OfficeFields'
-import PlotFields from './PlotFields'
+import FormSwitcher from './form-amenities/FormSwitcher'
 
 injectReducer('accountDetailForm', reducer)
 
@@ -57,11 +41,7 @@ const validationSchema = Yup.object().shape({
     constructedSurface: Yup.number()
       .typeError('Debe ser un número válido.')
       .min(0, 'No se aceptan valores negativos.'),
-    numberOfPrivate: Yup.number()
-      .optional()
-      .nullable()
-      .typeError('Debe ser un número válido.')
-      .min(0, 'No se aceptan valores negativos.'),
+
     numberOfVacantFloors: Yup.number()
       .optional()
       .nullable()
@@ -79,8 +59,7 @@ const validationSchema = Yup.object().shape({
       .optional()
       .nullable(),
     floorLevelLocation: Yup.string().nullable().notRequired(),
-    locatedInGallery: Yup.boolean().nullable(),
-    locatedFacingTheStreet: Yup.boolean().nullable(),
+
     commonExpenses: Yup.string().nullable().notRequired(),
     floors: Yup.string().nullable().notRequired(),
     numberOfFloors: Yup.string().nullable().notRequired(),
@@ -114,61 +93,135 @@ const validationSchema = Yup.object().shape({
       .min(20, 'El largo mínimo es de 20 caracteres.')
       .max(5120, 'No puede exceder los 5120 caracteres.'),
   }),
+  // locatedInGallery: Yup.boolean().nullable(), ⚠️ no esta en la api
+  // locatedFacingTheStreet: Yup.boolean().nullable(), ⚠️ no esta en la api
+  // numberOfPrivate: Yup.number()
+  //   .optional()
+  //   .nullable()
+  //   .typeError('Debe ser un número válido.')
+  //   .min(0, 'No se aceptan valores negativos.'), ⚠️ no esta en la api
 })
 
 const Caracteristicas = ({
   data = {
     externalLink: '',
     highlighted: false,
+    propertyStatusId: 4,
     observations: '',
+    disableReason: '',
     characteristics: {
-      locatedInCondominium: false,
-      surface: '',
-      constructedSurface: '',
-      numberOfPrivate: '',
-      numberOfVacantFloors: '',
-      numberOfMeetingRooms: '',
-      hasKitchenet: false,
-      hasHouse: false,
-      officeNumber: '',
-      floorLevelLocation: '',
-      locatedInGallery: false,
-      locatedFacingTheStreet: false,
-      commonExpenses: '',
-      numberOfFloors: '',
-      floors: '',
-      terraces: '',
-      terraceM2: '',
-      bathrooms: '',
-      bedrooms: '',
-      hasKitchen: false,
-      typeOfKitchen: '',
-      hasHeating: false,
-      typeOfHeating: '',
-      hasSecurity: false,
-      typeOfSecurity: [],
-      isFurnished: false,
-      hasAirConditioning: false,
-      hasGarage: false,
-      numberOfParkingSpaces: '',
-      hasParking: false,
-      hasElevator: false,
-      hasGym: false,
-      hasSwimmingPool: false,
-      hasBarbecueArea: false,
-      propertyTitle: '',
-      propertyDescription: '',
+      rol: '', // ✅
+      locatedInCondominium: false, //✅
+      numberOfVacantFloors: '', //✅
+      numberOfMeetingRooms: '', //✅
+      hasKitchenet: false, // ✅
+      hasHouse: false, //✅
+      officeNumber: '', //✅
+      floorLevelLocation: '', //✅
+      commonExpenses: '', //✅
+      numberOfFloors: '', //✅
+      terraces: '', //✅
+      terraceM2: '', //✅
+      bathrooms: '', //✅
+      bedrooms: '', //✅
+      surfaceUnit: 'm2', //✅
+      typeOfKitchen: '', //✅
+      hasHeating: false, //✅
+      numberOfParkingSpaces: '', //✅
+      hasSecurity: false, //✅
+      typeOfSecurity: [], //✅
+      isFurnished: false, //✅
+      hasAirConditioning: false, //✅
+      hasGarage: false, // ✅
+      hasParking: false, //✅
+      hasElevator: false, //✅
+      hasGym: false, //✅
+      hasSwimmingPool: false, //✅
+      hasBarbecueArea: false, //✅
+      propertyTitle: '', //✅
+      propertyDescription: '', //✅
+      hasKitchen: false, //✅
+      surface: '', //✅
+      constructedSurface: '', //✅
+      hasServiceRoom: false, //✅
+      hasLivingRoom: false, //✅
+      floorNumber: 0, //✅
+      geography: '', //✅
+      storageCount: 0, //✅
+      ceilingType: '', //✅
+      flooringType: '', //✅
+      unitNumber: '', //✅
+      hasHomeOffice: false, //✅
+      hasDiningRoom: false, //✅
+      hasYard: false, //✅
+      hasGuestBathroom: false, //✅
+      hasSuite: false, //✅
+      hasWalkInCloset: false, //✅
+      hasPlayRoom: false, //✅
+      hasPlayground: false, //✅
+      hasFireplace: false, //✅
+      hasPaddleCourt: false, //✅
+      hasPartyRoom: false, //✅
+      hasSoccerField: false, //✅
+      hasTennisCourt: false, //✅
+      hasBasketballCourt: false, //✅
+      contactHours: '', //✅
+      yearOfConstruction: 0, //✅
+      hasJacuzzi: false, //✅
+      hasHorseStable: false, //✅
+      landShape: '', //✅
+      distanceToAsphalt: 0, //✅
+      has24hConcierge: false, //✅
+      hasInternetAccess: false, //✅
+      hasNaturalGas: false, //✅
+      hasRunningWater: false, //✅
+      hasTelephoneLine: false, //✅
+      hasSewerConnection: false, //✅
+      hasElectricity: false, //✅
+      hasMansard: false, //✅
+      hasBalcony: false, //✅
+      hasClosets: false, //✅
+      hasVisitorParking: false, //✅
+      hasGreenAreas: false, //✅
+      hasMultiSportsCourt: false, //✅
+      hasRefrigerator: false, //✅
+      hasCinemaArea: false, //✅
+      hasSauna: false, //✅
+      houseType: '', //✅
+      apartmentType: '', //✅
+      unitsPerFloor: 0, //✅
+      hasLaundryRoom: false, //✅
+      hasMultipurposeRoom: false, //✅
+      petsAllowed: false, //✅
+      isCommercialUseAllowed: false, //✅
+      condominiumClosed: false, //✅
+      hasConcierge: false, //✅
+      hasWasherConnection: false, //✅
+      hasElectricGenerator: false, //✅
+      hasSolarEnergy: false, //✅
+      hasCistern: false, //✅
+      hasBolier: false, //✅
+      buildingName: '', //✅
+      buildingType: '', //✅
+      hasSecondLevel: false, //✅
+      //   locatedInGallery: false, ⚠️ no esta en la api
+      //   numberOfPrivate: '', ⚠️ no esta en la api
+      //   locatedFacingTheStreet: false ⚠️ no esta en la api
+      //   typeOfHeating: '', ⚠️ no esta en la api
+      //   floors: '', ⚠️ no esta en la api
+      //   orientation: ⚠️ no esta en la api
     },
   },
   onNextChange,
   onBackChange,
   currentStepStatus,
 }: CaracteristicasProps) => {
-  const [userAuthority] = [useAppSelector((state) => state.auth.session.rol)]
-
   const formData = useAppSelector(
     (state) => state.accountDetailForm.data.formData
   )
+
+  // Get "Tipo de Inmueble"
+  const typeOfPropertyId = formData.informacionPrincipal.typeOfPropertyId
 
   const onNext = (
     values: FormModel,
@@ -201,35 +254,41 @@ const Caracteristicas = ({
           return (
             <Form>
               <FormContainer>
-                {userAuthority === 2 ? (
-                  <FormItem
-                    label="Enlace de la propiedad publicada en otros portales (Enlace público)."
-                    className="border-2 p-3 rounded-lg dark:border-gray-600"
-                    invalid={errors.externalLink && touched.externalLink}
-                    errorMessage={errors.externalLink}
-                  >
-                    <Field name="externalLink">
-                      {({ field, form }: FieldProps<FormModel>) => {
-                        return (
-                          <Input
-                            prefix={<TbWorldSearch className="text-xl" />}
-                            field={field}
-                            type="text"
-                            size="md"
-                            className="mb-2 border-sky-500/60 border-[3px] rounded-lg"
-                            placeholder="Ej: https://www.portalinmobiliario.com/detalles-de-mi-publicacion"
-                            value={values.externalLink}
-                            onChange={(e) => {
-                              form.setFieldValue(field.name, e.target.value)
-                            }}
-                          />
-                        )
-                      }}
-                    </Field>
-                  </FormItem>
-                ) : null}
+                <FormSwitcher
+                  typeOfPropertyId={typeOfPropertyId}
+                  values={values}
+                  touched={touched}
+                  errors={errors}
+                />
 
-                {formData.informacionPrincipal.typeOfPropertyId ===
+                {/* <FormItem
+                  label="Enlace de la propiedad publicada en otros portales (Enlace público)."
+                  className="border-2 p-3 rounded-lg dark:border-gray-600"
+                  invalid={errors.externalLink && touched.externalLink}
+                  errorMessage={errors.externalLink}
+                >
+                  <Field name="externalLink">
+                    {({ field, form }: FieldProps<FormModel>) => {
+                      return (
+                        <Input
+                          prefix={<TbWorldSearch className="text-xl" />}
+                          field={field}
+                          type="text"
+                          size="md"
+                          className="mb-2 border-sky-500/60 border-[3px] rounded-lg"
+                          placeholder="Ej: https://www.portalinmobiliario.com/detalles-de-mi-publicacion"
+                          value={values.externalLink}
+                          onChange={(e) => {
+                            form.setFieldValue(field.name, e.target.value)
+                          }}
+                        />
+                      )
+                    }}
+                  </Field>
+                </FormItem> */}
+
+                {/* PARCELA */}
+                {/* {formData.informacionPrincipal.typeOfPropertyId ===
                   'Parcela' && <PlotFields values={values} />}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-0 md:grid-cols-2 md:gap-3 mt-4 place-content-center justify-items-center text-center">
@@ -270,7 +329,7 @@ const Caracteristicas = ({
                       }}
                     </Field>
                   </FormItem>
-                </div>
+                </div> */}
 
                 {/* ✅ */}
                 {/* 
@@ -301,7 +360,7 @@ const Caracteristicas = ({
                   </div>
                 ) : null} */}
 
-                <div className="grid grid-cols-1 gap-0 md:grid-cols-2 md:gap-3">
+                {/* <div className="grid grid-cols-1 gap-0 md:grid-cols-2 md:gap-3">
                   <FormItem
                     label="Superficie de terreno"
                     invalid={
@@ -359,27 +418,31 @@ const Caracteristicas = ({
                       }}
                     </Field>
                   </FormItem>
-                </div>
+                </div> */}
 
-                {formData.informacionPrincipal?.typeOfPropertyId ===
+                {/* OFICINA */}
+                {/* {formData.informacionPrincipal?.typeOfPropertyId ===
                   'Oficina' && (
                   <OfficeFields
                     values={values}
                     errors={errors}
                     touched={touched}
                   />
-                )}
+                )} */}
+                {/* OFICINA */}
 
-                {formData.informacionPrincipal?.typeOfPropertyId ===
+                {/* LOCAL COMERCIAL */}
+                {/* {formData.informacionPrincipal?.typeOfPropertyId ===
                   'Local Comercial' && (
                   <CommercialPremisesFields
                     values={values}
                     errors={errors}
                     touched={touched}
                   />
-                )}
+                )} */}
+                {/* LOCAL COMERCIAL */}
 
-                <div className="grid grid-cols-1 gap-0 md:grid-cols-2 md:gap-3">
+                {/* <div className="grid grid-cols-1 gap-0 md:grid-cols-2 md:gap-3">
                   <FormItem
                     label="Número de pisos"
                     asterisk={
@@ -465,9 +528,9 @@ const Caracteristicas = ({
                       }}
                     </Field>
                   </FormItem>
-                </div>
+                </div> */}
 
-                <div className="grid grid-cols-1 gap-0 md:grid-cols-2 md:gap-3">
+                {/* <div className="grid grid-cols-1 gap-0 md:grid-cols-2 md:gap-3">
                   <FormItem label="Baño(s)">
                     <Field name="characteristics.bathrooms">
                       {({ field, form }: FieldProps<FormModel>) => {
@@ -513,9 +576,10 @@ const Caracteristicas = ({
                       }}
                     </Field>
                   </FormItem>
-                </div>
+                </div> */}
 
-                <div className="grid grid-cols-2 gap-0 md:gap-3">
+                {/* aca */}
+                {/* <div className="grid grid-cols-2 gap-0 md:gap-3">
                   <FormItem
                     label="Cocina(s)"
                     className="flex justify-items-center items-start md:items-center"
@@ -621,9 +685,9 @@ const Caracteristicas = ({
                       }}
                     </Field>
                   </FormItem>
-                </div>
+                </div> */}
 
-                <div className="grid grid-cols-2 gap-0 md:gap-3">
+                {/* <div className="grid grid-cols-2 gap-0 md:gap-3">
                   <FormItem
                     label="Seguridad"
                     className="flex justify-items-center items-start md:items-center"
@@ -862,9 +926,9 @@ const Caracteristicas = ({
                       }}
                     </Field>
                   </FormItem>
-                </div>
+                </div> */}
 
-                <FormItem
+                {/* <FormItem
                   asterisk
                   label="Titulo de la Propiedad"
                   invalid={
@@ -913,7 +977,7 @@ const Caracteristicas = ({
                       />
                     )}
                   </Field>
-                </FormItem>
+                </FormItem> */}
 
                 <div className="flex justify-start gap-2">
                   <Button type="button" onClick={onBack}>

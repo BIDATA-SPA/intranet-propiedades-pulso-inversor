@@ -156,7 +156,7 @@ const SignUpCustomerForm = (props: SignUpFormProps) => {
           name: '',
           lastName: '',
           phone: '',
-          dialCodeId: '43',
+          dialCodeId: '',
           email: '',
           password: '',
           confirmPassword: '',

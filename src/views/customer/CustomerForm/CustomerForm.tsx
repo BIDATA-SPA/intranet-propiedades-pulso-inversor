@@ -143,7 +143,7 @@ const CustomerForm = forwardRef<FormikRef, CustomerForm>((props, ref) => {
       alias: '',
       rut: '',
       email: '',
-      dialCodeId: '43',
+      dialCodeId: '',
       phone: '',
       address: {
         countryId: 0,
