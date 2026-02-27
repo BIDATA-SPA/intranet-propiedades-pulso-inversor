@@ -44,7 +44,7 @@ const CreacionPropiedad = ({
   const { propertyId: routePropertyId } = useParams()
   const [searchParams] = useSearchParams()
   const dispatch = useAppDispatch()
-  useGetMyInfoQuery() // si no lo usas acá, puedes quitarlo
+  useGetMyInfoQuery()
 
   const queryPropertyId = searchParams.get('propertyId')
   const id = routePropertyId ?? queryPropertyId ?? null
@@ -58,12 +58,9 @@ const CreacionPropiedad = ({
 
   const isSubmittingAny = isLoadingCreate || isLoadingUpdate
 
-  // estados UI (dejas lo que realmente uses)
   const [busyToggle] = useState(false)
   const lastValuesRef = useRef<any>(null)
 
-  // ================== helpers ==================
-  // ✅ Aquí va tu buildPayload(values) (NO PDP)
   const buildPayload = (values: any) => {
     const step1 = {
       customerId: toNum(values?.informacionPrincipal?.customerId),
@@ -505,6 +502,22 @@ const CreacionPropiedad = ({
         coveredHullAreadUnit: toStr(
           values?.caracteristicas?.characteristics?.coveredHullAreadUnit
         ),
+        hasCowork: toBool(values?.caracteristicas?.characteristics?.hasCowork),
+        hasClosedCondominium: toBool(
+          values?.caracteristicas?.characteristics?.hasClosedCondominium
+        ),
+        hasWashingMachineConnection: toBool(
+          values?.caracteristicas?.characteristics?.hasWashingMachineConnection
+        ),
+        depth: Number(values?.caracteristicas?.characteristics?.depth),
+        depthUnit: values?.caracteristicas?.characteristics?.depthUnit,
+        cementeryName: values?.caracteristicas?.characteristics?.cementeryName,
+        width: Number(values?.caracteristicas?.characteristics?.width),
+        typeOfCemeteryPlot:
+          values?.caracteristicas?.characteristics?.typeOfCemeteryPlot,
+        long: Number(values?.caracteristicas?.characteristics?.width),
+        widthUnit: values?.caracteristicas?.characteristics?.widthUnit,
+        longUnit: values?.caracteristicas?.characteristics?.longUnit,
       },
     }
 

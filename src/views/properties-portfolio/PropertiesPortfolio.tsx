@@ -373,6 +373,25 @@ const PropertiesPortfolio = () => {
         typeOfFarm: property?.characteristics?.typeOfFarm,
         coveredHullAread: Number(property?.characteristics?.coveredHullAread),
         coveredHullAreadUnit: property?.characteristics?.coveredHullAreadUnit,
+        hasCowork: Boolean(property?.characteristics?.hasCowork),
+        hasClosedCondominium: Boolean(
+          property?.characteristics?.hasClosedCondominium
+        ),
+        hasWashingMachineConnection: Boolean(
+          property?.characteristics?.hasWashingMachineConnection
+        ),
+
+        // SEPULTURA
+        sectionWithinTheCemetery:
+          property?.characteristics?.sectionWithinTheCemetery,
+        depth: Number(property?.characteristics?.depth),
+        depthUnit: property?.characteristics?.depthUnit,
+        cementeryName: property?.characteristics?.cementeryName,
+        width: Number(property?.characteristics?.width),
+        typeOfCemeteryPlot: property?.characteristics?.typeOfCemeteryPlot,
+        long: Number(property?.characteristics?.width),
+        widthUnit: property?.characteristics?.widthUnit,
+        longUnit: property?.characteristics?.longUnit,
       },
 
       addressInformation: {

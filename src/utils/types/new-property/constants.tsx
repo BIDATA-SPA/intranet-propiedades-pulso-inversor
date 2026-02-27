@@ -241,6 +241,12 @@ export const filterUnitCoveredHullAread: TSelect[] = [
   { value: 'm2', label: 'm2' },
 ]
 
+export const filterTypeOfCemeteryPlot: TSelect[] = [
+  { value: 'Parcela', label: 'Parcela' },
+  { value: 'Bóveda', label: 'Bóveda' },
+  { value: 'Nicho', label: 'Nicho' },
+]
+
 export const filterTypeOfWinery: TSelect[] = [
   { value: 'Terreno', label: 'Terreno' },
   { value: 'Bodega', label: 'Bodega' },

@@ -196,8 +196,20 @@ export type Caracteristicas = {
     typeOfFarm: string
     coveredHullAread: number
     coveredHullAreadUnit: string
+    hasCowork: boolean
+    hasClosedCondominium: boolean
+    hasWashingMachineConnection: boolean
 
-    // Pendientes en la vista de comodidades y equipamiento
+    // SEPULTURA
+    sectionWithinTheCemetery: string
+    depth: number
+    depthUnit: string
+    cementeryName: string
+    width: number
+    typeOfCemeteryPlot: string
+    long: number
+    widthUnit: string
+    longUnit: string
   }
 }
 
@@ -489,6 +501,22 @@ export const initialState: KycFormState = {
         typeOfFarm: '',
         coveredHullAread: 0,
         coveredHullAreadUnit: 'm2',
+
+        // DEPARTAMENTO AMOBLADO
+        hasCowork: false,
+        hasClosedCondominium: false,
+        hasWashingMachineConnection: false,
+
+        // SEPULTURA
+        sectionWithinTheCemetery: '',
+        depth: 0,
+        depthUnit: 'm',
+        cementeryName: '',
+        width: 0,
+        widthUnit: 'm',
+        typeOfCemeteryPlot: '',
+        long: 0,
+        longUnit: 'm',
       },
     },
     addressInformation: {

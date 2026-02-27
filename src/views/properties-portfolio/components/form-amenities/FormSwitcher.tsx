@@ -77,6 +77,36 @@ import FichaTecnicaAgricolaFields from './Agricola/FichaTecnicaFields'
 import PrincipalAgricolaFields from './Agricola/PrincipalFields'
 import ServiciosAgricolaFields from './Agricola/ServiciosFields'
 
+// SITIO
+import EspaciosComunesSitioFields from './Sitio/EspaciosComunesFields'
+import FichaTecnicaSitioFields from './Sitio/FichaTecnicaFields'
+import PrincipalSitioFields from './Sitio/PrincipalFields'
+import SeguridadSitioFields from './Sitio/SeguridadFields'
+import ServiciosSitioFields from './Sitio/ServiciosFields'
+
+// DEPARTAMENTO AMOBLADO
+import AmbientesDepartamentoAmobladoFields from './DepartamentoAmoblado/AmbienteFields'
+import ComodidadesYEquipamientoDepartamentoAmobladoFields from './DepartamentoAmoblado/ComodidadesYEquipamientoFields'
+import CondicionesEspecialesDepartamentoAmobladoFields from './DepartamentoAmoblado/CondicionesEspecialesFields'
+import EspaciosComunesDepartamentoAmobladoFields from './DepartamentoAmoblado/EspaciosComunesFields'
+import FichaTecnicaDepartamentoAmobladoFields from './DepartamentoAmoblado/FichaTecnicaFields'
+import OtrosDepartamentoAmobladoFields from './DepartamentoAmoblado/OtrosFields'
+import PrincipalDepartamentoAmobladoFields from './DepartamentoAmoblado/PrincipalFields'
+import SeguridadDepartamentoAmobladoFields from './DepartamentoAmoblado/SeguridadFields'
+import ServiciosDepartamentoAmobladoFields from './DepartamentoAmoblado/ServiciosFields'
+
+// CASA AMOBLADA
+import AmbientesCasaAmobladaFields from './CasaAmoblada/AmbientesFields'
+import ComodidadesYEquipamientoCasaAmobladaFields from './CasaAmoblada/ComodidadesYEquipamiento'
+import FichaTecnicaCasaAmobladaFields from './CasaAmoblada/FichaTecnica'
+import PrincipalCasaAmobladaFields from './CasaAmoblada/PrincipalFields'
+import SeguridadCasaAmobladaFields from './CasaAmoblada/Seguridad'
+import ServiciosCasaAmobladaFields from './CasaAmoblada/Servicios'
+
+// SEPULTURA
+import FichaTecnicaSepulturaFields from './Sepultura/FichaTecnicaFields'
+import PrincipalSepulturaFields from './Sepultura/PrincipalFields'
+
 export type PropertyType =
   | 'Casa'
   | 'Departamento'
@@ -88,7 +118,7 @@ export type PropertyType =
   | 'Industrial'
   | 'Local Comercial'
   | 'Agrícola'
-  | 'Sitio' //⚠️
+  | 'Sitio'
   | 'Departamento Amoblado' //⚠️
   | 'Casa Amoblada' //⚠️
   | 'Sepultura' //⚠️
@@ -693,8 +723,238 @@ const FormSwitcher = ({
           </div>
         </>
       )
+
+    case 'Sitio':
+      return (
+        <>
+          <div className="my-2">
+            <PrincipalSitioFields
+              values={values}
+              touched={touched}
+              errors={errors}
+            />
+          </div>
+
+          <div className="my-2">
+            <CollapsibleForm title="Espacios Comunes">
+              <EspaciosComunesSitioFields
+                values={values}
+                touched={touched}
+                errors={errors}
+              />
+            </CollapsibleForm>
+          </div>
+
+          <div className="my-2">
+            <CollapsibleForm title="Ficha Técnica">
+              <FichaTecnicaSitioFields
+                values={values}
+                touched={touched}
+                errors={errors}
+              />
+            </CollapsibleForm>
+          </div>
+
+          <div className="my-2">
+            <CollapsibleForm title="Seguridad">
+              <SeguridadSitioFields
+                values={values}
+                touched={touched}
+                errors={errors}
+              />
+            </CollapsibleForm>
+          </div>
+
+          <div className="my-2">
+            <CollapsibleForm title="Servicios">
+              <ServiciosSitioFields
+                values={values}
+                touched={touched}
+                errors={errors}
+              />
+            </CollapsibleForm>
+          </div>
+        </>
+      )
+    case 'Departamento Amoblado':
+      return (
+        <>
+          <div className="my-2">
+            <PrincipalDepartamentoAmobladoFields
+              values={values}
+              touched={touched}
+              errors={errors}
+            />
+          </div>
+
+          <div className="my-2">
+            <CollapsibleForm title="Ambientes">
+              <AmbientesDepartamentoAmobladoFields
+                values={values}
+                touched={touched}
+                errors={errors}
+              />
+            </CollapsibleForm>
+          </div>
+
+          <div className="my-2">
+            <CollapsibleForm title="Comodidades y Equipamiento">
+              <ComodidadesYEquipamientoDepartamentoAmobladoFields
+                values={values}
+                touched={touched}
+                errors={errors}
+              />
+            </CollapsibleForm>
+          </div>
+
+          <div className="my-2">
+            <CollapsibleForm title="Condiciones Especiales">
+              <CondicionesEspecialesDepartamentoAmobladoFields
+                values={values}
+                touched={touched}
+                errors={errors}
+              />
+            </CollapsibleForm>
+          </div>
+
+          <div className="my-2">
+            <CollapsibleForm title="Espacios Comunes">
+              <EspaciosComunesDepartamentoAmobladoFields
+                values={values}
+                touched={touched}
+                errors={errors}
+              />
+            </CollapsibleForm>
+          </div>
+
+          <div className="my-2">
+            <CollapsibleForm title="Ficha Tecnica">
+              <FichaTecnicaDepartamentoAmobladoFields
+                values={values}
+                touched={touched}
+                errors={errors}
+              />
+            </CollapsibleForm>
+          </div>
+
+          <div className="my-2">
+            <CollapsibleForm title="Otros">
+              <OtrosDepartamentoAmobladoFields
+                values={values}
+                touched={touched}
+                errors={errors}
+              />
+            </CollapsibleForm>
+          </div>
+
+          <div className="my-2">
+            <CollapsibleForm title="Seguridad">
+              <SeguridadDepartamentoAmobladoFields
+                values={values}
+                touched={touched}
+                errors={errors}
+              />
+            </CollapsibleForm>
+          </div>
+
+          <div className="my-2">
+            <CollapsibleForm title="Servicios">
+              <ServiciosDepartamentoAmobladoFields
+                values={values}
+                touched={touched}
+                errors={errors}
+              />
+            </CollapsibleForm>
+          </div>
+        </>
+      )
+    case 'Casa Amoblada':
+      return (
+        <>
+          <div className="my-2">
+            <PrincipalCasaAmobladaFields
+              values={values}
+              touched={touched}
+              errors={errors}
+            />
+          </div>
+
+          <div className="my-2">
+            <CollapsibleForm title="Ambientes">
+              <AmbientesCasaAmobladaFields
+                values={values}
+                touched={touched}
+                errors={errors}
+              />
+            </CollapsibleForm>
+          </div>
+
+          <div className="my-2">
+            <CollapsibleForm title="Comodidades y Equipamiento">
+              <ComodidadesYEquipamientoCasaAmobladaFields
+                values={values}
+                touched={touched}
+                errors={errors}
+              />
+            </CollapsibleForm>
+          </div>
+
+          <div className="my-2">
+            <CollapsibleForm title="Ficha Técnica">
+              <FichaTecnicaCasaAmobladaFields
+                values={values}
+                touched={touched}
+                errors={errors}
+              />
+            </CollapsibleForm>
+          </div>
+
+          <div className="my-2">
+            <CollapsibleForm title="Seguridad">
+              <SeguridadCasaAmobladaFields
+                values={values}
+                touched={touched}
+                errors={errors}
+              />
+            </CollapsibleForm>
+          </div>
+
+          <div className="my-2">
+            <CollapsibleForm title="Servicios">
+              <ServiciosCasaAmobladaFields
+                values={values}
+                touched={touched}
+                errors={errors}
+              />
+            </CollapsibleForm>
+          </div>
+        </>
+      )
+
+    case 'Sepultura':
+      return (
+        <>
+          <div className="my-2">
+            <PrincipalSepulturaFields
+              values={values}
+              touched={touched}
+              errors={errors}
+            />
+          </div>
+
+          <div className="my-2">
+            <CollapsibleForm title="Ficha Técnica">
+              <FichaTecnicaSepulturaFields
+                values={values}
+                touched={touched}
+                errors={errors}
+              />
+            </CollapsibleForm>
+          </div>
+        </>
+      )
     default:
-      break
+      return null
   }
 }
 

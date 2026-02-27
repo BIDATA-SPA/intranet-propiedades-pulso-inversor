@@ -206,6 +206,22 @@ export interface Property {
     typeOfFarm: string
     coveredHullAread: number
     coveredHullAreadUnit: string
+
+    // DEPARTAMENTO AMOBLADO
+    hasCowork: boolean
+    hasClosedCondominium: boolean
+    hasWashingMachineConnection: boolean
+
+    // SEPULTURA
+    sectionWithinTheCemetery: string
+    depth: number
+    depthUnit: string
+    cementeryName: string
+    width: number
+    typeOfCemeteryPlot: string
+    long: number
+    widthUnit: string
+    longUnit: string
   }
   address: {
     lng: number
