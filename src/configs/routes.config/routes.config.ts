@@ -54,26 +54,6 @@ export const protectedRoutes: Routes = [
     authority: [],
   },
   {
-    key: 'dashboard',
-    path: '/dashboard',
-    component: lazy(() => import('@/views/dashboard')),
-    authority: [],
-  },
-  {
-    key: 'tools-and-services',
-    path: '/mis-recursos',
-    component: lazy(() => import('@/views/tools-and-services')),
-    authority: [],
-  },
-  {
-    key: 'tools-and-services-folders',
-    path: '/mis-recursos/:folderId/archivos',
-    component: lazy(
-      () => import('@/views/tools-and-services/folderId/folders')
-    ),
-    authority: [],
-  },
-  {
     key: 'calendar',
     path: '/mi-calendario',
     component: lazy(() => import('@/views/my-calendar')),
@@ -83,12 +63,6 @@ export const protectedRoutes: Routes = [
     key: 'user-profile',
     path: '/mi-perfil/:userId',
     component: lazy(() => import('@/views/account')),
-    authority: [],
-  },
-  {
-    key: 'support',
-    path: '/ayuda',
-    component: lazy(() => import('@/views/support')),
     authority: [],
   },
 ]

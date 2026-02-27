@@ -62,8 +62,6 @@ const PortalPresence: React.FC<Props> = ({
   const pdpToken = useAppSelector((s) => s.pdpAuth.token)
   const pdpTokentEST = useAppSelector((s) => s.pdpAuth)
 
-  console.log(pdpTokentEST)
-
   // 🔐 acciones seguras (usan ensureToken internamente)
   const { secureUpdate, secureDelete } = usePdpSecureActions()
 
@@ -157,57 +155,250 @@ const PortalPresence: React.FC<Props> = ({
         currencyId: toStr(p?.currencyId),
         propertyPrice: toNum(p?.propertyPrice),
       },
-      step2: {
-        highlighted: toBool(p?.highlighted),
-        disableReason: p?.disableReason ?? null,
-        observations: p?.observations ?? null,
+      step2 = {
+        externalLink: toStr(p?.identification?.externalLink),
+        highlighted: toBool(p?.identification?.highlighted),
+        propertyStatusId: toNum(p?.identification?.propertyStatusId),
+        observations: toStr(p?.identification?.observations),
+        disableReason: toStr(p?.identification?.disableReason),
+
         characteristics: {
-          numberOfPrivate: toStr(p?.characteristics?.numberOfPrivate),
-          officeNumber: toStr(p?.characteristics?.officeNumber),
-          numberOfVacantFloors: toStr(p?.characteristics?.numberOfVacantFloors),
-          numberOfMeetingRooms: toStr(p?.characteristics?.numberOfMeetingRooms),
-          hasKitchenet: toBool(p?.characteristics?.hasKitchenet),
-          locatedInGallery: toBool(p?.characteristics?.locatedInGallery),
-          locatedFacingTheStreet: toBool(
-            p?.characteristics?.locatedFacingTheStreet
-          ),
-          floorLevelLocation: toStr(p?.characteristics?.floorLevelLocation),
-          commonExpenses: toStr(p?.characteristics?.commonExpenses),
-          hasHouse: toBool(p?.characteristics?.hasHouse),
-          surface: toStr(p?.characteristics?.surface),
-          constructedSurface: toStr(p?.characteristics?.constructedSurface),
-          floors: toStr(p?.characteristics?.floors),
-          terraces: toStr(p?.characteristics?.terraces),
-          terraceM2: toStr(p?.characteristics?.terraceM2),
-          numberOfFloors: toStr(p?.characteristics?.numberOfFloors),
-          bathrooms: toStr(p?.characteristics?.bathrooms),
-          surfaceUnit: p?.characteristics?.surfaceUnit ?? null,
-          bedrooms: toStr(p?.characteristics?.bedrooms),
-          hasKitchen: toBool(p?.characteristics?.hasKitchen),
-          typeOfKitchen: p?.characteristics?.typeOfKitchen ?? null,
-          hasHeating: toBool(p?.characteristics?.hasHeating),
-          typeOfHeating: p?.characteristics?.typeOfHeating ?? null,
-          hasAirConditioning: toBool(p?.characteristics?.hasAirConditioning),
-          hasParking: toBool(p?.characteristics?.hasParking),
-          hasGarage: toBool(p?.characteristics?.hasGarage),
-          numberOfParkingSpaces:
-            p?.characteristics?.numberOfParkingSpaces ?? null,
-          hasElevator: toBool(p?.characteristics?.hasElevator),
-          hasGym: toBool(p?.characteristics?.hasGym),
-          hasSwimmingPool: toBool(p?.characteristics?.hasSwimmingPool),
-          hasSecurity: toBool(p?.characteristics?.hasSecurity),
-          typeOfSecurity: Array.isArray(p?.characteristics?.typeOfSecurity)
-            ? p.characteristics.typeOfSecurity
-            : [],
+          rol: toStr(p?.identification?.characteristics?.rol),
+
           locatedInCondominium: toBool(
-            p?.characteristics?.locatedInCondominium
+            p?.identification?.characteristics?.locatedInCondominium
           ),
-          isFurnished: toBool(p?.characteristics?.isFurnished),
-          hasBarbecueArea: toBool(p?.characteristics?.hasBarbecueArea),
-          propertyTitle: toStr(p?.propertyTitle),
-          propertyDescription: toStr(p?.propertyDescription),
+
+          numberOfVacantFloors: toStr(
+            p?.identification?.characteristics?.numberOfVacantFloors
+          ),
+          numberOfMeetingRooms: toStr(
+            p?.identification?.characteristics?.numberOfMeetingRooms
+          ),
+
+          hasKitchenet: toBool(
+            p?.identification?.characteristics?.hasKitchenet
+          ),
+          hasHouse: toBool(p?.identification?.characteristics?.hasHouse),
+
+          officeNumber: toStr(p?.identification?.characteristics?.officeNumber),
+          floorLevelLocation: toStr(
+            p?.identification?.characteristics?.floorLevelLocation
+          ),
+
+          commonExpenses: toStr(
+            p?.identification?.characteristics?.commonExpenses
+          ),
+
+          numberOfFloors: toStr(
+            p?.identification?.characteristics?.numberOfFloors
+          ),
+
+          terraces: toStr(p?.identification?.characteristics?.terraces),
+          terraceM2: toStr(p?.identification?.characteristics?.terraceM2),
+
+          bathrooms: toStr(p?.identification?.characteristics?.bathrooms),
+          bedrooms: toStr(p?.identification?.characteristics?.bedrooms),
+
+          surfaceUnit: toStr(p?.identification?.characteristics?.surfaceUnit),
+          typeOfKitchen: toStr(
+            p?.identification?.characteristics?.typeOfKitchen
+          ),
+
+          hasHeating: toBool(p?.identification?.characteristics?.hasHeating),
+          hasSecurity: toBool(p?.identification?.characteristics?.hasSecurity),
+
+          typeOfSecurity: Array.isArray(
+            p?.identification?.characteristics?.typeOfSecurity
+          )
+            ? p.identification.characteristics.typeOfSecurity
+                .map((x: any) => toStr(x?.value ?? x))
+                .filter(Boolean)
+            : [],
+
+          isFurnished: toBool(p?.identification?.characteristics?.isFurnished),
+
+          hasAirConditioning: toBool(
+            p?.identification?.characteristics?.hasAirConditioning
+          ),
+
+          hasGarage: toBool(p?.identification?.characteristics?.hasGarage),
+          hasParking: toBool(p?.identification?.characteristics?.hasParking),
+          hasElevator: toBool(p?.identification?.characteristics?.hasElevator),
+          hasGym: toBool(p?.identification?.characteristics?.hasGym),
+          hasSwimmingPool: toBool(
+            p?.identification?.characteristics?.hasSwimmingPool
+          ),
+          hasBarbecueArea: toBool(
+            p?.identification?.characteristics?.hasBarbecueArea
+          ),
+
+          propertyTitle: toStr(
+            p?.identification?.characteristics?.propertyTitle
+          ),
+          propertyDescription: toStr(
+            p?.identification?.characteristics?.propertyDescription
+          ),
+
+          hasKitchen: toBool(p?.identification?.characteristics?.hasKitchen),
+
+          surface: toStr(p?.identification?.characteristics?.surface),
+          constructedSurface: toStr(
+            p?.identification?.characteristics?.constructedSurface
+          ),
+
+          hasServiceRoom: toBool(
+            p?.identification?.characteristics?.hasServiceRoom
+          ),
+          hasLivingRoom: toBool(
+            p?.identification?.characteristics?.hasLivingRoom
+          ),
+
+          geography: toStr(p?.identification?.characteristics?.geography),
+          storageCount: toNum(p?.identification?.characteristics?.storageCount),
+
+          ceilingType: toStr(p?.identification?.characteristics?.ceilingType),
+          flooringType: toStr(p?.identification?.characteristics?.flooringType),
+
+          hasHomeOffice: toBool(
+            p?.identification?.characteristics?.hasHomeOffice
+          ),
+          hasDiningRoom: toBool(
+            p?.identification?.characteristics?.hasDiningRoom
+          ),
+          hasYard: toBool(p?.identification?.characteristics?.hasYard),
+          hasGuestBathroom: toBool(
+            p?.identification?.characteristics?.hasGuestBathroom
+          ),
+          hasSuite: toBool(p?.identification?.characteristics?.hasSuite),
+          hasWalkInCloset: toBool(
+            p?.identification?.characteristics?.hasWalkInCloset
+          ),
+          hasPlayRoom: toBool(p?.identification?.characteristics?.hasPlayRoom),
+          hasFireplace: toBool(
+            p?.identification?.characteristics?.hasFireplace
+          ),
+          hasPlayground: toBool(
+            p?.identification?.characteristics?.hasPlayground
+          ),
+          hasPaddleCourt: toBool(
+            p?.identification?.characteristics?.hasPaddleCourt
+          ),
+          hasPartyRoom: toBool(
+            p?.identification?.characteristics?.hasPartyRoom
+          ),
+          hasSoccerField: toBool(
+            p?.identification?.characteristics?.hasSoccerField
+          ),
+          hasTennisCourt: toBool(
+            p?.identification?.characteristics?.hasTennisCourt
+          ),
+          hasBasketballCourt: toBool(
+            p?.identification?.characteristics?.hasBasketballCourt
+          ),
+
+          contactHours: toStr(p?.identification?.characteristics?.contactHours),
+          yearOfConstruction: toNum(
+            p?.identification?.characteristics?.yearOfConstruction
+          ),
+
+          hasJacuzzi: toBool(p?.identification?.characteristics?.hasJacuzzi),
+          hasHorseStable: toBool(
+            p?.identification?.characteristics?.hasHorseStable
+          ),
+          landShape: toStr(p?.identification?.characteristics?.landShape),
+          distanceToAsphalt: toNum(
+            p?.identification?.characteristics?.distanceToAsphalt
+          ),
+
+          has24hConcierge: toBool(
+            p?.identification?.characteristics?.has24hConcierge
+          ),
+          hasInternetAccess: toBool(
+            p?.identification?.characteristics?.hasInternetAccess
+          ),
+          hasNaturalGas: toBool(
+            p?.identification?.characteristics?.hasNaturalGas
+          ),
+          hasRunningWater: toBool(
+            p?.identification?.characteristics?.hasRunningWater
+          ),
+          hasTelephoneLine: toBool(
+            p?.identification?.characteristics?.hasTelephoneLine
+          ),
+          hasSewerConnection: toBool(
+            p?.identification?.characteristics?.hasSewerConnection
+          ),
+          hasElectricity: toBool(
+            p?.identification?.characteristics?.hasElectricity
+          ),
+
+          hasMansard: toBool(p?.identification?.characteristics?.hasMansard),
+          hasBalcony: toBool(p?.identification?.characteristics?.hasBalcony),
+          hasClosets: toBool(p?.identification?.characteristics?.hasClosets),
+          hasVisitorParking: toBool(
+            p?.identification?.characteristics?.hasVisitorParking
+          ),
+          hasGreenAreas: toBool(
+            p?.identification?.characteristics?.hasGreenAreas
+          ),
+          hasMultiSportsCourt: toBool(
+            p?.identification?.characteristics?.hasMultiSportsCourt
+          ),
+          hasRefrigerator: toBool(
+            p?.identification?.characteristics?.hasRefrigerator
+          ),
+          hasCinemaArea: toBool(
+            p?.identification?.characteristics?.hasCinemaArea
+          ),
+          hasSauna: toBool(p?.identification?.characteristics?.hasSauna),
+
+          houseType: toStr(p?.identification?.characteristics?.houseType),
+
+          // DEPTOS
+          floorNumber: toNum(p?.identification?.characteristics?.floorNumber),
+          unitNumber: toStr(p?.identification?.characteristics?.unitNumber),
+          apartmentType: toStr(
+            p?.identification?.characteristics?.apartmentType
+          ),
+          unitsPerFloor: toNum(
+            p?.identification?.characteristics?.unitsPerFloor
+          ),
+          hasLaundryRoom: toBool(
+            p?.identification?.characteristics?.hasLaundryRoom
+          ),
+          hasMultipurposeRoom: toBool(
+            p?.identification?.characteristics?.hasMultipurposeRoom
+          ),
+          petsAllowed: toBool(p?.identification?.characteristics?.petsAllowed),
+          isCommercialUseAllowed: toBool(
+            p?.identification?.characteristics?.isCommercialUseAllowed
+          ),
+          condominiumClosed: toBool(
+            p?.identification?.characteristics?.condominiumClosed
+          ),
+          hasConcierge: toBool(
+            p?.identification?.characteristics?.hasConcierge
+          ),
+          hasWasherConnection: toBool(
+            p?.identification?.characteristics?.hasWasherConnection
+          ),
+          hasElectricGenerator: toBool(
+            p?.identification?.characteristics?.hasElectricGenerator
+          ),
+          hasSolarEnergy: toBool(
+            p?.identification?.characteristics?.hasSolarEnergy
+          ),
+          hasCistern: toBool(p?.identification?.characteristics?.hasCistern),
+          hasBolier: toBool(p?.identification?.characteristics?.hasBolier),
+
+          // LOCAL COMERCIAL
+          buildingName: toStr(p?.identification?.characteristics?.buildingName),
+          buildingType: toStr(p?.identification?.characteristics?.buildingType),
+          hasSecondLevel: toBool(
+            p?.identification?.characteristics?.hasSecondLevel
+          ),
         },
-        externalLink: p?.externalLink ?? null,
       },
       step3: {
         countryId: toNum(p?.address?.country?.id),

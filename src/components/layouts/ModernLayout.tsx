@@ -1,6 +1,5 @@
 import Header from '@/components/template/Header'
 import MobileNav from '@/components/template/MobileNav'
-import Notification from '@/components/template/Notification'
 import SideNav from '@/components/template/SideNav'
 import SideNavToggle from '@/components/template/SideNavToggle'
 import SidePanel from '@/components/template/SidePanel'
@@ -33,9 +32,7 @@ const HeaderActionsEnd = () => {
     <>
       {userAuthority === 2 ? <ConverseDivise /> : null}
 
-      {userAuthority === 2 ? (
-        <Notification notifications={notifications} />
-      ) : null}
+      {userAuthority === 2 ? null : null}
 
       {userAuthority === 2 ? (
         <div className="sm:block hidden">

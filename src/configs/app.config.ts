@@ -11,7 +11,7 @@ export type AppConfig = {
 const appConfig: AppConfig = {
   socketUrl: `${import.meta.env.VITE_SOCKET_URL}/`,
   apiUrl: `${import.meta.env.VITE_API_URL}/`,
-  authenticatedEntryPath: '/dashboard',
+  authenticatedEntryPath: '/mis-propiedades',
   unAuthenticatedEntryPath: '/iniciar-sesion',
   tourPath: '/',
   locale: 'es',

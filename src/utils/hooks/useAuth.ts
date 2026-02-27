@@ -217,7 +217,7 @@ function useAuth() {
         )
 
         setTimeout(() => {
-          window.location.href = 'https://procanje.com/evento-webinar'
+          window.location.href = ''
         }, 4 * 1000)
 
         return {

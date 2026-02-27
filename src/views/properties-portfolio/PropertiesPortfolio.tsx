@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 import AdaptableCard from '@/components/shared/AdaptableCard'
 import Container from '@/components/shared/Container'
 import Tabs from '@/components/ui/Tabs'
@@ -8,7 +9,6 @@ import {
 import { injectReducer } from '@/store'
 import { isoUtcToLocalDate } from '@/utils/iso-to-locale-date'
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
-import { FaHouseSignal } from 'react-icons/fa6'
 import { HiOutlineHome } from 'react-icons/hi'
 import { useLocation, useNavigate, useParams } from 'react-router'
 import UploadImage from '../my-properties/PropertyDetails/components/UploadImage'
@@ -16,10 +16,8 @@ import FormStep from './components/FormStep'
 import { usePathChangeEffect } from './hooks/use-patch-change-effect'
 import reducer, {
   Address,
-  FinancialInformation as FinancialInformationType,
-  Identification as IdentificationType,
-  PersonalInformation as PersonalInformationType,
-  PortalOfPortals as PortalOfPortalsType,
+  Caracteristicas as CaracteristicasType,
+  InformacionPrincipal as InformacionPrincipalType,
   resetFormState,
   setCurrentStep,
   setFormData,
@@ -29,37 +27,14 @@ import reducer, {
 } from './store'
 
 const { TabNav, TabList, TabContent } = Tabs
-
 injectReducer('accountDetailForm', reducer)
 
-const PersonalInformation = lazy(
-  () => import('./components/PersonalInformation')
+const InformacionPrincipal = lazy(
+  () => import('./components/InformacionPrincipal')
 )
-const Identification = lazy(() => import('./components/Identification'))
+const Caracteristicas = lazy(() => import('./components/Caracteristicas'))
 const AddressInfomation = lazy(() => import('./components/AddressInfomation'))
-const AccountReview = lazy(() => import('./components/AccountReview'))
-const PortaOfPropertyOverview = lazy(
-  () => import('../portal-of-portals/components/property-details/Overview')
-)
-
-// Normaliza la forma "property_portales" del GET a lo que guarda el form:
-// []  -> sin portal
-// [{ portalName: "Procanje" }] -> [{ id:"procanje", name:"Procanje" }]
-const normalizePropertyPortales = (
-  raw: Array<{ portalName?: string }> | undefined | null
-): { id: string; name: string }[] => {
-  const hasProcanje =
-    Array.isArray(raw) &&
-    raw.some(
-      (p) =>
-        String(p?.portalName ?? '')
-          .trim()
-          .toLowerCase() === 'pulsoPropiedades'
-    )
-  return hasProcanje
-    ? [{ id: 'pulsoPropiedades', name: 'Pulso Propiedades' }]
-    : []
-}
+const CreacionPropiedad = lazy(() => import('./components/CreacionPropiedad'))
 
 const ResetKycFormOnRouteChange = () => {
   const location = useLocation()
@@ -71,11 +46,12 @@ const ResetKycFormOnRouteChange = () => {
     }
   }, [location.pathname, dispatch])
 
-  return null // este componente no renderiza nada
+  return null
 }
 
 const PropertiesPortfolio = () => {
   const params = useParams()
+  const location = useLocation()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const { data: user } = useGetMyInfoQuery()
@@ -83,11 +59,9 @@ const PropertiesPortfolio = () => {
 
   const userId = Number(user?.id) ?? null
 
-  // --- clave: id y edit mode
   const propertyId = params.propertyId ?? null
   const isEditMode = Boolean(propertyId)
 
-  // --- usa UNA SOLA query, condicionada
   const { data: property, refetch } = useGetPropertyByIdQuery(
     propertyId as string,
     {
@@ -106,21 +80,16 @@ const PropertiesPortfolio = () => {
     (state) => state.accountDetailForm.data.formData
   )
 
-  // --- imágenes ordenadas desde property
   const sortedImages = property?.images
     ? [...property.images].sort((a, b) => Number(a.number) - Number(b.number))
     : []
 
   const handleNextChange = (
-    values:
-      | PersonalInformationType
-      | IdentificationType
-      | Address
-      | FinancialInformationType
-      | PortalOfPortalsType,
+    values: InformacionPrincipalType | CaracteristicasType | Address,
     name: string
   ) => {
     const nextStep = currentStep + 1
+
     dispatch(setFormData({ [name]: values }))
     dispatch(
       setStepStatus({
@@ -137,194 +106,389 @@ const PropertiesPortfolio = () => {
   }
 
   const currentStepStatus = useMemo(
-    () => stepStatus[currentStep].status,
+    () => stepStatus?.[currentStep]?.status,
     [stepStatus, currentStep]
   )
 
-  // --- Hidrata el formulario solo en edit mode y cuando property llega
+  // Hidratación edit mode (solo campos que siguen existiendo en el wizard)
   useEffect(() => {
     if (!isEditMode || !property || propertyId !== property?.id) return
 
-    const apiLat = property?.address?.lat
-    const apiLng = property?.address?.lng
-
     const editedData = {
-      personalInformation: {
-        customerId: Number(property?.customer?.id),
-        typeOfOperationId: property?.typeOfOperationId,
-        typeOfPropertyId: property?.typeOfPropertyId,
-        currencyId: property?.currencyId,
-        propertyPrice: Number(property?.propertyPrice),
+      informacionPrincipal: {
+        customerId: Number(property?.customer?.id ?? null),
+        typeOfOperationId: property?.typeOfOperationId ?? null,
+        typeOfPropertyId: property?.typeOfPropertyId ?? null,
+        currencyId: (property?.currencyId ?? 'CLP') as 'CLP' | 'UF',
+        propertyPrice: Number(property?.propertyPrice ?? 0),
         timeAvailable: {
           start: isoUtcToLocalDate(property?.timeAvailableStart),
           end: isoUtcToLocalDate(property?.timeAvailableEnd),
         },
       },
-      identification: {
-        externalLink: property?.externalLink,
-        highlighted: property?.highlighted,
-        observations: property?.observations,
+      caracteristicas: {
+        externalLink: property?.externalLink ?? '',
+        highlighted: Boolean(property?.highlighted),
+        observations: property?.observations ?? '',
+        propertyStatusId: Number(property?.propertyStatus?.id ?? 0),
         characteristics: {
-          locatedInCondominium: property?.characteristics?.locatedInCondominium,
-          surface: property?.characteristics?.surface,
-          constructedSurface: property?.characteristics?.constructedSurface,
-          numberOfPrivate: property?.characteristics?.numberOfPrivate,
-          numberOfVacantFloors: property?.characteristics?.numberOfVacantFloors,
-          numberOfMeetingRooms: property?.characteristics?.numberOfMeetingRooms,
-          hasKitchenet: property?.characteristics?.hasKitchenet,
-          hasHouse: property?.characteristics?.hasHouse,
-          officeNumber: property?.characteristics?.officeNumber,
-          floorLevelLocation: property?.characteristics?.floorLevelLocation,
-          locatedInGallery: property?.characteristics?.locatedInGallery,
-          locatedFacingTheStreet:
-            property?.characteristics?.locatedFacingTheStreet,
-          commonExpenses: property?.characteristics?.commonExpenses,
-          floors: property?.characteristics?.floors,
-          numberOfFloors: property?.characteristics?.numberOfFloors,
-          terraces: property?.characteristics?.terraces,
-          terraceM2: property?.characteristics?.terraceM2,
-          bathrooms: property?.characteristics?.bathrooms,
-          bedrooms: property?.characteristics?.bedrooms,
-          hasKitchen: property?.characteristics?.hasKitchen,
-          typeOfKitchen: property?.characteristics?.typeOfKitchen,
-          hasHeating: property?.characteristics?.hasHeating,
-          typeOfHeating: property?.characteristics?.typeOfHeating,
-          hasSecurity: property?.characteristics?.hasSecurity,
-          typeOfSecurity: property?.characteristics?.typeOfSecurity?.map(
-            (type) => ({ value: type, label: type })
+          rol: property?.characteristics?.rol ?? '',
+          locatedInCondominium: Boolean(
+            property?.characteristics?.locatedInCondominium
           ),
-          isFurnished: property?.characteristics?.isFurnished,
-          hasAirConditioning: property?.characteristics?.hasAirConditioning,
-          hasGarage: property?.characteristics?.hasGarage,
+          numberOfVacantFloors:
+            property?.characteristics?.numberOfVacantFloors ?? '',
+          numberOfMeetingRooms:
+            property?.characteristics?.numberOfMeetingRooms ?? '',
+          hasKitchenet: Boolean(property?.characteristics?.hasKitchenet),
+          hasHouse: Boolean(property?.characteristics?.hasHouse),
+          officeNumber: property?.characteristics?.officeNumber ?? '',
+          floorLevelLocation:
+            property?.characteristics?.floorLevelLocation ?? '',
+          commonExpenses: property?.characteristics?.commonExpenses ?? '',
+          numberOfFloors: property?.characteristics?.numberOfFloors ?? '',
+          terraces: property?.characteristics?.terraces ?? '',
+          terraceM2: property?.characteristics?.terraceM2 ?? '',
+          bathrooms: property?.characteristics?.bathrooms ?? '',
+          bedrooms: property?.characteristics?.bedrooms ?? '',
+          surfaceUnit: property?.characteristics?.surfaceUnit ?? '',
+          typeOfKitchen: property?.characteristics?.typeOfKitchen ?? '',
+          hasHeating: Boolean(property?.characteristics?.hasHeating),
+          hasSecurity: Boolean(property?.characteristics?.hasSecurity),
+          typeOfSecurity: Array.isArray(
+            property?.characteristics?.typeOfSecurity
+          )
+            ? property.characteristics.typeOfSecurity.map((t: string) => ({
+                value: t,
+                label: t,
+              }))
+            : [],
+          isFurnished: Boolean(property?.characteristics?.isFurnished),
+          hasAirConditioning: Boolean(
+            property?.characteristics?.hasAirConditioning
+          ),
+          orientation: property?.characteristics?.orientation,
+          typeOfHeating: property?.characteristics?.typeOfHeating,
+          locatedInGallery: Boolean(
+            property?.characteristics?.locatedInGallery
+          ),
+          locatedFacingTheStreet: Boolean(
+            property?.characteristics?.locatedFacingTheStreet
+          ),
+          numberOfPrivate: Number(property?.characteristics?.numberOfPrivate),
+          numberOfDepartment: property?.characteristics?.numberOfDepartment,
+          apartmentsPerFloor: Number(
+            property?.characteristics?.apartmentsPerFloor
+          ),
+          departmentType: property?.characteristics?.departmentType,
+          hasRooftop: Boolean(property?.characteristics?.hasRooftop),
+          hasBoiler: Boolean(property?.characteristics?.hasBoiler),
+          hasLoggia: Boolean(property?.characteristics?.hasLoggia),
+          hasGarage: Boolean(property?.characteristics?.hasGarage),
+          hasParking: Boolean(property?.characteristics?.hasParking),
+          hasElevator: Boolean(property?.characteristics?.hasElevator),
+          hasGym: Boolean(property?.characteristics?.hasGym),
+          hasSwimmingPool: Boolean(property?.characteristics?.hasSwimmingPool),
+          hasBarbecueArea: Boolean(property?.characteristics?.hasBarbecueArea),
+          propertyTitle: property?.propertyTitle ?? '',
+          propertyDescription: property?.propertyDescription ?? '',
+          hasKitchen: Boolean(property?.characteristics?.hasKitchen),
+          surface: property?.characteristics?.surface ?? '',
+          constructedSurface:
+            property?.characteristics?.constructedSurface ?? '',
           numberOfParkingSpaces:
-            property?.characteristics?.numberOfParkingSpaces,
-          hasParking: property?.characteristics?.hasParking,
-          hasElevator: property?.characteristics?.hasElevator,
-          hasGym: property?.characteristics?.hasGym,
-          hasSwimmingPool: property?.characteristics?.hasSwimmingPool,
-          hasBarbecueArea: property?.characteristics?.hasBarbecueArea,
-          propertyTitle: property?.propertyTitle,
-          propertyDescription: property?.propertyDescription,
+            property?.characteristics?.numberOfParkingSpaces ?? '',
+          hasServiceRoom: Boolean(property?.characteristics?.hasServiceRoom),
+          hasLivingRoom: Boolean(property?.characteristics?.hasLivingRoom),
+          geography: property?.characteristics?.geography ?? '',
+          storageCount: Number(property?.characteristics?.storageCount ?? 0),
+          ceilingType: property?.characteristics?.ceilingType ?? '',
+          flooringType: property?.characteristics?.flooringType ?? '',
+          hasHomeOffice: Boolean(property?.characteristics?.hasHomeOffice),
+          hasDiningRoom: Boolean(property?.characteristics?.hasDiningRoom),
+          hasYard: Boolean(property?.characteristics?.hasYard),
+          hasGuestBathroom: Boolean(
+            property?.characteristics?.hasGuestBathroom
+          ),
+          hasSuite: Boolean(property?.characteristics?.hasSuite),
+          hasWalkInCloset: Boolean(property?.characteristics?.hasWalkInCloset),
+          hasPlayRoom: Boolean(property?.characteristics?.hasPlayRoom),
+          hasFireplace: Boolean(property?.characteristics?.hasFireplace),
+          hasPlayground: Boolean(property?.characteristics?.hasPlayground),
+          hasPaddleCourt: Boolean(property?.characteristics?.hasPaddleCourt),
+          hasPartyRoom: Boolean(property?.characteristics?.hasPartyRoom),
+          hasSoccerField: Boolean(property?.characteristics?.hasSoccerField),
+          hasTennisCourt: Boolean(property?.characteristics?.hasTennisCourt),
+          hasBasketballCourt: Boolean(
+            property?.characteristics?.hasBasketballCourt
+          ),
+          contactHours: property?.characteristics?.contactHours ?? '',
+          yearOfConstruction: Number(
+            property?.characteristics?.yearOfConstruction ?? 0
+          ),
+          hasJacuzzi: Boolean(property?.characteristics?.hasJacuzzi),
+          hasHorseStable: Boolean(property?.characteristics?.hasHorseStable),
+          landShape: property?.characteristics?.landShape ?? '',
+          distanceToAsphalt: Number(
+            property?.characteristics?.distanceToAsphalt ?? 0
+          ),
+          has24hConcierge: Boolean(property?.characteristics?.has24hConcierge),
+          hasInternetAccess: Boolean(
+            property?.characteristics?.hasInternetAccess
+          ),
+          hasNaturalGas: Boolean(property?.characteristics?.hasNaturalGas),
+          hasRunningWater: Boolean(property?.characteristics?.hasRunningWater),
+          hasTelephoneLine: Boolean(
+            property?.characteristics?.hasTelephoneLine
+          ),
+          hasSewerConnection: Boolean(
+            property?.characteristics?.hasSewerConnection
+          ),
+          hasElectricity: Boolean(property?.characteristics?.hasElectricity),
+          hasMansard: Boolean(property?.characteristics?.hasMansard),
+          hasBalcony: Boolean(property?.characteristics?.hasBalcony),
+          hasClosets: Boolean(property?.characteristics?.hasClosets),
+          hasVisitorParking: Boolean(
+            property?.characteristics?.hasVisitorParking
+          ),
+          hasGreenAreas: Boolean(property?.characteristics?.hasGreenAreas),
+          hasMultiSportsCourt: Boolean(
+            property?.characteristics?.hasMultiSportsCourt
+          ),
+          hasRefrigerator: Boolean(property?.characteristics?.hasRefrigerator),
+          hasCinemaArea: Boolean(property?.characteristics?.hasCinemaArea),
+          hasSauna: Boolean(property?.characteristics?.hasSauna),
+          houseType: property?.characteristics?.houseType ?? '',
+          floorNumber: Number(property?.characteristics?.floorNumber ?? 0),
+          unitNumber: property?.characteristics?.unitNumber ?? '',
+          apartmentType: property?.characteristics?.apartmentType ?? '',
+          unitsPerFloor: Number(property?.characteristics?.unitsPerFloor ?? 0),
+          hasLaundryRoom: Boolean(property?.characteristics?.hasLaundryRoom),
+          hasMultipurposeRoom: Boolean(
+            property?.characteristics?.hasMultipurposeRoom
+          ),
+          petsAllowed: Boolean(property?.characteristics?.petsAllowed),
+          isCommercialUseAllowed: Boolean(
+            property?.characteristics?.isCommercialUseAllowed
+          ),
+          condominiumClosed: Boolean(
+            property?.characteristics?.condominiumClosed
+          ),
+          hasConcierge: Boolean(property?.characteristics?.hasConcierge),
+          hasWasherConnection: Boolean(
+            property?.characteristics?.hasWasherConnection
+          ),
+          hasElectricGenerator: Boolean(
+            property?.characteristics?.hasElectricGenerator
+          ),
+          hasSolarEnergy: Boolean(property?.characteristics?.hasSolarEnergy),
+          hasCistern: Boolean(property?.characteristics?.hasCistern),
+          hasBolier: Boolean(property?.characteristics?.hasBolier),
+          buildingName: property?.characteristics?.buildingName ?? '',
+          buildingType: property?.characteristics?.buildingType ?? '',
+          hasSecondLevel: Boolean(property?.characteristics?.hasSecondLevel),
+
+          //   PARCELA
+          frontageMeters: Number(property?.characteristics?.frontageMeters),
+          deepMeters: Number(property?.characteristics?.deepMeters),
+          isUrbanized: Boolean(property?.characteristics?.isUrbanized),
+          hasFlatSurface: Boolean(property?.characteristics?.hasFlatSurface),
+
+          //   POR INTEGRAR
+          //   BODEGA
+          typeOfBuilding: property?.characteristics?.typeOfBuilding,
+          hasControlledAccess: Boolean(
+            property?.characteristics?.hasControlledAccess
+          ),
+          hasThreephaseCurrent: Boolean(
+            property?.characteristics?.hasThreephaseCurrent
+          ),
+          hasSurveillanceCamera: Boolean(
+            property?.characteristics?.hasSurveillanceCamera
+          ),
+          hasScale: Boolean(property?.characteristics?.hasScale),
+          hasVentilationSystem: Boolean(
+            property?.characteristics?.hasVentilationSystem
+          ),
+          typeOfWinery: property?.characteristics?.typeOfWinery,
+          cellarHeight: Number(property?.characteristics?.cellarHeight),
+          cellarHeightUnit: property?.characteristics?.cellarHeightUnit,
+          pricePerUnitOfArea: Number(
+            property?.characteristics?.pricePerUnitOfArea
+          ),
+          pricePerUnitOfAreaUnit:
+            property?.characteristics?.pricePerUnitOfAreaUnit,
+          floorStand: Number(property?.characteristics?.floorStand),
+          floorStandUnit: property?.characteristics?.floorStandUnit,
+          flatbedTrailers: Number(property?.characteristics?.flatbedTrailers),
+          hasAlarm: Boolean(property?.characteristics?.hasAlarm),
+          hasFireProtectionSystem: Boolean(
+            property?.characteristics?.hasFireProtectionSystem
+          ),
         },
+
+        // OFICINA
+        hasMeetingRooms: Boolean(property?.characteristics?.hasMeetingRooms),
+        hasFreeFloor: Boolean(property?.characteristics?.hasFreeFloor),
+        hasValetParking: Boolean(property?.characteristics?.hasValetParking),
+        hasLobby: Boolean(property?.characteristics?.hasLobby),
+        hasReceptionArea: Boolean(property?.characteristics?.hasReceptionArea),
+        bathroomsPerFloor: Number(property?.characteristics?.bathroomsPerFloor),
+        officesPerFloor: Number(property?.characteristics?.officesPerFloor),
+
+        // ESTACIONAMIENTO
+        hasSimpleParking: Boolean(property?.characteristics?.hasSimpleParking),
+        hasDoubleParking: Boolean(property?.characteristics?.hasDoubleParking),
+        hasSubway: Boolean(property?.characteristics?.hasSubway),
+        typeOfParking: property?.characteristics?.typeOfParking,
+        accessToParking: property?.characteristics?.accessToParking,
+        typeOfParkingCoverage: property?.characteristics?.typeOfParkingCoverage,
+
+        // TERRENO
+        hasReforestation: Boolean(property?.characteristics?.hasReforestation),
+
+        // INDUSTRIAL
+        hasWarehouses: Boolean(property?.characteristics?.hasWarehouses),
+        hasLocationCentral: Boolean(
+          property?.characteristics?.hasLocationCentral
+        ),
+
+        // LOCAL COMERCIAL
+        hasWheelchairRamp: Boolean(
+          property?.characteristics?.hasWheelchairRamp
+        ),
+        hasFittingRoom: Boolean(property?.characteristics?.hasFittingRoom),
+
+        // AGRICOLA
+        hectares: Number(property?.characteristics?.hectares),
+        hasDrinkingFountains: Boolean(
+          property?.characteristics?.hasDrinkingFountains
+        ),
+        hasWaterTank: Boolean(property?.characteristics?.hasWaterTank),
+        hasBarn: Boolean(property?.characteristics?.hasBarn),
+        hasMills: Boolean(property?.characteristics?.hasMills),
+        hasCorral: Boolean(property?.characteristics?.hasCorral),
+        hasSilos: Boolean(property?.characteristics?.hasSilos),
+
+        typeOfFarm: property?.characteristics?.typeOfFarm,
+        coveredHullAread: Number(property?.characteristics?.coveredHullAread),
+        coveredHullAreadUnit: property?.characteristics?.coveredHullAreadUnit,
+        hasCowork: Boolean(property?.characteristics?.hasCowork),
+        hasClosedCondominium: Boolean(
+          property?.characteristics?.hasClosedCondominium
+        ),
+        hasWashingMachineConnection: Boolean(
+          property?.characteristics?.hasWashingMachineConnection
+        ),
+
+        // SEPULTURA
+        sectionWithinTheCemetery:
+          property?.characteristics?.sectionWithinTheCemetery,
+        depth: Number(property?.characteristics?.depth),
+        depthUnit: property?.characteristics?.depthUnit,
+        cementeryName: property?.characteristics?.cementeryName,
+        width: Number(property?.characteristics?.width),
+        typeOfCemeteryPlot: property?.characteristics?.typeOfCemeteryPlot,
+        long: Number(property?.characteristics?.width),
+        widthUnit: property?.characteristics?.widthUnit,
+        longUnit: property?.characteristics?.longUnit,
       },
+
       addressInformation: {
-        countryId: property?.address?.country?.id,
-        stateId: property?.address?.state?.id,
-        cityId: property?.address?.city?.id,
+        countryId: property?.address?.country?.id ?? null,
+        stateId: property?.address?.state?.id ?? null,
+        cityId: property?.address?.city?.id ?? null,
         letter: property?.address?.letter ?? '',
         number: property?.address?.number ?? '',
         references: property?.address?.references ?? '',
         address: property?.address?.address ?? '',
         addressPublic: property?.address?.addressPublic ?? '',
-        lat: apiLat ? String(apiLat) : '',
-        lng: apiLng ? String(apiLng) : '',
+        lat: property?.address?.lat ? String(property.address.lat) : '',
+        lng: property?.address?.lng ? String(property.address.lng) : '',
       },
+
+      // Si en tu formData existe financialInformation y lo sigues guardando aunque el step ya no exista:
       financialInformation: {
-        isExchanged: property?.isExchanged,
+        isExchanged: false, // Boolean(property?.isExchanged)
         timeInExchange: {
-          start: isoUtcToLocalDate(property?.timeInExchangeStart),
-          end: isoUtcToLocalDate(property?.timeInExchangeEnd),
+          start: null,
+          end: null,
         },
-        propertyDescriptionInExchange: property?.propertyDescriptionInExchange,
+        propertyDescriptionInExchange: '',
       },
-      portalsInformation: {
-        portals: normalizePropertyPortales(property?.property_portales),
-      },
+
       owner_id: userId,
     }
 
     dispatch(setFormData(editedData))
   }, [dispatch, isEditMode, property, propertyId, userId])
 
-  // --- Pasos al entrar en modo edición
+  // Estados iniciales al entrar en edición
   useEffect(() => {
     if (!isEditMode || !property?.id) return
 
-    const hasImages =
-      Array.isArray(property?.images) && property.images.length > 0
-
-    dispatch(setCurrentStep(4)) // Tu lógica original dejaba 5 igualmente
+    dispatch(setCurrentStep(4))
     dispatch(
       setStepStatus({
         0: { status: 'complete' },
         1: { status: 'complete' },
         2: { status: 'complete' },
         3: { status: 'complete' },
-        4: { status: 'complete' },
-        5: { status: hasImages ? 'complete' : 'current' },
-        6: { status: hasImages ? 'current' : 'pending' },
+        4: { status: 'current' },
       })
     )
-  }, [isEditMode, property?.id, property?.images, dispatch])
+  }, [isEditMode, property?.id, dispatch])
 
-  // --- Refetch solo en rutas válidas e ID presente
   usePathChangeEffect(() => {
     if (isEditMode && location.pathname.startsWith('/mis-propiedades')) {
       refetch()
     }
   })
 
-  console.log('formData', formData)
-
   return (
     <Container className="h-full">
-      <Tabs
-        value={currentTab}
-        onChange={(val) => {
-          setCurrentTab(String(val))
-        }}
-      >
+      <Tabs value={currentTab} onChange={(val) => setCurrentTab(String(val))}>
         <TabList>
           <TabNav value="tab1" icon={<HiOutlineHome />}>
             {isEditMode ? 'Detalles' : 'Crear Propiedad'}
           </TabNav>
-
-          {/* ℹ️ disable-pdp */}
-          {isEditMode && (
-            <TabNav value="tab2" icon={<FaHouseSignal />}>
-              Portal de Portales
-            </TabNav>
-          )}
-          {/* ℹ️ end disable-pdp */}
         </TabList>
+
         <div className="p-4">
           <TabContent value="tab1">
             <ResetKycFormOnRouteChange />
+
             <AdaptableCard className="h-full" bodyClass="h-full">
               <div className="grid lg:grid-cols-5 xl:grid-cols-3 2xl:grid-cols-5 gap-4 h-full">
-                {currentStep !== 6 && (
-                  <div className="2xl:col-span-1 xl:col-span-1 lg:col-span-2 py-2 bg-gray-100 border rounded-lg">
-                    <FormStep
-                      currentStep={currentStep}
-                      currentStepStatus={currentStepStatus}
-                      stepStatus={stepStatus}
-                    />
-                  </div>
-                )}
-                <div
-                  className={
-                    currentStep !== 6
-                      ? '2xl:col-span-4 lg:col-span-3 xl:col-span-2'
-                      : 'lg:col-span-5'
-                  }
-                >
-                  <div className="p-4 lg:p-5 border rounded-lg h-[700px] overflow-y-scroll">
+                {/* wizard lateral siempre visible en 0..4 */}
+                <div className="2xl:col-span-1 xl:col-span-1 lg:col-span-2 py-2 bg-gray-100 border rounded-lg">
+                  <FormStep
+                    currentStep={currentStep}
+                    currentStepStatus={currentStepStatus}
+                    stepStatus={stepStatus}
+                  />
+                </div>
+
+                <div className="2xl:col-span-4 lg:col-span-3 xl:col-span-2">
+                  <div className="p-4 lg:p-5 border rounded-lg h-[650px] max-h-[650px] overflow-y-scroll">
                     <Suspense fallback={<></>}>
                       {currentStep === 0 && (
-                        <PersonalInformation
-                          data={formData.personalInformation}
+                        <InformacionPrincipal
+                          data={formData.informacionPrincipal}
                           currentStepStatus={currentStepStatus}
                           onNextChange={handleNextChange}
                         />
                       )}
+
                       {currentStep === 1 && (
-                        <Identification
-                          data={formData.identification}
+                        <Caracteristicas
+                          data={formData.caracteristicas}
                           currentStepStatus={currentStepStatus}
                           onNextChange={handleNextChange}
                           onBackChange={handleBackChange}
                         />
                       )}
+
                       {currentStep === 2 && (
                         <AddressInfomation
                           data={formData.addressInformation}
@@ -334,8 +498,9 @@ const PropertiesPortfolio = () => {
                         />
                       )}
 
+                      {/* ✅ step 3: publicar */}
                       {currentStep === 3 && (
-                        <AccountReview
+                        <CreacionPropiedad
                           data={formData}
                           onSuccess={(data) => {
                             if (data?.id) {
@@ -343,45 +508,27 @@ const PropertiesPortfolio = () => {
                               dispatch(setCurrentStep(4))
                               dispatch(
                                 setStepStatus({
-                                  4: { status: 'complete' },
-                                  5: { status: 'current' },
+                                  3: { status: 'complete' },
+                                  4: { status: 'current' },
                                 })
                               )
                             }
                           }}
-                          onError={(error) => {
-                            // Maneja error si quieres mostrar feedback
+                          onError={() => {
+                            //
                           }}
                         />
                       )}
 
+                      {/* ✅ step 4: imágenes */}
                       {currentStep === 4 && (
-                        <UploadImage
-                          propertyType={
-                            formData?.personalInformation?.typeOfPropertyId ??
-                            ''
-                          }
-                          images={sortedImages}
-                          onNextChange={() => {
-                            dispatch(
-                              setStepStatus({
-                                5: { status: 'complete' },
-                                6: { status: 'current' },
-                              })
-                            )
-                            dispatch(setCurrentStep(5))
-                          }}
-                        />
+                        <UploadImage images={sortedImages} />
                       )}
                     </Suspense>
                   </div>
                 </div>
               </div>
             </AdaptableCard>
-          </TabContent>
-
-          <TabContent value="tab2">
-            <PortaOfPropertyOverview />
           </TabContent>
         </div>
       </Tabs>

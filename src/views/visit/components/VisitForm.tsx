@@ -1,7 +1,8 @@
-import { Formik, Field, Form, FormikHelpers } from 'formik'
+import { Field, Form, Formik, type FormikHelpers } from 'formik'
 import * as Yup from 'yup'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+
 import Button from '@/components/ui/Button'
 import FormItem from '@/components/ui/FormItem'
 import Input from '@/components/ui/Input'
@@ -10,6 +11,7 @@ import DatePicker from '@/components/ui/DatePicker'
 import TimeInput from '@/components/ui/TimeInput'
 import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
+
 import {
   useGetAllCustomersQuery,
   useGetAllPropertiesQuery,
@@ -76,6 +78,7 @@ const formatPriceForPdf = (
   currency?: string
 ) => {
   if (value === null || value === undefined || value === '') return ''
+
   let num: number | null
   if (typeof value === 'string') {
     num = parseNumeric(value)
@@ -102,62 +105,56 @@ const formatRutInput = (raw: string): string => {
   if (!clean) return ''
   const body = clean.slice(0, -1)
   const dv = clean.slice(-1)
+
   let bodyWithDots = ''
   let counter = 0
   for (let i = body.length - 1; i >= 0; i--) {
     bodyWithDots = body[i] + bodyWithDots
     counter++
     if (counter === 3 && i !== 0) {
-      bodyWithDots = '.' + bodyWithDots
+      bodyWithDots = `.${bodyWithDots}`
       counter = 0
     }
   }
   return `${bodyWithDots}-${dv}`
 }
 
-// Define el prefijo según el código de moneda
 const getCurrencyPrefix = (code: string): string => {
-  switch (code) {
-    case 'CLP':
-      return '$'
-    case 'USD':
-      return 'USD '
-    case 'UF':
-      return 'UF '
-    default:
-      return ''
-  }
+  switch (code) {
+    case 'CLP':
+      return '$'
+    case 'USD':
+      return 'USD '
+    case 'UF':
+      return 'UF '
+    default:
+      return ''
+  }
 }
 
 /**
- * ESTA REEMPLAZA A LA ANTIGUA. Formatea el valor con prefijo de moneda.
+ * Formatea el valor con prefijo de moneda.
+ * - Mantiene solo dígitos.
+ * - Aplica separador de miles según es-CL.
  */
 const formatPriceInput = (inputValue: string, currencyCode: string): string => {
-  const prefix = getCurrencyPrefix(currencyCode)
-  
-  // 1. Remover el prefijo actual (si existe) y cualquier carácter que no sea dígito.
-  let rawValue = inputValue.replace(prefix, '').replace(/[^\d]/g, '')
+  const prefix = getCurrencyPrefix(currencyCode)
+  const rawValue = inputValue.replace(prefix, '').replace(/[^\d]/g, '')
 
-  if (rawValue === '') {
-    return '' 
-  }
+  if (rawValue === '') return ''
 
-  // 2. Convertir a número entero y formatear usando la localización Chilena (puntos de miles)
-  const numberValue = parseInt(rawValue, 10)
-  if (isNaN(numberValue)) {
-    return prefix 
-  }
+  const numberValue = parseInt(rawValue, 10)
+  if (Number.isNaN(numberValue)) return prefix
 
-  const formattedNumber = numberValue.toLocaleString('es-CL', {
-    maximumFractionDigits: 0,
-  })
+  const formattedNumber = numberValue.toLocaleString('es-CL', {
+    maximumFractionDigits: 0,
+  })
 
-  // 3. Devolver el prefijo + el número formateado
-  return `${prefix}${formattedNumber}`
+  return `${prefix}${formattedNumber}`
 }
 
-const loadImageAsDataUrl = (url: string): Promise<string> => {
-  return new Promise((resolve, reject) => {
+const loadImageAsDataUrl = (url: string): Promise<string> =>
+  new Promise((resolve, reject) => {
     const img = new Image()
     img.crossOrigin = 'anonymous'
     img.onload = () => {
@@ -170,15 +167,13 @@ const loadImageAsDataUrl = (url: string): Promise<string> => {
         return
       }
       ctx.drawImage(img, 0, 0)
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.9)
-      resolve(dataUrl)
+      resolve(canvas.toDataURL('image/jpeg', 0.9))
     }
     img.onerror = (err) => reject(err)
     img.src = url
   })
-}
 
-const generateVisitPdf = async (payload: {
+type VisitPdfPayload = {
   customerName: string
   customerRut: string
   customerEmail: string
@@ -196,7 +191,9 @@ const generateVisitPdf = async (payload: {
   endTime: string
   description: string
   propertyImages: Array<{ path: string }>
-}) => {
+}
+
+const generateVisitPdf = async (payload: VisitPdfPayload) => {
   const doc = new jsPDF('p', 'pt', 'a4')
   const pageWidth = doc.internal.pageSize.getWidth()
   const pageHeight = doc.internal.pageSize.getHeight()
@@ -208,10 +205,12 @@ const generateVisitPdf = async (payload: {
   try {
     logoDataUrl = await loadImageAsDataUrl('/img/logo/logo.pdf.jpeg')
   } catch (err) {
+    // seguimos sin logo
+    // eslint-disable-next-line no-console
     console.log('No se pudo cargar logo local, seguimos sin logo.', err)
   }
 
-  // === MARCA DE AGUA: se dibuja PRIMERO, con baja opacidad ===
+  // === MARCA DE AGUA ===
   if (logoDataUrl) {
     const wmWidth = 500
     const wmHeight = 500
@@ -220,34 +219,24 @@ const generateVisitPdf = async (payload: {
 
     const anyDoc = doc as any
     if (anyDoc.GState) {
-      const gState = anyDoc.GState({
-        opacity: 0.15,
-        fillOpacity: 0.15,
-      })
+      const gState = anyDoc.GState({ opacity: 0.15, fillOpacity: 0.15 })
       anyDoc.setGState(gState)
       anyDoc.addImage(logoDataUrl, 'PNG', wmX, wmY, wmWidth, wmHeight)
-      const gStateReset = anyDoc.GState({
-        opacity: 1,
-        fillOpacity: 1,
-      })
-      anyDoc.setGState(gStateReset)
+      const reset = anyDoc.GState({ opacity: 1, fillOpacity: 1 })
+      anyDoc.setGState(reset)
     } else {
-      // Si la versión de jsPDF no soporta GState, lo dibujamos igual pero con ese tamaño
       doc.addImage(logoDataUrl, 'PNG', wmX, wmY, wmWidth, wmHeight)
     }
   }
-  // ==========================================================
 
-  // Header con logo arriba a la izquierda (igual que antes)
+  // Header
   if (logoDataUrl) {
     doc.addImage(logoDataUrl, 'PNG', marginX, y, 120, 40)
   }
 
   doc.setFont('times', 'normal')
   doc.setFontSize(9)
-  doc.text('Pulso Propiedades', pageWidth - marginX, y + 5, {
-    align: 'right',
-  })
+  doc.text('Pulso Propiedades', pageWidth - marginX, y + 5, { align: 'right' })
   doc.text('Email: contacto@pulsopropiedades.cl', pageWidth - marginX, y + 18, {
     align: 'right',
   })
@@ -346,11 +335,7 @@ const generateVisitPdf = async (payload: {
   doc.text('Valor:', propTextXLabel, propY)
   doc.setFont('times', 'normal')
   const formattedPrice = formatPriceForPdf(payload.price, payload.currency)
-  doc.text(
-    `${formattedPrice} ${payload.currency || ''}`,
-    propTextXValue,
-    propY
-  )
+  doc.text(`${formattedPrice} ${payload.currency || ''}`, propTextXValue, propY)
 
   const propBottomY = propY
 
@@ -390,18 +375,15 @@ const generateVisitPdf = async (payload: {
     y += lines.length * detailLineHeight + 10
   } else {
     for (let i = 0; i < paragraphs.length; i++) {
-      const pText = paragraphs[i]
-      const lines = doc.splitTextToSize(pText, detailWidth)
+      const lines = doc.splitTextToSize(paragraphs[i], detailWidth)
       doc.text(lines, marginX, y)
       y += lines.length * detailLineHeight
-      if (i < paragraphs.length - 1) {
-        y += 6
-      }
+      if (i < paragraphs.length - 1) y += 6
     }
     y += 10
   }
 
-  if (payload.propertyImages && payload.propertyImages.length > 0) {
+  if (payload.propertyImages?.length) {
     doc.setFont('times', 'bold')
     doc.setFontSize(10)
     doc.text('Imágenes de la propiedad', marginX, y)
@@ -411,8 +393,7 @@ const generateVisitPdf = async (payload: {
     const gap = 6
     const thumbsPerRow = 6
     const usableWidth = pageWidth - marginX * 2
-    const thumbWidth =
-      (usableWidth - gap * (thumbsPerRow - 1)) / thumbsPerRow
+    const thumbWidth = (usableWidth - gap * (thumbsPerRow - 1)) / thumbsPerRow
     const thumbHeight = thumbWidth * 0.7
 
     for (let i = 0; i < maxImages; i++) {
@@ -429,6 +410,7 @@ const generateVisitPdf = async (payload: {
         const dataUrl = await loadImageAsDataUrl(imgMeta.path)
         doc.addImage(dataUrl, 'JPEG', imgX, imgY, thumbWidth, thumbHeight)
       } catch (err) {
+        // eslint-disable-next-line no-console
         console.log('Error cargando imagen de propiedad:', imgMeta, err)
       }
     }
@@ -444,10 +426,7 @@ const generateVisitPdf = async (payload: {
     'y para el caso de venta, el 2% del valor final de la operación más el impuesto legal por concepto de honorarios, ' +
     'de acuerdo a lo estipulado por la ley.'
 
-  const footerLines = doc.splitTextToSize(
-    footerText,
-    pageWidth - marginX * 2
-  )
+  const footerLines = doc.splitTextToSize(footerText, pageWidth - marginX * 2)
   doc.setFont('times', 'normal')
   doc.setFontSize(9)
   doc.text(footerLines, marginX, y)
@@ -474,14 +453,9 @@ const generateVisitPdf = async (payload: {
       align: 'center',
     }
   )
-  doc.text(
-    'Pulso Propiedades',
-    rightLineX + lineWidth / 2,
-    lineY + 12,
-    {
-      align: 'center',
-    }
-  )
+  doc.text('Pulso Propiedades', rightLineX + lineWidth / 2, lineY + 12, {
+    align: 'center',
+  })
 
   doc.setFont('times', 'normal')
   doc.setFontSize(8)
@@ -489,25 +463,31 @@ const generateVisitPdf = async (payload: {
     `RUT: ${payload.customerRut || '—'}`,
     leftLineX + lineWidth / 2,
     lineY + 24,
-    { align: 'center' }
+    {
+      align: 'center',
+    }
   )
-  doc.text(
-    'RUT: XX.XXX.XXX-X',
-    rightLineX + lineWidth / 2,
-    lineY + 24,
-    { align: 'center' }
-  )
+  doc.text('RUT: XX.XXX.XXX-X', rightLineX + lineWidth / 2, lineY + 24, {
+    align: 'center',
+  })
 
   doc.save(`orden-visita-${payload.propertyId}.pdf`)
 }
 
-
-const normalizeCollection = <T = any>(result: any): T[] => {
+const normalizeCollection = <T,>(result: any): T[] => {
   if (!result) return []
   if (Array.isArray(result)) return result
-  if ('data' in result && Array.isArray(result.data)) return result.data
+  if (
+    typeof result === 'object' &&
+    'data' in result &&
+    Array.isArray(result.data)
+  ) {
+    return result.data as T[]
+  }
   return []
 }
+
+type SelectOption = { value: any; label: string }
 
 const VisitForm = ({ propertyId }: VisitFormProps) => {
   const navigate = useNavigate()
@@ -525,34 +505,53 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
     search: '',
   })
 
-  const customers = normalizeCollection<any>(customersData)
-  const properties = normalizeCollection<any>(propertiesData)
+  const customers = useMemo(
+    () => normalizeCollection<any>(customersData),
+    [customersData]
+  )
+  const properties = useMemo(
+    () => normalizeCollection<any>(propertiesData),
+    [propertiesData]
+  )
 
-  const customerOptions =
-    customers.map((customer: any) => ({
-      value: customer.id,
-      label: `${customer.name} ${customer.lastName || ''}`,
-    })) || []
+  const customerOptions: SelectOption[] = useMemo(
+    () =>
+      customers.map((customer: any) => ({
+        value: customer.id,
+        label: `${customer.name} ${customer.lastName || ''}`.trim(),
+      })),
+    [customers]
+  )
 
-  const propertyOptions =
-    properties.map((property: any) => ({
-      value: property.id,
-      label: `${property.id} · ${property.typeOfOperationId} de ${property.typeOfPropertyId}`,
-    })) || []
+  const propertyOptions: SelectOption[] = useMemo(
+    () =>
+      properties.map((property: any) => ({
+        value: property.id,
+        label: `${property.id} · ${property.typeOfOperationId} de ${property.typeOfPropertyId}`,
+      })),
+    [properties]
+  )
 
-  const currencyOptions = [
-    { value: 'CLP', label: 'CLP - Peso Chileno' },
-    { value: 'USD', label: 'USD - Dólar' },
-    { value: 'UF', label: 'UF - Unidad de Fomento' },
-  ]
+  const currencyOptions: SelectOption[] = useMemo(
+    () => [
+      { value: 'CLP', label: 'CLP - Peso Chileno' },
+      { value: 'USD', label: 'USD - Dólar' },
+      { value: 'UF', label: 'UF - Unidad de Fomento' },
+    ],
+    []
+  )
 
-  const eventTypeOptions = [
-    { value: 'visit order', label: 'Orden de Visita' },
-    { value: 'event', label: 'Evento' },
-  ]
+  const eventTypeOptions: SelectOption[] = useMemo(
+    () => [
+      { value: 'visit order', label: 'Orden de Visita' },
+      { value: 'event', label: 'Evento' },
+    ],
+    []
+  )
 
-  const selectedProperty = properties.find(
-    (p: any) => String(p.id) === String(propertyId)
+  const selectedProperty = useMemo(
+    () => properties.find((p: any) => String(p.id) === String(propertyId)),
+    [properties, propertyId]
   )
 
   const getPropertyAddress = (property: any): string => {
@@ -567,29 +566,32 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
 
   const getPropertyPrice = (property: any): string => {
     if (!property) return ''
-    if (property.propertyPrice) return property.propertyPrice.toString()
-    if (property.price) return property.price.toString()
-    if (property.priceAmount) return property.priceAmount.toString()
+    if (property.propertyPrice != null) return String(property.propertyPrice)
+    if (property.price != null) return String(property.price)
+    if (property.priceAmount != null) return String(property.priceAmount)
     return ''
   }
 
-  const initialValues: VisitFormValues = {
-    eventType: 'visit order',
-    title: '',
-    customerId: null,
-    propertyId: propertyId || '',
-    customerRut: '',
-    customerEmail: '',
-    customerPhone: '', // sin valor por defecto, para que funcione bien el placeholder
-    propertyAddress: getPropertyAddress(selectedProperty),
-    price: getPropertyPrice(selectedProperty),
-    currency: 'CLP',
-    startDate: new Date(),
-    startTime: '09:00',
-    endDate: new Date(),
-    endTime: '09:00',
-    description: '',
-  }
+  const initialValues: VisitFormValues = useMemo(
+    () => ({
+      eventType: 'visit order',
+      title: '',
+      customerId: null,
+      propertyId: propertyId || '',
+      customerRut: '',
+      customerEmail: '',
+      customerPhone: '',
+      propertyAddress: getPropertyAddress(selectedProperty),
+      price: getPropertyPrice(selectedProperty),
+      currency: 'CLP',
+      startDate: new Date(),
+      startTime: '09:00',
+      endDate: new Date(),
+      endTime: '09:00',
+      description: '',
+    }),
+    [propertyId, selectedProperty]
+  )
 
   const handleSubmit = async (
     values: VisitFormValues,
@@ -611,21 +613,20 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
       const startDateText = formatDate(values.startDate)
       const endDateText = formatDate(values.endDate)
 
-      const propertyImages: Array<{ path: string }> =
-        (rawProperty?.images || []).map((img: any) => ({
-          path: img.path,
-        })) || []
+      const propertyImages: Array<{ path: string }> = (
+        (rawProperty?.images || []) as any[]
+      )
+        .filter(Boolean)
+        .map((img: any) => ({ path: img.path }))
+        .filter((img: any) => Boolean(img.path))
 
-      const visitPayload = {
-        eventType: values.eventType,
-        title: values.title || `Visita para propiedad ${values.propertyId}`,
+      const visitPayload: VisitPdfPayload = {
         customerName: customer
-          ? `${customer.name} ${customer.lastName || ''}`
+          ? `${customer.name} ${customer.lastName || ''}`.trim()
           : '',
         customerRut: values.customerRut,
         customerEmail: values.customerEmail,
         customerPhone: values.customerPhone,
-        customerId: values.customerId ? Number(values.customerId) : null,
         propertyId: Number(values.propertyId),
         propertyAddress:
           values.propertyAddress || getPropertyAddress(rawProperty),
@@ -640,12 +641,7 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
         endTime: values.endTime,
         description: values.description || rawProperty?.observations || '',
         propertyImages,
-        rawProperty,
       }
-
-      //console.log(' Propiedad completa seleccionada:', rawProperty)
-      //console.log(' Campo images de la propiedad:', rawProperty?.images)
-      //console.log(' Datos de la visita (payload listo):', visitPayload)
 
       await generateVisitPdf(visitPayload)
 
@@ -659,10 +655,11 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
         navigate('/mis-propiedades')
       }, 1500)
     } catch (error: any) {
+      // eslint-disable-next-line no-console
       console.error('❌ Error al generar PDF:', error)
       toast.push(
         <Notification title="Error" type="danger">
-          {error.message || 'Error al generar la orden de visita'}
+          {error?.message || 'Error al generar la orden de visita'}
         </Notification>
       )
     } finally {
@@ -683,6 +680,22 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
           properties.find(
             (p: any) => String(p.id) === String(values.propertyId || propertyId)
           ) || selectedProperty
+
+        const selectedEventType = eventTypeOptions.find(
+          (opt) => opt.value === values.eventType
+        )
+
+        const selectedCurrency = currencyOptions.find(
+          (opt) => opt.value === values.currency
+        )
+
+        const selectedCustomer = customerOptions.find(
+          (opt) => String(opt.value) === String(values.customerId)
+        )
+
+        const selectedPropertyOption = propertyOptions.find(
+          (opt) => String(opt.value) === String(values.propertyId)
+        )
 
         return (
           <Form className="space-y-6">
@@ -714,7 +727,7 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
             )}
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="mt-2 mb-1 md:col-span-2">
+              <div className="mb-1 mt-2 md:col-span-2">
                 <h4 className="text-sm font-semibold text-gray-700">
                   Datos del evento
                 </h4>
@@ -732,10 +745,8 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
                 <Select
                   placeholder="Seleccionar tipo"
                   options={eventTypeOptions}
-                  value={eventTypeOptions.find(
-                    (opt) => opt.value === values.eventType
-                  )}
-                  onChange={(option) =>
+                  value={selectedEventType}
+                  onChange={(option: any) =>
                     setFieldValue('eventType', option?.value)
                   }
                 />
@@ -753,7 +764,7 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
                 />
               </FormItem>
 
-              <div className="mt-4 mb-1 border-t border-dashed border-gray-200 pt-3 md:col-span-2">
+              <div className="mb-1 mt-4 border-t border-dashed border-gray-200 pt-3 md:col-span-2">
                 <h4 className="text-sm font-semibold text-gray-700">
                   Datos del cliente
                 </h4>
@@ -765,33 +776,27 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
               <FormItem
                 label="Cliente"
                 invalid={Boolean(errors.customerId && touched.customerId)}
-                errorMessage={errors.customerId}
+                errorMessage={errors.customerId as any}
               >
                 <Select
                   placeholder="Seleccionar cliente"
                   options={customerOptions}
-                  value={customerOptions.find(
-                    (opt) => opt.value === values.customerId
-                  )}
-                  onChange={(option) => {
-                    setFieldValue('customerId', option?.value)
+                  value={selectedCustomer}
+                  onChange={(option: any) => {
+                    setFieldValue('customerId', option?.value ?? null)
+
                     const customer = customers.find(
                       (c: any) => String(c.id) === String(option?.value)
                     )
-                    if (customer) {
-                      if (customer.rut) {
-                        setFieldValue(
-                          'customerRut',
-                          formatRutInput(customer.rut)
-                        )
-                      }
-                      if (customer.email) {
-                        setFieldValue('customerEmail', customer.email)
-                      }
-                      if (customer.phone) {
-                        setFieldValue('customerPhone', customer.phone)
-                      }
-                    }
+
+                    if (!customer) return
+
+                    if (customer.rut)
+                      setFieldValue('customerRut', formatRutInput(customer.rut))
+                    if (customer.email)
+                      setFieldValue('customerEmail', customer.email)
+                    if (customer.phone)
+                      setFieldValue('customerPhone', customer.phone)
                   }}
                 />
               </FormItem>
@@ -802,56 +807,51 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
                     <Input
                       {...field}
                       placeholder="RUT del cliente"
-                      onChange={(e) => {
-                        const formatted = formatRutInput(e.target.value)
-                        setFieldValue('customerRut', formatted)
-                      }}
+                      onChange={(e) =>
+                        setFieldValue(
+                          'customerRut',
+                          formatRutInput(e.target.value)
+                        )
+                      }
                     />
                   )}
                 </Field>
               </FormItem>
 
               <FormItem
-                label="Correo electrónico"
-                invalid={Boolean(
-                  errors.customerEmail && touched.customerEmail
-                )}
-                errorMessage={errors.customerEmail}
-              >
-                <Field name="customerEmail">
-                  {({ field, form }: any) => (
-                    <Input
-                      {...field}
-                      type="email"
-                      placeholder="cliente@email.com"
-                      
-                      // 🚫 LÓGICA ONFOCUS ELIMINADA 🚫
-                      
-                      onChange={(e) => {
-                        form.setFieldValue('customerEmail', e.target.value)
-                      }}
-                    />
-                  )}
-                </Field>
-              </FormItem>
+                label="Correo electrónico"
+                invalid={Boolean(errors.customerEmail && touched.customerEmail)}
+                errorMessage={errors.customerEmail}
+              >
+                <Field name="customerEmail">
+                  {({ field, form }: any) => (
+                    <Input
+                      {...field}
+                      type="email"
+                      placeholder="cliente@email.com"
+                      onChange={(e) =>
+                        form.setFieldValue('customerEmail', e.target.value)
+                      }
+                    />
+                  )}
+                </Field>
+              </FormItem>
 
               <FormItem label="Teléfono">
-                <Field name="customerPhone">
-                  {({ field, form }: any) => (
-                    <Input
-                      {...field}
-                      placeholder="Ej: +56912345678"
-                      // 🚫 LÓGICA ONFOCUS ELIMINADA 🚫
-                      onChange={(e) => {
-                        // Simplemente usar el valor que escribe el usuario.
-                        form.setFieldValue('customerPhone', e.target.value)
-                      }}
-                    />
-                  )}
-                </Field>
-              </FormItem>
+                <Field name="customerPhone">
+                  {({ field, form }: any) => (
+                    <Input
+                      {...field}
+                      placeholder="Ej: +56912345678"
+                      onChange={(e) =>
+                        form.setFieldValue('customerPhone', e.target.value)
+                      }
+                    />
+                  )}
+                </Field>
+              </FormItem>
 
-              <div className="mt-4 mb-1 border-t border-dashed border-gray-200 pt-3 md:col-span-2">
+              <div className="mb-1 mt-4 border-t border-dashed border-gray-200 pt-3 md:col-span-2">
                 <h4 className="text-sm font-semibold text-gray-700">
                   Datos de la propiedad
                 </h4>
@@ -868,21 +868,21 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
                 <Select
                   placeholder="Seleccionar propiedad"
                   options={propertyOptions}
-                  value={propertyOptions.find(
-                    (opt) => String(opt.value) === String(values.propertyId)
-                  )}
-                  onChange={(option) => {
+                  value={selectedPropertyOption}
+                  onChange={(option: any) => {
                     setFieldValue('propertyId', option?.value)
+
                     const property = properties.find(
                       (p: any) => String(p.id) === String(option?.value)
                     )
-                    if (property) {
-                      setFieldValue(
-                        'propertyAddress',
-                        getPropertyAddress(property)
-                      )
-                      setFieldValue('price', getPropertyPrice(property))
-                    }
+
+                    if (!property) return
+
+                    setFieldValue(
+                      'propertyAddress',
+                      getPropertyAddress(property)
+                    )
+                    setFieldValue('price', getPropertyPrice(property))
                   }}
                 />
               </FormItem>
@@ -897,49 +897,44 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
               </FormItem>
 
               <FormItem label="Precio">
-                <Field name="price">
-                  {({ field, form, meta }: any) => ( // ⬅️ AGREGAR 'form'
-                    <Input
-                      {...field}
-                      inputMode="numeric"
-                      placeholder="60.000.000"
-                      onChange={(e) => {
-                        const formatted = formatPriceInput(
-                          e.target.value, 
-                          form.values.currency // ⬅️ PASAR LA MONEDA
-                        )
-                        form.setFieldValue('price', formatted) 
-                      }}
-                    />
-                  )}
-                </Field>
-              </FormItem>
+                <Field name="price">
+                  {({ field, form }: any) => (
+                    <Input
+                      {...field}
+                      inputMode="numeric"
+                      placeholder="60.000.000"
+                      onChange={(e) => {
+                        const formatted = formatPriceInput(
+                          e.target.value,
+                          form.values.currency
+                        )
+                        form.setFieldValue('price', formatted)
+                      }}
+                    />
+                  )}
+                </Field>
+              </FormItem>
 
               <FormItem label="Código moneda">
-                <Select
-                  placeholder="Seleccionar moneda"
-                  options={currencyOptions}
-                  value={currencyOptions.find(
-                    (opt) => opt.value === values.currency
-                  )}
-                  onChange={(option) => {
-                    // 1. Establecer el nuevo código de moneda
-                    setFieldValue('currency', option?.value)
+                <Select
+                  placeholder="Seleccionar moneda"
+                  options={currencyOptions}
+                  value={selectedCurrency}
+                  onChange={(option: any) => {
+                    const newCurrency = option?.value || 'CLP'
+                    setFieldValue('currency', newCurrency)
 
-                    // 2. RE-FORMATEAR el precio existente con el nuevo prefijo
-                    const newCurrency = option?.value || 'CLP'
-                    if (values.price) { 
-                      const formattedValue = formatPriceInput(
-                        values.price, 
-                        newCurrency
-                      )
-                      setFieldValue('price', formattedValue)
-                    }
-                  }}
-                />
-              </FormItem>
+                    if (values.price) {
+                      setFieldValue(
+                        'price',
+                        formatPriceInput(values.price, newCurrency)
+                      )
+                    }
+                  }}
+                />
+              </FormItem>
 
-              <div className="mt-4 mb-1 border-t border-dashed border-gray-200 pt-3 md:col-span-2">
+              <div className="mb-1 mt-4 border-t border-dashed border-gray-200 pt-3 md:col-span-2">
                 <h4 className="text-sm font-semibold text-gray-700">
                   Horario de la visita
                 </h4>
@@ -952,7 +947,7 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
               <FormItem
                 label="Fecha inicial"
                 invalid={Boolean(errors.startDate && touched.startDate)}
-                errorMessage={errors.startDate as string}
+                errorMessage={errors.startDate as any}
               >
                 <DatePicker
                   value={values.startDate}
@@ -972,12 +967,9 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
                       ? new Date(`2000-01-01T${values.startTime}`)
                       : new Date()
                   }
-                  onChange={(time) => {
-                    const hours = time.getHours().toString().padStart(2, '0')
-                    const minutes = time
-                      .getMinutes()
-                      .toString()
-                      .padStart(2, '0')
+                  onChange={(time: Date) => {
+                    const hours = String(time.getHours()).padStart(2, '0')
+                    const minutes = String(time.getMinutes()).padStart(2, '0')
                     setFieldValue('startTime', `${hours}:${minutes}`)
                   }}
                   format="24"
@@ -987,7 +979,7 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
               <FormItem
                 label="Fecha de término"
                 invalid={Boolean(errors.endDate && touched.endDate)}
-                errorMessage={errors.endDate as string}
+                errorMessage={errors.endDate as any}
               >
                 <DatePicker
                   value={values.endDate}
@@ -1007,25 +999,22 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
                       ? new Date(`2000-01-01T${values.endTime}`)
                       : new Date()
                   }
-                  onChange={(time) => {
-                    const hours = time.getHours().toString().padStart(2, '0')
-                    const minutes = time
-                      .getMinutes()
-                      .toString()
-                      .padStart(2, '0')
+                  onChange={(time: Date) => {
+                    const hours = String(time.getHours()).padStart(2, '0')
+                    const minutes = String(time.getMinutes()).padStart(2, '0')
                     setFieldValue('endTime', `${hours}:${minutes}`)
                   }}
                   format="24"
                 />
               </FormItem>
 
-              <div className="mt-4 mb-1 border-t border-dashed border-gray-200 pt-3 md:col-span-2">
+              <div className="mb-1 mt-4 border-t border-dashed border-gray-200 pt-3 md:col-span-2">
                 <h4 className="text-sm font-semibold text-gray-700">
                   Notas adicionales
                 </h4>
                 <p className="text-xs text-gray-500">
-                  Información que quieras que aparezca en la orden (indicaciones,
-                  puntos de referencia, etc.).
+                  Información que quieras que aparezca en la orden
+                  (indicaciones, puntos de referencia, etc.).
                 </p>
               </div>
 
@@ -1041,7 +1030,10 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
             </div>
 
             <div className="flex flex-col justify-end gap-3 border-t border-gray-100 pt-4 md:flex-row md:gap-4">
-              <Button type="button" onClick={() => navigate('/mis-propiedades')}>
+              <Button
+                type="button"
+                onClick={() => navigate('/mis-propiedades')}
+              >
                 Regresar
               </Button>
               <Button

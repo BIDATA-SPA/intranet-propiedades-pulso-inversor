@@ -33,7 +33,7 @@ injectReducer('accountDetailForm', reducer)
 
 type FormModel = PortalOfPortalsType
 
-type IdentificationProps = {
+type CaracteristicasProps = {
   data: PortalOfPortalsType
   onNextChange?: (
     values: FormModel,
@@ -129,7 +129,7 @@ const PortalOfPortals = ({
   onNextChange,
   onBackChange,
   currentStepStatus,
-}: IdentificationProps) => {
+}: CaracteristicasProps) => {
   const dispatch = useAppDispatch()
   const { textTheme } = useThemeClass()
   const params = useParams()
@@ -142,7 +142,7 @@ const PortalOfPortals = ({
     values: FormModel,
     setSubmitting: (isSubmitting: boolean) => void
   ) => {
-    onNextChange?.(values, 'identification', setSubmitting)
+    onNextChange?.(values, 'caracteristicas', setSubmitting)
   }
 
   const onBack = () => {
@@ -263,7 +263,7 @@ const PortalOfPortals = ({
                             portalOfPortals: {
                               ...formData.portalOfPortals,
                               listing_type: normalizeListingType(
-                                formData.personalInformation.typeOfOperationId
+                                formData.informacionPrincipal.typeOfOperationId
                               ),
                             },
                           })
@@ -311,7 +311,7 @@ const PortalOfPortals = ({
                             portalOfPortals: {
                               ...formData.portalOfPortals,
                               property_type: normalizeTypeOfProperty(
-                                formData.personalInformation.typeOfPropertyId
+                                formData.informacionPrincipal.typeOfPropertyId
                               ),
                             },
                           })
@@ -361,7 +361,7 @@ const PortalOfPortals = ({
                             portalOfPortals: {
                               ...formData.portalOfPortals,
                               external_url:
-                                formData.identification.externalLink,
+                                formData.caracteristicas.externalLink,
                             },
                           })
                         )
@@ -447,7 +447,7 @@ const PortalOfPortals = ({
                           portalOfPortals: {
                             ...formData.portalOfPortals,
                             title:
-                              formData.identification?.characteristics
+                              formData.caracteristicas?.characteristics
                                 ?.propertyTitle,
                           },
                         })
@@ -545,7 +545,7 @@ const PortalOfPortals = ({
                             portalOfPortals: {
                               ...formData.portalOfPortals,
                               price_clp: Number(
-                                formData.personalInformation.propertyPrice
+                                formData.informacionPrincipal.propertyPrice
                               ),
                             },
                           })
@@ -639,7 +639,7 @@ const PortalOfPortals = ({
                             portalOfPortals: {
                               ...formData.portalOfPortals,
                               currency:
-                                formData?.personalInformation?.currencyId,
+                                formData?.informacionPrincipal?.currencyId,
                             },
                           })
                         )
@@ -688,7 +688,7 @@ const PortalOfPortals = ({
                             portalOfPortals: {
                               ...formData.portalOfPortals,
                               area_total: Number(
-                                formData.identification.characteristics.surface
+                                formData.caracteristicas.characteristics.surface
                               ),
                             },
                           })
@@ -735,7 +735,7 @@ const PortalOfPortals = ({
                             portalOfPortals: {
                               ...formData.portalOfPortals,
                               area_useful: Number(
-                                formData.identification.characteristics
+                                formData.caracteristicas.characteristics
                                   .constructedSurface
                               ),
                             },

@@ -1,20 +1,7 @@
 import type { NavigationTree } from '@/@types/navigation'
-import {
-  NAV_ITEM_TYPE_COLLAPSE,
-  NAV_ITEM_TYPE_ITEM,
-} from '@/constants/navigation.constant'
+import { NAV_ITEM_TYPE_ITEM } from '@/constants/navigation.constant'
 
 const navigationConfig: NavigationTree[] = [
-  {
-    key: 'dashboard',
-    path: '/dashboard',
-    title: 'Dashboard',
-    translateKey: '',
-    icon: 'dashboard',
-    type: NAV_ITEM_TYPE_ITEM,
-    authority: [],
-    subMenu: [],
-  },
   {
     key: 'customers',
     path: '/clientes',
@@ -25,16 +12,6 @@ const navigationConfig: NavigationTree[] = [
     authority: [],
     subMenu: [],
   },
-  //   {
-  //     key: 'properties-portfolio',
-  //     path: '/cartera-de-propiedades',
-  //     title: 'Cartera de Propiedades',
-  //     translateKey: '',
-  //     icon: 'properties',
-  //     type: NAV_ITEM_TYPE_ITEM,
-  //     authority: [],
-  //     subMenu: [],
-  //   },
   {
     key: 'my-properties',
     path: '/mis-propiedades',
@@ -55,81 +32,6 @@ const navigationConfig: NavigationTree[] = [
     authority: [],
     subMenu: [],
   },
-  {
-    key: 'tools-and-services',
-    path: '/mis-recursos',
-    title: 'Mis recursos',
-    translateKey: '',
-    icon: 'toolsAndServices',
-    type: NAV_ITEM_TYPE_ITEM,
-    authority: [],
-    subMenu: [],
-  },
-  {
-    key: 'support',
-    path: '/ayuda',
-    title: 'Ayuda',
-    translateKey: '',
-    icon: 'support',
-    type: NAV_ITEM_TYPE_ITEM,
-    authority: [],
-    subMenu: [],
-  },
-]
-
-const navigationConfigCustomer: NavigationTree[] = [
-  {
-    key: 'dashboard',
-    path: '/dashboard',
-    title: 'Dashboard',
-    translateKey: '',
-    icon: 'dashboard',
-    type: NAV_ITEM_TYPE_ITEM,
-    authority: [],
-    subMenu: [],
-  },
-  {
-    key: 'external-services',
-    path: '/servicios-externos',
-    title: 'Servicios externos',
-    translateKey: '',
-    icon: 'externalServices',
-    type: NAV_ITEM_TYPE_ITEM,
-    authority: [],
-    subMenu: [],
-  },
-  {
-    key: 'inbox-requests',
-    path: '/bandeja-de-solicitudes',
-    title: 'Bandeja de solicitudes',
-    translateKey: '',
-    icon: 'inbox',
-    type: NAV_ITEM_TYPE_COLLAPSE,
-    authority: [],
-    subMenu: [
-      {
-        key: 'inbox-requests-external-services-id',
-        path: '/gestion-de-solicitud-de-servicios/inbox',
-        title: 'Servicios externos',
-        translateKey: '',
-        icon: '',
-        type: NAV_ITEM_TYPE_ITEM,
-        authority: [],
-        subMenu: [],
-      },
-    ],
-  },
-  {
-    key: 'support',
-    path: '/ayuda',
-    title: 'Ayuda',
-    translateKey: '',
-    icon: 'support',
-    type: NAV_ITEM_TYPE_ITEM,
-    authority: [],
-    subMenu: [],
-  },
 ]
 
 export default navigationConfig
-export { navigationConfigCustomer }

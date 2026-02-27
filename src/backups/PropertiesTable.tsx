@@ -22,7 +22,7 @@ import { formatDate } from '@fullcalendar/core'
 import classNames from 'classnames'
 import { EmblaOptionsType } from 'embla-carousel'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { FaHandshake, FaRegStar, FaStar } from 'react-icons/fa'
+import { FaRegStar, FaStar } from 'react-icons/fa'
 import { FaHouseCircleCheck } from 'react-icons/fa6'
 import { HiOutlineEye, HiTrash } from 'react-icons/hi'
 import { IoHomeSharp } from 'react-icons/io5'
@@ -37,7 +37,6 @@ import {
   setTotalItems,
 } from '../store/propertyListSlice'
 import { Property } from '../store/types'
-import UpdateExchangeForm from './dialog/UpdateExchangeForm'
 import UpdateStatusForm from './dialog/UpdateStatusForm'
 
 export interface ColumnSort {
@@ -430,16 +429,6 @@ const PropertiesTable: React.FC = () => {
           </Tooltip>
 
           {/* If property isn't in exchange, it will show action */}
-          {!isExchanged && (
-            <Tooltip title="Habilitar para Canje">
-              <span
-                className="cursor-pointer p-2 hover:text-blue-500"
-                onClick={onUpdateExchange}
-              >
-                <FaHandshake className="text-2xl" />
-              </span>
-            </Tooltip>
-          )}
           <Tooltip title={highlighted ? 'Quitar destacada' : 'Destacar'}>
             <span
               className="cursor-pointer p-2 hover:text-yellow-500"
@@ -495,8 +484,6 @@ const PropertiesTable: React.FC = () => {
     )
   }
 
-  // console.log('LIST', data?.data?.properties)
-
   return (
     <>
       <DataTable
@@ -512,19 +499,6 @@ const PropertiesTable: React.FC = () => {
         onPaginationChange={handlePageChange}
         onSelectChange={handlePageSizeChange}
       />
-
-      <Dialog
-        width={700}
-        isOpen={dialogState.updateExchange}
-        onClose={closeUpdateExchangeDialog}
-        onRequestClose={closeUpdateExchangeDialog}
-      >
-        <h5 className="mb-4">Habilitar para canje</h5>
-        <UpdateExchangeForm
-          property={selectedItem}
-          onClose={closeUpdateExchangeDialog}
-        />
-      </Dialog>
 
       <Dialog
         isOpen={dialogState.updateStatus}

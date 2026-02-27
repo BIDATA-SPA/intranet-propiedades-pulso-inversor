@@ -181,8 +181,6 @@ const MainContentEvent = ({ closeDialogsVisOrd, selectedDate }) => {
       propertyId,
     } = values
 
-    // console.log('valores form',values)
-
     const body: CreateVisitOrd = {
       title,
       description,
@@ -240,7 +238,7 @@ const MainContentEvent = ({ closeDialogsVisOrd, selectedDate }) => {
 
   useEffect(() => {
     if (filtersProperties) {
-      // console.log(filtersProperties);
+      //
     }
   }, [filtersProperties])
 

@@ -1,6 +1,5 @@
 import { Button, Card, Skeleton } from '@/components/ui'
 import { useGetUserByIdQuery } from '@/services/RtkQueryService'
-import { useAppSelector } from '@/store'
 import { format } from 'date-fns'
 import { useEffect, useState } from 'react'
 import { HiArrowLeft } from 'react-icons/hi'
@@ -31,7 +30,6 @@ const UserDetails = () => {
   const [isEditingFields, setIsEditingFields] = useState(false)
   const { userId } = useParams()
   const navigate = useNavigate()
-  const [userAuthority] = [useAppSelector((state) => state.auth.session.rol)]
   const [editingInitialValues, setEditingInitialValues] =
     useState(initialValues)
   const { data, isFetching } = useGetUserByIdQuery(userId, {
@@ -54,8 +52,8 @@ const UserDetails = () => {
         name: data?.name,
         lastName: data?.lastName,
         rut: data?.rut,
-        phone: data?.phone,
-        dialCodeId: data?.dialCode?.id, // data?.dialCode
+        phone: '', // data?.phone
+        dialCodeId: '', // data?.dialCode
         webPage: data?.webPage,
         about: data?.about,
         companies: data?.companies,
@@ -186,24 +184,6 @@ const UserDetails = () => {
                       </span>
                       <span className="text-gray-700 font-semibold dark:text-white/80">
                         {data?.rut || 'Por completar...'}
-                      </span>
-                    </>
-                  )}
-                </div>
-
-                <div className="flex flex-col">
-                  {isFetching ? (
-                    <>
-                      <Skeleton className="mt-4 w-[20%]" />
-                      <Skeleton className="mt-1 w-[30%]" />
-                    </>
-                  ) : (
-                    <>
-                      <span className="font-semibold dark:text-white/80">
-                        Teléfono:
-                      </span>
-                      <span className="text-gray-700 font-semibold dark:text-white/80">
-                        {data?.phone || '-'}
                       </span>
                     </>
                   )}
