@@ -26,8 +26,22 @@ type SignInFormSchema = {
   password: string
 }
 
+const PULSO_DOMAIN = 'pulsopropiedades.cl'
+const PULSO_EMAIL_ERROR =
+  'El correo o dominio no perteneces a Pulso Propiedades'
+
+// ✅ mismo enfoque que en SignUp
 const validationSchema = Yup.object().shape({
-  username: Yup.string().required('Por favor, ingresa tu usuario'),
+  username: Yup.string()
+    .transform((val) => (val ? val.toLowerCase().trim() : ''))
+    .email('Email no válido.')
+    .required('Por favor, ingresa tu usuario')
+    .test('pulso-domain', PULSO_EMAIL_ERROR, (value) => {
+      if (!value) return false
+      const parts = value.split('@')
+      if (parts.length !== 2) return false
+      return parts[1] === PULSO_DOMAIN
+    }),
   password: Yup.string().required('Por favor, ingresa tu contraseña'),
 })
 
@@ -38,23 +52,30 @@ const SignInForm = (props: SignInFormProps) => {
     forgotPasswordUrl = '/recuperar-contraseña',
     signUpUrl = '/crear-cuenta',
   } = props
-  const [signInAdmin, { isLoading, error }] = useSignInAdminMutation()
+
+  const [signInAdmin, { isLoading }] = useSignInAdminMutation()
   const { showNotification } = useNotification()
   const [message, setMessage] = useTimeOutMessage()
-
   const { signIn } = useAuth()
 
   const onSignIn = async (
     values: SignInFormSchema,
-    { setSubmitting, resetForm }
+    { setSubmitting, resetForm }: any
   ) => {
     if (disableSubmit) {
       setSubmitting(false)
       return
     }
 
-    const { username, password } = values
-    const normalizedEmail = username.toLowerCase().trim()
+    const normalizedEmail = values.username.toLowerCase().trim()
+    const password = values.password
+
+    // ✅ guard extra (por si alguien evita el schema)
+    if (!normalizedEmail.endsWith(`@${PULSO_DOMAIN}`)) {
+      showNotification('warning', 'Correo inválido', PULSO_EMAIL_ERROR)
+      setSubmitting(false)
+      return
+    }
 
     try {
       const result = await signInAdmin({
@@ -70,9 +91,7 @@ const SignInForm = (props: SignInFormProps) => {
           'Credenciales inválidas',
           'Usuario o contraseña incorrectos.'
         )
-        resetForm({
-          values: { username: '', password: '', grant_type: '' },
-        })
+        resetForm({ values: { username: '', password: '' } })
         return
       }
 
@@ -86,9 +105,7 @@ const SignInForm = (props: SignInFormProps) => {
           'Cuenta no confirmada',
           'Debes confirmar tu correo electrónico para poder iniciar sesión.'
         )
-        resetForm({
-          values: { username: '', password: '', grant_type: '' },
-        })
+        resetForm({ values: { username: '', password: '' } })
         return
       }
 
@@ -102,9 +119,7 @@ const SignInForm = (props: SignInFormProps) => {
             'Acceso denegado',
             'Este usuario no pertenece a esta sesión.'
           )
-          resetForm({
-            values: { username: '', password: '', grant_type: '' },
-          })
+          resetForm({ values: { username: '', password: '' } })
           return
         }
 
@@ -117,7 +132,6 @@ const SignInForm = (props: SignInFormProps) => {
           return
         }
 
-        // Caso no contemplado de tipo o rol
         showNotification(
           'warning',
           'Advertencia',
@@ -126,17 +140,14 @@ const SignInForm = (props: SignInFormProps) => {
         return
       }
 
-      // CASO 4: Error inesperado sin estructura clara
+      // CASO 4: Error inesperado
       showNotification(
         'warning',
         'Error inesperado',
         'Ha ocurrido un problema con el servidor. Intenta más tarde.'
       )
-      resetForm({
-        values: { username: '', password: '', grant_type: '' },
-      })
+      resetForm({ values: { username: '', password: '' } })
     } catch (err: any) {
-      // Errores de red o excepciones no controladas
       showNotification(
         'danger',
         'Error inesperado',
@@ -154,18 +165,13 @@ const SignInForm = (props: SignInFormProps) => {
           <>{message}</>
         </Alert>
       )}
+
       <Formik
-        initialValues={{
-          username: '',
-          password: '',
-        }}
+        initialValues={{ username: '', password: '' }}
         validationSchema={validationSchema}
         onSubmit={(values, formikHelpers) => {
-          if (!disableSubmit) {
-            onSignIn(values, formikHelpers)
-          } else {
-            formikHelpers.setSubmitting(false)
-          }
+          if (!disableSubmit) onSignIn(values, formikHelpers)
+          else formikHelpers.setSubmitting(false)
         }}
       >
         {({ touched, errors, isSubmitting }) => (
@@ -177,13 +183,14 @@ const SignInForm = (props: SignInFormProps) => {
                 errorMessage={errors.username}
               >
                 <Field
-                  type="text"
+                  type="email"
                   autoComplete="off"
                   name="username"
-                  placeholder="Introduce tu usuario"
+                  placeholder={`usuario@${PULSO_DOMAIN}`}
                   component={Input}
                 />
               </FormItem>
+
               <FormItem
                 label="Contraseña"
                 invalid={(errors.password && touched.password) as boolean}
@@ -196,14 +203,17 @@ const SignInForm = (props: SignInFormProps) => {
                   component={PasswordInput}
                 />
               </FormItem>
+
               <div className="flex justify-end mb-6">
                 <ActionLink to={forgotPasswordUrl}>
                   Recuperar contraseña
                 </ActionLink>
               </div>
+
               <Button block loading={isLoading} variant="solid" type="submit">
                 {isSubmitting ? 'Ingresando...' : 'Ingresar'}
               </Button>
+
               <div className="mt-4 text-center">
                 <span>{`¿Aún no tiene cuenta?`} </span>
                 <ActionLink to={signUpUrl}>Regístrate</ActionLink>
