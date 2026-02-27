@@ -32,14 +32,6 @@ export async function apiSignUpCustomer(data: SignUpCredential) {
   })
 }
 
-export async function apiSignUpWebinar(data: SignUpCredential) {
-  return ApiService.fetchData<SignUpResponse>({
-    url: '/users/seminario',
-    method: 'post',
-    data,
-  })
-}
-
 export async function apiSignOut() {
   return ApiService.fetchData({
     url: '/auth/logout',
