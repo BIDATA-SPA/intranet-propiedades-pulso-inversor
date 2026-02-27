@@ -16,8 +16,7 @@ const toE164Chile = (raw: string) => {
 }
 
 const WhatsAppChat = () => {
-  // Puede venir "993043913", "9 9304 3913", "0993043913", etc.
-  const phoneNumberLocal = '994355075'
+  const phoneNumberLocal = '932320459'
   const phoneE164 = toE164Chile(phoneNumberLocal)
 
   const defaultMessage = 'Soy Corredor/a, necesito ayuda - Pulso Propiedades'

@@ -1,5 +1,4 @@
 import { useGetPropertiesMetadataQuery } from '@/services/RtkQueryService'
-import { IMetadata } from '@/services/metadata/properties/types/metadata.type'
 
 export const useMetadata = () => {
   const {
@@ -9,7 +8,7 @@ export const useMetadata = () => {
     error: isMetadataErrorMsg,
   } = useGetPropertiesMetadataQuery()
 
-  const meta: IMetadata = {
+  const meta = {
     totalProperties: metadata?.totalProperties,
     totalPropertiesInExchange: metadata?.totalPropertiesInExchange,
     totalPropertiesSold: metadata?.totalPropertiesSold,

@@ -7,7 +7,7 @@ import {
   useUpdatePropertyMutation,
 } from '@/services/RtkQueryService'
 import { useAppSelector } from '@/store'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Property } from '../../store/types'
 
 interface UpdateStatusFormProps {
@@ -19,21 +19,28 @@ const UpdateStatusForm = ({ onClose, property }: UpdateStatusFormProps) => {
   const userAuthority = useAppSelector((state) => state.auth.session.rol)
   const { data: disabledReasons } = useGetAllDisabledReasonsQuery()
   const [updateProperty, { isLoading }] = useUpdatePropertyMutation()
-  const [selectedReason, setSelectedReason] = useState(
-    property?.propertyStatus?.id
+
+  // ✅ el select debe partir con el status actual
+  const [selectedStatusId, setSelectedStatusId] = useState<string | number>(
+    property?.propertyStatus?.id ?? ''
   )
 
-  const allOptions = disabledReasons ?? [
-    { value: '1', label: 'Vendida' },
-    { value: '2', label: 'Dada de baja' },
-    { value: '3', label: 'Deshabilitada' },
-    { value: '4', label: 'Activa' },
-  ]
+  // ✅ NO invento estados: uso API si viene, si no, tu fallback
+  const allOptions = useMemo(
+    () =>
+      disabledReasons ?? [
+        { value: '1', label: 'Vendida' },
+        { value: '2', label: 'Dada de baja' },
+        { value: '3', label: 'Deshabilitada' },
+        { value: '4', label: 'Activa' },
+      ],
+    [disabledReasons]
+  )
 
-  // 🔹 Filtrar opciones según el rol del usuario
+  // 🔹 Filtrar opciones según el rol del usuario (mantengo tu regla)
   const selectOptions =
     userAuthority === 3
-      ? allOptions.filter((opt) => ['2', '4'].includes(opt.value)) // Solo "Activa" y "Dada de baja"
+      ? allOptions.filter((opt) => ['2', '4'].includes(String(opt.value)))
       : allOptions
 
   const openNotification = (
@@ -50,35 +57,47 @@ const UpdateStatusForm = ({ onClose, property }: UpdateStatusFormProps) => {
     )
   }
 
-  const handleSelectChange = (selectedOption) => {
-    setSelectedReason(selectedOption ? selectedOption.value : '')
+  const handleSelectChange = (opt: any) => {
+    setSelectedStatusId(opt ? opt.value : '')
   }
 
-  const onSubmit = async (e) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // const body = {
-    //   step2: {
-    //     propertyStatusId: selectedReason, // property?.propertyStatus?.id
-    //   },
-    // }
+    if (!property?.id) {
+      openNotification('danger', '¡Error!', 'ID de propiedad no definido.', 3)
+      return
+    }
+
+    if (!selectedStatusId) {
+      openNotification(
+        'warning',
+        'Falta selección',
+        'Debes seleccionar un estado.',
+        3
+      )
+      return
+    }
 
     try {
-      await updateProperty({ id: property?.id }).unwrap()
-      //   await updateProperty({ id: property?.id, ...body }).unwrap()
+      await updateProperty({
+        id: property.id,
+        step2: { propertyStatusId: Number(selectedStatusId) },
+      }).unwrap()
 
       openNotification(
         'success',
         '¡Actualizada!',
-        'Propiedad actualizada exitosamente',
+        'Estado de la propiedad actualizado exitosamente.',
         3
       )
       onClose()
-    } catch (error) {
+    } catch (error: any) {
       openNotification(
         'danger',
         '¡Error!',
-        error?.message ||
+        error?.data?.message ||
+          error?.message ||
           'Ha habido un error al actualizar esta propiedad, inténtelo más tarde.',
         3
       )
@@ -92,7 +111,9 @@ const UpdateStatusForm = ({ onClose, property }: UpdateStatusFormProps) => {
         isSearchable
         options={selectOptions}
         placeholder="Seleccionar"
-        value={selectOptions.find((option) => option.value === selectedReason)}
+        value={selectOptions.find(
+          (option) => String(option.value) === String(selectedStatusId)
+        )}
         onChange={handleSelectChange}
       />
 

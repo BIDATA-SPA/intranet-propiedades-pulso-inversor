@@ -1,22 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { SegmentItemOption } from '@/components/shared'
-import { Segment } from '@/components/ui'
 import Button from '@/components/ui/Button'
-import Dialog from '@/components/ui/Dialog'
-import { FormContainer, FormItem } from '@/components/ui/Form'
-import ApiService from '@/services/ApiService'
-import {
-  mapSpcToPortalCreate,
-  mapSpcToPortalUpdate,
-} from '@/services/portal/mappers/toPortalPublication'
-import {
-  useCreatePropertyMutation,
-  useGetMyInfoQuery,
-  useLazyFindPortalPublicationsQuery,
-  useUpdatePropertyMutation,
-} from '@/services/RtkQueryService'
-import { injectReducer } from '@/store'
-import { usePdpSecureActions } from '@/utils/hooks/usePdpSecureActions'
+import { FormContainer } from '@/components/ui/Form'
 import openNotification from '@/utils/openNotification'
 import {
   stripNulls,
@@ -26,11 +10,18 @@ import {
   toStr,
   toStrOrNull,
 } from '@/utils/parsing-types'
-import { Field, FieldProps, Form, Formik } from 'formik'
+import { Field, Form, Formik } from 'formik'
 import { useRef, useState } from 'react'
-import { HiCheckCircle } from 'react-icons/hi'
 import { useParams, useSearchParams } from 'react-router-dom'
-import reducer, { resetFormState, setFormData, useAppDispatch } from '../store'
+
+import {
+  useCreatePropertyMutation,
+  useGetMyInfoQuery,
+  useUpdatePropertyMutation,
+} from '@/services/RtkQueryService'
+
+import { injectReducer } from '@/store'
+import reducer, { resetFormState, useAppDispatch } from '../store'
 
 injectReducer('accountDetailForm', reducer)
 
@@ -53,27 +44,26 @@ const CreacionPropiedad = ({
   const { propertyId: routePropertyId } = useParams()
   const [searchParams] = useSearchParams()
   const dispatch = useAppDispatch()
-  const { data: user } = useGetMyInfoQuery()
+  useGetMyInfoQuery() // si no lo usas acá, puedes quitarlo
 
   const queryPropertyId = searchParams.get('propertyId')
   const id = routePropertyId ?? queryPropertyId ?? null
   const hasPropertyId = Boolean(id)
 
-  // Pulso Propiedades
+  // ✅ Pulso Propiedades
   const [createProperty, { isLoading: isLoadingCreate }] =
     useCreatePropertyMutation()
   const [updateProperty, { isLoading: isLoadingUpdate }] =
     useUpdatePropertyMutation()
 
-  // Portal de Portales (para buscar por code)
-  const [findPortalByCode] = useLazyFindPortalPublicationsQuery()
-
-  // 🔐 acciones seguras PDP
-  const { ensureToken, secureCreate, secureUpdate } = usePdpSecureActions()
-
   const isSubmittingAny = isLoadingCreate || isLoadingUpdate
 
+  // estados UI (dejas lo que realmente uses)
+  const [busyToggle] = useState(false)
+  const lastValuesRef = useRef<any>(null)
+
   // ================== helpers ==================
+  // ✅ Aquí va tu buildPayload(values) (NO PDP)
   const buildPayload = (values: any) => {
     const step1 = {
       customerId: toNum(values?.informacionPrincipal?.customerId),
@@ -532,17 +522,12 @@ const CreacionPropiedad = ({
     }
 
     const step4 = {
-      isExchanged: false, // toBool(values?.financialInformation?.isExchanged)
+      isExchanged: false,
       timeInExchange: {
-        start: null, // toISOOrNull(values?.financialInformation?.timeInExchange?.start)
-        end: null, // toISOOrNull(values?.financialInformation?.timeInExchange?.end)
+        start: null,
+        end: null,
       },
       propertyDescriptionInExchange: '',
-      // propertyDescriptionInExchange:
-      // values?.caracteristicas?.characteristics?.propertyDescription ??
-      // toStrOrNull(
-      //   values?.financialInformation?.propertyDescriptionInExchange
-      // ),
     }
 
     const step5 = {
@@ -551,130 +536,6 @@ const CreacionPropiedad = ({
 
     return stripNulls({ step1, step2, step3, step4, step5 })
   }
-
-  // ================== portal seguro ==================
-  const publishToPortal = async (
-    localId: string | number,
-    action: 'create' | 'update'
-  ) => {
-    try {
-      // 1) traer la propiedad de Pulso
-      const spcRes = await ApiService.fetchData<any, any>({
-        url: `properties/${localId}`,
-        method: 'get',
-      })
-
-      const spc = {
-        ...spcRes?.data,
-        user: {
-          ...spcRes?.data?.user,
-          phone: `${user?.dialCode?.dialCode + user?.phone}`,
-        },
-      }
-
-      if (!spc) {
-        openNotification(
-          'danger',
-          'Portal',
-          'No se pudo leer la propiedad para publicar en el Portal',
-          4
-        )
-        return
-      }
-
-      if (action === 'create') {
-        const base = mapSpcToPortalCreate(spc)
-        const payload = {
-          ...base,
-          portal: 'pulsoPropiedades' as const,
-          owner_id: String(user?.id),
-        }
-        await secureCreate(payload)
-        openNotification(
-          'success',
-          'Portal',
-          `Publicación creada (code: ${payload.code})`,
-          3
-        )
-        return
-      }
-
-      // action === 'update'
-      const code = String(localId)
-
-      // token para el find
-      const pdpToken = await ensureToken()
-
-      const found = await findPortalByCode({
-        code,
-        page: 1,
-        page_size: 50,
-        pdpToken,
-      }).unwrap()
-
-      const items: any[] = Array.isArray(found)
-        ? found
-        : found?.items ?? found?.data ?? []
-
-      if (items.length > 0) {
-        const body = {
-          ...mapSpcToPortalUpdate(spc),
-          portal: 'pulsoPropiedades' as const,
-          owner_id: String(user?.id),
-        }
-
-        const results = await Promise.allSettled(
-          items
-            .filter((i) => typeof i.uuid === 'string' && i.uuid.length > 0)
-            .map((i) => secureUpdate(i.uuid, body))
-        )
-        const ok = results.filter((r) => r.status === 'fulfilled').length
-
-        openNotification(
-          'success',
-          'Portal',
-          `Actualizadas ${ok}/${items.length} publicaciones`,
-          3
-        )
-        setTimeout(() => {
-          window.location.reload()
-        }, 2500)
-      } else {
-        // si no había publicaciones, creamos una nueva
-        const base = mapSpcToPortalCreate(spc)
-        const payload = {
-          ...base,
-          portal: 'pulsoPropiedades' as const,
-          owner_id: String(user?.id),
-        }
-        await secureCreate(payload)
-        openNotification(
-          'success',
-          'Portal',
-          `No había publicaciones. Se creó una nueva (code: ${payload.code})`,
-          4
-        )
-        setTimeout(() => {
-          window.location.reload()
-        }, 2500)
-      }
-    } catch (err: any) {
-      const text =
-        err?.data?.detail && Array.isArray(err.data.detail)
-          ? err.data.detail
-              .map((d: any) => d?.msg || JSON.stringify(d))
-              .join(' • ')
-          : (err?.data && JSON.stringify(err.data)) ||
-            err?.message ||
-            'Error desconocido en el Portal'
-      openNotification('danger', 'Portal', text, 5)
-    }
-  }
-
-  // estados UI
-  const [confirmOpen, setConfirmOpen] = useState(false)
-  const [busyToggle, setBusyToggle] = useState(false)
-  const lastValuesRef = useRef<any>(null)
 
   return (
     <>
@@ -686,9 +547,6 @@ const CreacionPropiedad = ({
         enableReinitialize
         initialValues={{
           ...data,
-          portalsInformation: {
-            portals: [PORTAL_TAG],
-          },
         }}
         onSubmit={async (values, { setSubmitting }) => {
           try {
@@ -698,6 +556,7 @@ const CreacionPropiedad = ({
             if (hasPropertyId) {
               // UPDATE Pulso
               await updateProperty({ id, ...payload }).unwrap()
+
               openNotification(
                 'success',
                 'Propiedad Actualizada',
@@ -705,46 +564,45 @@ const CreacionPropiedad = ({
                 3
               )
 
-              // portal seguro
-              await publishToPortal(id!, 'update')
-
               dispatch(resetFormState())
               onSuccess?.({ id, action: 'update' })
-            } else {
-              // CREATE Pulso
-              const created = await createProperty(payload as any).unwrap()
-              openNotification(
-                'success',
-                'Propiedad Creada',
-                'Propiedad creada exitosamente',
-                3
-              )
 
-              const newId = created?.id
-              if (newId != null) {
-                // actualizar externalLink en Pulso
-                const fastLink = computeExternalLink(newId)
-                try {
-                  await updateProperty({
-                    id: newId,
-                    step2: { externalLink: fastLink },
-                  } as any).unwrap()
-                } catch {
-                  openNotification(
-                    'warning',
-                    'Aviso',
-                    'Se creó la propiedad, pero no se pudo actualizar el enlace externo.',
-                    4
-                  )
-                }
-
-                // portal seguro create
-                await publishToPortal(newId, 'create')
-              }
-
-              dispatch(resetFormState())
-              onSuccess?.({ id: created?.id, action: 'create' })
+              window.setTimeout(() => window.location.reload(), 350)
+              return
             }
+
+            // CREATE Pulso
+            const created = await createProperty(payload as any).unwrap()
+
+            openNotification(
+              'success',
+              'Propiedad Creada',
+              'Propiedad creada exitosamente',
+              3
+            )
+
+            const newId = created?.id
+            if (newId != null) {
+              const fastLink = computeExternalLink(newId)
+              try {
+                await updateProperty({
+                  id: newId,
+                  step2: { externalLink: fastLink },
+                } as any).unwrap()
+              } catch {
+                openNotification(
+                  'warning',
+                  'Aviso',
+                  'Se creó la propiedad, pero no se pudo actualizar el enlace externo.',
+                  4
+                )
+              }
+            }
+
+            dispatch(resetFormState())
+            onSuccess?.({ id: created?.id, action: 'create' })
+
+            window.setTimeout(() => window.location.reload(), 350)
           } catch (err: any) {
             openNotification(
               'danger',
@@ -766,73 +624,6 @@ const CreacionPropiedad = ({
           return (
             <Form>
               <FormContainer>
-                <FormItem label="Publicar también en Portal de Portales">
-                  <Field name="portalsInformation.portals">
-                    {({ field }: FieldProps<any>) => {
-                      if (
-                        !Array.isArray(field.value) ||
-                        field.value.length === 0 ||
-                        field.value[0]?.id !== 'pulsoPropiedades'
-                      ) {
-                        const next = [PORTAL_TAG]
-                        setTimeout(() => {
-                          field.form.setFieldValue(field.name, next, false)
-                          dispatch(
-                            setFormData({
-                              portalsInformation: { portals: next },
-                            })
-                          )
-                        }, 0)
-                      }
-
-                      return (
-                        <Segment
-                          selectionType="single"
-                          value="pulsoPropiedades"
-                          onChange={() => {}}
-                        >
-                          <div className="grid grid-cols-1 gap-3 w-full">
-                            <Segment.Item value="pulsoPropiedades">
-                              {() => (
-                                <SegmentItemOption
-                                  active
-                                  disabled
-                                  hoverable={false}
-                                  className="relative min-h-[72px] w-full cursor-not-allowed opacity-100"
-                                  customCheck={
-                                    <HiCheckCircle className="text-sky-600 absolute top-2 right-2 text-lg" />
-                                  }
-                                  defaultGutter={false}
-                                  onSegmentItemClick={() => {}}
-                                >
-                                  <div className="flex items-center gap-3 p-2 w-full">
-                                    <div className="h-18 w-28 rounded-md bg-transparent flex items-center justify-center shrink-0">
-                                      <img
-                                        src="/img/portals/logo-portal-de-portales.svg"
-                                        alt="Logo Portal de Portales"
-                                        className="object-cover"
-                                      />
-                                    </div>
-                                    <div className="flex-1">
-                                      <h6 className="font-semibold">
-                                        Portal de Portales
-                                      </h6>
-                                      <p className="text-xs text-slate-500">
-                                        Siempre activo para sincronizar con
-                                        Portal de Portales (Pulso Propiedades)
-                                      </p>
-                                    </div>
-                                  </div>
-                                </SegmentItemOption>
-                              )}
-                            </Segment.Item>
-                          </div>
-                        </Segment>
-                      )
-                    }}
-                  </Field>
-                </FormItem>
-
                 <div className="mt-8 max-w-[350px] mx-auto">
                   <Button
                     block
@@ -841,33 +632,14 @@ const CreacionPropiedad = ({
                     type="submit"
                     disabled={disabled}
                   >
-                    Publicar (Pulso Propiedades + Portal de Portales)
+                    {hasPropertyId
+                      ? 'Actualizar Propiedad'
+                      : 'Publicar Propiedad'}
                   </Button>
                 </div>
-              </FormContainer>
 
-              <Dialog
-                isOpen={confirmOpen}
-                onClose={() => setConfirmOpen(false)}
-                onRequestClose={() => setConfirmOpen(false)}
-              >
-                <h5 className="mb-3">Remover de Portal de Portales</h5>
-                <p className="text-sm text-slate-600">
-                  (Control deshabilitado - no se puede desmarcar desde aquí)
-                </p>
-                <div className="text-right mt-6">
-                  <Button
-                    className="ltr:mr-2 rtl:ml-2"
-                    variant="plain"
-                    onClick={() => setConfirmOpen(false)}
-                  >
-                    Cerrar
-                  </Button>
-                  <Button disabled variant="solid" color="red-500">
-                    Acción deshabilitada
-                  </Button>
-                </div>
-              </Dialog>
+                <Field name="__noop" type="hidden" />
+              </FormContainer>
             </Form>
           )
         }}

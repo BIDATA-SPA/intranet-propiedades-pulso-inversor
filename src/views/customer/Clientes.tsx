@@ -1,5 +1,8 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { Select as SelectType } from '@/@types/select'
+import type { InputHTMLAttributes } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+
+import type { Select as SelectType } from '@/@types/select'
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 import { Tooltip } from '@/components/ui'
 import Alert from '@/components/ui/Alert'
@@ -10,27 +13,14 @@ import Pagination from '@/components/ui/Pagination'
 import Select from '@/components/ui/Select'
 import Spinner from '@/components/ui/Spinner'
 import Table from '@/components/ui/Table'
+
 import {
-  useCreateRatingUserSendMailMutation,
   useGetAllCustomersQuery,
   useGetDashboardQuery,
-  useGetMyInfoQuery,
 } from '@/services/RtkQueryService'
-import useNotification from '@/utils/hooks/useNotification'
-import type { ColumnFiltersState } from '@tanstack/react-table'
-import {
-  flexRender,
-  getCoreRowModel,
-  getFacetedMinMaxValues,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  useReactTable,
-} from '@tanstack/react-table'
-import cloneDeep from 'lodash/cloneDeep'
-import type { InputHTMLAttributes } from 'react'
-import { useEffect, useMemo, useState } from 'react'
+
+import classNames from 'classnames'
+import { FaUser } from 'react-icons/fa'
 import { FaUserCheck, FaUserPlus, FaUsers } from 'react-icons/fa6'
 import {
   HiOutlineSearch,
@@ -38,19 +28,17 @@ import {
   HiOutlineUserAdd,
   HiViewList,
 } from 'react-icons/hi'
+import { HiOutlineSquares2X2 } from 'react-icons/hi2'
 import { IoMdEye } from 'react-icons/io'
-import { TbChecklist } from 'react-icons/tb'
-import { useNavigate } from 'react-router'
-import { useSearchParams } from 'react-router-dom'
 
-import { useCopyToClipboard } from '@/utils/hooks/useCopyToClipboard'
 import {
   DEFAULT_TAILWIND_COLORS,
   getRandomBackgroundColor,
 } from '@/utils/randomColor'
-import classNames from 'classnames'
-import { FaUserAlt } from 'react-icons/fa'
-import { HiOutlineSquares2X2 } from 'react-icons/hi2'
+
+const { Tr, Th, Td, THead, TBody } = Table
+
+type ViewMode = 'table' | 'cards'
 
 interface DebouncedInputProps
   extends Omit<
@@ -61,10 +49,8 @@ interface DebouncedInputProps
   onChange: (value: string) => void
   debounce?: number
   toggleViewMode: () => void
-  viewMode: 'table' | 'cards'
+  viewMode: ViewMode
 }
-
-const { Tr, Th, Td, THead, TBody } = Table
 
 function DebouncedInput({
   value: initialValue,
@@ -77,21 +63,14 @@ function DebouncedInput({
   const [value, setValue] = useState(initialValue)
   const navigate = useNavigate()
 
-  const handleResetButtonClick = () => {
-    setValue('')
-  }
+  useEffect(() => setValue(initialValue), [initialValue])
 
   useEffect(() => {
-    setValue(initialValue)
-  }, [initialValue])
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      onChange(value)
-    }, debounce)
-
+    const timeout = setTimeout(() => onChange(value), debounce)
     return () => clearTimeout(timeout)
-  }, [value])
+  }, [value, debounce, onChange])
+
+  const handleReset = () => setValue('')
 
   return (
     <div className="sm:flex sm:justify-between lg:items-center">
@@ -110,7 +89,7 @@ function DebouncedInput({
           size="sm"
           className="xl:w-[10%] lg:w-[15%] md:w-full mobile:w-full sp:w-full mb-0 md:mb-2 text-xl"
           icon={<HiOutlineTrash />}
-          onClick={handleResetButtonClick}
+          onClick={handleReset}
         />
       </div>
 
@@ -137,9 +116,7 @@ function DebouncedInput({
           color="lime-500"
           className="w-full md:h-[25%] sm:h-[80%] sm:w-[160px] xl:mb-4 md:mb-4 lg:mb-4 mobile:mb-4 sp:mb-4"
           icon={<HiOutlineUserAdd />}
-          onClick={() => {
-            navigate('/clientes/crear')
-          }}
+          onClick={() => navigate('/clientes/crear')}
         >
           Crear cliente
         </Button>
@@ -155,30 +132,53 @@ const pageSizeOption: SelectType[] = [
   { value: 50, label: '50 por página' },
 ]
 
+/** Ajusta esto si tu API tiene otra forma */
+type Customer = {
+  id: number | string
+  name?: string
+  lastName?: string
+  alias?: string
+  rut?: string
+  email?: string
+  phone?: string
+  image?: string
+  dialCode?: { dialCode?: string }
+  address?: {
+    country?: { name?: string }
+    internalDbCity?: { name?: string }
+  }
+}
+
+type CustomersResponse = {
+  data?: Customer[]
+  meta?: {
+    page?: number
+    totalItems?: number
+  }
+}
+
+const safeArray = <T,>(val: unknown): T[] =>
+  Array.isArray(val) ? (val as T[]) : []
+
 const Clientes = () => {
   const navigate = useNavigate()
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [searchParams, setSearchParams] = useSearchParams()
+
   const [search, setSearch] = useState(searchParams.get('search') || '')
-  const [currentPage, setCurrentPage] = useState(+searchParams.get('page') || 1)
-  const [pageSize, setPageSize] = useState(pageSizeOption[0].value)
-  const [viewMode, setViewMode] = useState<'table' | 'cards'>('table')
-  const { data: me } = useGetMyInfoQuery()
-
-  const { showNotification } = useNotification()
-  const [
-    createRatingUserSendMail,
-    { isError: isErrorEmail, isSuccess: isSuccessEmail },
-  ] = useCreateRatingUserSendMailMutation()
-
-  const { copyToClipboard } = useCopyToClipboard()
+  const [currentPage, setCurrentPage] = useState(
+    Number(searchParams.get('page')) || 1
+  )
+  const [pageSize, setPageSize] = useState<number>(
+    Number(searchParams.get('limit')) || Number(pageSizeOption[0].value)
+  )
+  const [viewMode, setViewMode] = useState<ViewMode>('table')
 
   const { data, isFetching, isLoading, isError, error, refetch } =
     useGetAllCustomersQuery(
       {
         page: currentPage || 1,
         limit: pageSize,
-        ...(search && { search: search }),
+        ...(search ? { search } : {}),
       },
       { refetchOnMountOrArgChange: true }
     )
@@ -190,181 +190,39 @@ const Clientes = () => {
     }
   )
 
-  const userId = me?.id
-
-  // Sent Rating form to customer
-  const handleSendRatingForm = async (formData) => {
-    const {
-      id: customerId,
-      createdByUser: { id: userId },
-      email,
-    } = cloneDeep(formData)
-
-    const urlCalificacion = `${location.origin.replace(
-      /\/$/,
-      ''
-    )}/calificar-corredor/${userId}/${customerId}`
-
-    const data = {
-      mail: email || '',
-      cc: [''],
-      subject: 'Calificar corredor - Pulso Propiedades',
-      link: urlCalificacion,
-    }
-
-    await createRatingUserSendMail(data)
-  }
-
-  useEffect(() => {
-    if (isSuccessEmail) {
-      showNotification(
-        'success',
-        'Éxito',
-        'Formulario de encuesta enviado exitosamente'
-      )
-    }
-  }, [isSuccessEmail])
-
-  useEffect(() => {
-    if (isErrorEmail) {
-      showNotification(
-        'danger',
-        'Error',
-        'Error al enviar la encuesta, inténtalo más tarde'
-      )
-    }
-  }, [isErrorEmail])
+  const customers = useMemo(
+    () => safeArray<Customer>((data as CustomersResponse)?.data),
+    [data]
+  )
+  const apiMeta = (data as CustomersResponse)?.meta
 
   useEffect(() => {
     const queryParams = new URLSearchParams({
       limit: String(pageSize),
       page: String(currentPage),
-      ...(search && { search: search }),
+      ...(search ? { search } : {}),
     })
-
     setSearchParams(queryParams)
-  }, [pageSize, currentPage, search])
+  }, [pageSize, currentPage, search, setSearchParams])
 
-  const columns = useMemo(
-    () => [
-      {
-        header: 'Cliente',
-        accessorKey: 'customer',
-        cell: (cellProps: any) => {
-          return (
-            <div className="flex items-center">
-              <span
-                className="font-bold cursor-pointer hover:text-lime-500 transition-colors duration-200"
-                onClick={() => {
-                  navigate(`/clientes/${cellProps.row.original.id}`)
-                }}
-              >
-                {cellProps.row.original.name} {cellProps.row.original.lastName}{' '}
-                {cellProps.row.original?.alias && (
-                  <small>({cellProps.row.original?.alias})</small>
-                )}
-              </span>
-            </div>
-          )
-        },
-      },
-      {
-        header: 'alias',
-        cell: (cellProps: any) => <>{cellProps.row.original.alias || '-'}</>,
-      },
-      {
-        header: 'Teléfono/Celular',
-        cell: (cellProps: any) => (
-          <>
-            {`${
-              cellProps.row.original.dialCode?.dialCode
-                ? `(${cellProps.row.original.dialCode?.dialCode})`
-                : ''
-            }`}{' '}
-            {cellProps.row.original.phone || ''}
-          </>
-        ),
-      },
-      {
-        header: 'Correo',
-        cell: (cellProps: any) => <>{cellProps.row.original.email || '-'}</>,
-      },
-      {
-        header: 'Ubicación',
-        cell: (cellProps: any) => {
-          const { address } = cellProps.row.original
+  const onPaginationChange = (page: number) => setCurrentPage(page)
 
-          return (
-            <p>
-              {address?.country?.name}
-              {`, ${address?.internalDbCity?.name}`}
-            </p>
-          )
-        },
-      },
-      {
-        header: 'Acciones',
-        accessorKey: 'details',
-        cell: (cellProps) => {
-          return (
-            <div className="w-100 flex gap-4">
-              <Tooltip title="Ver detalles">
-                <span
-                  className="font-bold cursor-pointer hover:text-lime-500 transition-colors duration-200"
-                  onClick={() => {
-                    navigate(`/clientes/${cellProps.row.original.id}`)
-                  }}
-                >
-                  <IoMdEye className="text-xl" />
-                </span>
-              </Tooltip>
-            </div>
-          )
-        },
-      },
-    ],
-    [navigate, userId, showNotification]
-  )
-
-  const table = useReactTable({
-    data: data?.data,
-    columns,
-    state: {
-      columnFilters,
-    },
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues(),
-    debugColumns: false,
-    debugHeaders: false,
-    debugRows: false,
-    debugTable: false,
-  })
-
-  const onPaginationChange = (page: number) => {
-    table.setPageIndex(page - 1)
-    setCurrentPage(page)
+  const onPageSelect = (selected: SelectType | null) => {
+    const next = Number(selected?.value ?? pageSizeOption[0].value)
+    setPageSize(next)
+    setCurrentPage(1)
   }
 
-  const onPageSelect = ({ value }: SelectType) => {
-    setPageSize(value)
-    table.setPageSize(Number(value))
-  }
+  const toggleViewMode = () =>
+    setViewMode((prev) => (prev === 'table' ? 'cards' : 'table'))
 
-  const toggleViewMode = () => {
-    setViewMode(viewMode === 'table' ? 'cards' : 'table')
-  }
-
-  if (isLoading)
+  if (isLoading) {
     return (
       <div className="w-100 h-screen flex justify-center items-center">
         <Spinner className="mr-4" size="40px" />
       </div>
     )
+  }
 
   if (isError) {
     return (
@@ -372,7 +230,7 @@ const Clientes = () => {
         <Alert
           showIcon
           type="warning"
-          title={`${error?.message}` || 'Error de servidor'}
+          title={(error as any)?.message || 'Error de servidor'}
           className="w-screen flex justify-start items-start"
         >
           <span
@@ -390,6 +248,8 @@ const Clientes = () => {
   return (
     <div>
       <h3 className="mb-4">Clientes</h3>
+
+      {/* Cards métricas */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 mb-6">
         <Card className="shadow-sm">
           <div className="flex items-center gap-4">
@@ -440,190 +300,220 @@ const Clientes = () => {
         </Card>
       </div>
 
-      <>
-        <DebouncedInput
-          value={search}
-          placeholder="Buscar Cliente..."
-          toggleViewMode={toggleViewMode}
-          viewMode={viewMode}
-          onChange={setSearch}
-        />
+      <DebouncedInput
+        value={search}
+        placeholder="Buscar Cliente..."
+        toggleViewMode={toggleViewMode}
+        viewMode={viewMode}
+        onChange={(val) => {
+          setSearch(val)
+          setCurrentPage(1)
+        }}
+      />
 
-        {viewMode === 'table' ? (
-          <Table>
-            <THead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <Tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <Th key={header.id} colSpan={header.colSpan}>
-                        {header.isPlaceholder ? null : (
-                          <div>
-                            {flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                          </div>
-                        )}
-                      </Th>
-                    )
-                  })}
+      {/* Vista Tabla */}
+      {viewMode === 'table' ? (
+        <Table>
+          <THead>
+            <Tr>
+              <Th>Cliente</Th>
+              <Th>Alias</Th>
+              <Th>Teléfono/Celular</Th>
+              <Th>Correo</Th>
+              <Th>Ubicación</Th>
+              <Th>Acciones</Th>
+            </Tr>
+          </THead>
+
+          {isFetching ? (
+            <TableRowSkeleton columns={6} rows={pageSize} />
+          ) : (
+            <TBody className="dark:text-white/90 dark:font-semibold">
+              {customers.map((c) => (
+                <Tr key={String(c.id)}>
+                  <Td>
+                    <div className="flex items-center">
+                      <span
+                        className="font-bold cursor-pointer hover:text-lime-500 transition-colors duration-200"
+                        onClick={() => navigate(`/clientes/${c.id}`)}
+                      >
+                        {`${c.name || ''} ${c.lastName || ''}`.trim()}{' '}
+                        {c.alias ? <small>({c.alias})</small> : null}
+                      </span>
+                    </div>
+                  </Td>
+
+                  <Td>{c.alias || '-'}</Td>
+
+                  <Td>
+                    {c.dialCode?.dialCode ? `(${c.dialCode.dialCode}) ` : ''}
+                    {c.phone || ''}
+                  </Td>
+
+                  <Td>{c.email || '-'}</Td>
+
+                  <Td>
+                    {c.address?.country?.name || '-'}
+                    {c.address?.internalDbCity?.name
+                      ? `, ${c.address.internalDbCity.name}`
+                      : ''}
+                  </Td>
+
+                  <Td>
+                    <div className="w-100 flex gap-4">
+                      <Tooltip title="Ver detalles">
+                        <span
+                          className="font-bold cursor-pointer hover:text-lime-500 transition-colors duration-200"
+                          onClick={() => navigate(`/clientes/${c.id}`)}
+                        >
+                          <IoMdEye className="text-xl" />
+                        </span>
+                      </Tooltip>
+                    </div>
+                  </Td>
                 </Tr>
               ))}
-            </THead>
 
-            {isFetching ? (
-              <TableRowSkeleton columns={5} rows={pageSize} />
-            ) : (
-              <TBody className="dark:text-white/90 dark:font-semibold">
-                {table.getRowModel().rows.map((row) => {
-                  return (
-                    <Tr key={row.id}>
-                      {row.getVisibleCells().map((cell) => {
-                        return (
-                          <Td key={cell.id}>
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                            )}
-                          </Td>
-                        )
-                      })}
-                    </Tr>
-                  )
-                })}
-              </TBody>
-            )}
-          </Table>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {data?.data?.map((customer) => {
-              const randomColor = getRandomBackgroundColor({
-                colors: DEFAULT_TAILWIND_COLORS,
-              })
+              {!customers.length && (
+                <Tr>
+                  <Td colSpan={6}>
+                    <div className="py-8 text-center text-sm text-gray-500">
+                      No se encontraron clientes.
+                    </div>
+                  </Td>
+                </Tr>
+              )}
+            </TBody>
+          )}
+        </Table>
+      ) : (
+        /* Vista Cards */
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {customers.map((customer) => {
+            const randomColor = getRandomBackgroundColor({
+              colors: DEFAULT_TAILWIND_COLORS,
+            })
 
-              return (
-                <Card
-                  key={customer.id}
-                  className="rounded-lg relative border bg-white dark:bg-gray-500 dark:border-gray-600 w-full hover:shadow-xl hover:scale-105 transition-all duration-300 flex flex-col mx-auto shadow-sm overflow-hidden"
-                >
-                  <div
-                    className={classNames(
-                      randomColor,
-                      'h-16 w-full opacity-80 absolute top-0 left-0 right-0 z-0 rounded-t-lg'
+            return (
+              <Card
+                key={String(customer.id)}
+                className="rounded-lg relative border bg-white dark:bg-gray-500 dark:border-gray-600 w-full hover:shadow-xl hover:scale-105 transition-all duration-300 flex flex-col mx-auto shadow-sm overflow-hidden"
+              >
+                <div
+                  className={classNames(
+                    randomColor,
+                    'h-16 w-full opacity-80 absolute top-0 left-0 right-0 z-0 rounded-t-lg'
+                  )}
+                />
+
+                <div className="w-full flex m-2 ml-3 text-white relative z-10">
+                  <div className="w-12 h-12 p-2 bg-white dark:bg-gray-500 rounded-full flex items-center justify-center">
+                    {customer.image ? (
+                      <img
+                        className="w-12 h-12 rounded-full object-cover"
+                        src={customer.image}
+                        alt="Customer"
+                      />
+                    ) : (
+                      <FaUser className="w-10 h-10 text-gray-600 dark:text-gray-200" />
                     )}
-                  />
-                  <div className="w-full flex m-2 ml-3 text-white relative z-10">
-                    <div className="w-12 h-12 p-2 bg-white dark:bg-gray-500 rounded-full flex items-center justify-center">
-                      {customer.image ? (
-                        <img
-                          className="w-12 h-12 rounded-full object-cover"
-                          src={customer.image}
-                          alt="Customer"
-                        />
-                      ) : (
-                        <FaUserAlt className="w-10 h-10 text-gray-600 dark:text-gray-200" />
-                      )}
-                    </div>
-                    <div className="title mt-2 ml-2 font-bold flex flex-col">
-                      <div className="break-words text-white">
-                        <p className="text-sm">
-                          {customer.name} {customer.lastName}{' '}
-                          {customer?.alias && (
-                            <small>({customer?.alias})</small>
-                          )}
-                        </p>
-                      </div>
+                  </div>
+
+                  <div className="title mt-2 ml-2 font-bold flex flex-col">
+                    <div className="break-words text-white">
+                      <p className="text-sm">
+                        {`${customer.name || ''} ${
+                          customer.lastName || ''
+                        }`.trim()}{' '}
+                        {customer.alias ? (
+                          <small>({customer.alias})</small>
+                        ) : null}
+                      </p>
                     </div>
                   </div>
-                  <div className="flex flex-col p-3 mt-2 border-t border-gray-200 dark:border-gray-600 flex-grow">
-                    <p className="text-xs mb-1">
-                      <span className="font-semibold">RUT:</span>{' '}
-                      {customer.rut || '-'}
-                    </p>
-                    <p className="text-xs mb-1">
-                      <span className="font-semibold">Teléfono/Celular:</span>{' '}
-                      {`${
-                        customer.dialCode?.dialCode
-                          ? `(${customer.dialCode?.dialCode})`
-                          : ''
-                      } `}
-                      {customer.phone || ''}
-                    </p>
-                    <p className="text-xs mb-">
-                      <span className="font-semibold">Correo:</span>{' '}
-                      {customer.email || '-'}
-                    </p>
-                    <p className="text-xs mb-1">
-                      <span className="font-semibold">Ubicación:</span>{' '}
-                      {customer.address?.country?.name}
-                      {`, ${customer.address?.internalDbCity?.name}`}
-                    </p>
+                </div>
 
-                    <div className="flex flex-col mt-4 p-4 dark:bg-gray-700 rounded-b-lg border-t border-gray-300 dark:border-gray-600 ">
-                      <div className="flex gap-4 w-full">
-                        <Tooltip title="Ver detalles">
-                          <span
-                            className="font-bold cursor-pointer hover:text-lime-500 transition-colors duration-200"
-                            onClick={() => {
-                              navigate(`/clientes/${customer.id}`)
-                            }}
-                          >
-                            <IoMdEye className="text-xl" />
-                          </span>
-                        </Tooltip>
+                <div className="flex flex-col p-3 mt-2 border-t border-gray-200 dark:border-gray-600 flex-grow">
+                  <p className="text-xs mb-1">
+                    <span className="font-semibold">RUT:</span>{' '}
+                    {customer.rut || '-'}
+                  </p>
 
-                        <Tooltip
-                          title={`Enviar encuesta a ${customer?.name} ${customer?.lastName}`}
+                  <p className="text-xs mb-1">
+                    <span className="font-semibold">Teléfono/Celular:</span>{' '}
+                    {customer.dialCode?.dialCode
+                      ? `(${customer.dialCode.dialCode}) `
+                      : ''}
+                    {customer.phone || ''}
+                  </p>
+
+                  <p className="text-xs mb-1">
+                    <span className="font-semibold">Correo:</span>{' '}
+                    {customer.email || '-'}
+                  </p>
+
+                  <p className="text-xs mb-1">
+                    <span className="font-semibold">Ubicación:</span>{' '}
+                    {customer.address?.country?.name || '-'}
+                    {customer.address?.internalDbCity?.name
+                      ? `, ${customer.address.internalDbCity.name}`
+                      : ''}
+                  </p>
+
+                  <div className="flex flex-col mt-4 p-4 dark:bg-gray-700 rounded-b-lg border-t border-gray-300 dark:border-gray-600">
+                    <div className="flex gap-4 w-full">
+                      <Tooltip title="Ver detalles">
+                        <span
+                          className="font-bold cursor-pointer hover:text-lime-500 transition-colors duration-200"
+                          onClick={() => navigate(`/clientes/${customer.id}`)}
                         >
-                          <span
-                            className="font-bold cursor-pointer hover:text-lime-500 transition-colors duration-200"
-                            onClick={() => {
-                              handleSendRatingForm(customer)
-                            }}
-                          >
-                            <TbChecklist className="text-xl" />
-                          </span>
-                        </Tooltip>
-
-                        <Tooltip title={`Enviar encuesta para web`}>
-                          <span
-                            className="font-bold cursor-pointer hover:text-lime-500 transition-colors duration-200"
-                            onClick={() => {
-                              handleSendRatingForm(customer)
-                            }}
-                          >
-                            test
-                            <TbChecklist className="text-xl" />
-                          </span>
-                        </Tooltip>
-                      </div>
+                          <IoMdEye className="text-xl" />
+                        </span>
+                      </Tooltip>
                     </div>
                   </div>
-                </Card>
-              )
-            })}
-          </div>
-        )}
+                </div>
+              </Card>
+            )
+          })}
 
-        <div className="flex items-center mt-5">
-          <Pagination
-            currentPage={+data?.meta?.page}
-            total={data?.meta.totalItems}
-            pageSize={pageSize}
-            onChange={onPaginationChange}
-          />
-          <div style={{ minWidth: 120 }}>
-            <Select
-              size="sm"
-              isSearchable={false}
-              defaultValue={pageSizeOption[0]}
-              options={pageSizeOption}
-              onChange={(selected) => onPageSelect(selected as SelectType)}
-            />
-          </div>
+          {!customers.length && (
+            <div className="col-span-full py-10 text-center text-sm text-gray-500">
+              No se encontraron clientes.
+            </div>
+          )}
         </div>
-      </>
+      )}
+
+      {/* Footer paginación */}
+      <div className="flex items-center mt-5">
+        <Pagination
+          currentPage={Number(apiMeta?.page || currentPage)}
+          total={Number(apiMeta?.totalItems || 0)}
+          pageSize={pageSize}
+          onChange={onPaginationChange}
+        />
+        <div style={{ minWidth: 120 }}>
+          <Select
+            size="sm"
+            isSearchable={false}
+            value={
+              pageSizeOption.find(
+                (o) => Number(o.value) === Number(pageSize)
+              ) || pageSizeOption[0]
+            }
+            options={pageSizeOption}
+            onChange={(selected) => onPageSelect(selected as SelectType)}
+          />
+        </div>
+      </div>
+
+      {/* Nota: isFetching ya cubre skeleton/loader; si quieres un spinner global lo agregamos aquí */}
+      {isFetching && (
+        <div className="mt-2 flex items-center gap-2 text-xs text-gray-500">
+          <Spinner size={14} /> Actualizando...
+        </div>
+      )}
     </div>
   )
 }

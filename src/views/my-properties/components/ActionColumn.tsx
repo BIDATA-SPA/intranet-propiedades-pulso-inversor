@@ -3,12 +3,10 @@ import { Dialog, Tooltip } from '@/components/ui'
 import {
   useDeletePropertyMutation,
   useGetMyInfoQuery,
-  useLazyFindPortalPublicationsQuery,
   useUpdatePropertyMutation,
 } from '@/services/RtkQueryService'
 import { useAppSelector } from '@/store'
 import useNotification from '@/utils/hooks/useNotification'
-import { usePdpSecureActions } from '@/utils/hooks/usePdpSecureActions'
 import classNames from 'classnames'
 import { useEffect, useState } from 'react'
 import { FaRegFilePdf, FaRegStar, FaStar } from 'react-icons/fa'
@@ -19,26 +17,23 @@ import { useNavigate } from 'react-router'
 import UpdateStatusForm from './dialog/UpdateStatusForm'
 
 type TDialogState = {
-  updateExchange?: boolean
   updateStatus?: boolean
   deleteProperty?: boolean
 }
 
-const PulsoRealtorIcon = ({ row }) => {
-  const { data: userInfo } = useGetMyInfoQuery(undefined, {
-    refetchOnMountOrArgChange: true,
-  })
+const PulsoRealtorIcon = ({ row }: { row: any }) => {
+  useGetMyInfoQuery(undefined, { refetchOnMountOrArgChange: true })
+  return null
 }
 
-const ActionColumn = ({ row, className }) => {
+const ActionColumn = ({ row, className }: { row: any; className?: string }) => {
   const [userAuthority] = [useAppSelector((state) => state.auth.session.rol)]
-  const { data: userInfo } = useGetMyInfoQuery(undefined, {
-    refetchOnMountOrArgChange: true,
-  })
+
+  useGetMyInfoQuery(undefined, { refetchOnMountOrArgChange: true })
+
   const navigate = useNavigate()
   const [updateProperty] = useUpdatePropertyMutation()
 
-  // Pulso (propiedad)
   const [
     deleteProperty,
     {
@@ -48,49 +43,40 @@ const ActionColumn = ({ row, className }) => {
     },
   ] = useDeletePropertyMutation()
 
-  // Portal de Portales
-  const [findPortalByCode] = useLazyFindPortalPublicationsQuery()
-
-  // 🔐 hook seguro PDP
-  const { ensureToken, secureDelete } = usePdpSecureActions()
-
   const { showNotification } = useNotification()
-  const [selectedItem, setSelectedItem] = useState(null)
+  const [selectedItem, setSelectedItem] = useState<any>(null)
   const [dialogState, setDialogState] = useState<TDialogState>({
     updateStatus: false,
-    updateExchange: false,
     deleteProperty: false,
   })
 
-  // loading local para la cascada
-  const [isCascadeDeleting, setIsCascadeDeleting] = useState(false)
-
-  const handleUpdateStatus = (item) => {
+  const handleUpdateStatus = (item: any) => {
     setSelectedItem(item)
     setDialogState({
       updateStatus: true,
-      updateExchange: false,
       deleteProperty: false,
     })
   }
 
-  const handleHighlight = async (row) => {
-    const id = row?.id
+  const handleHighlight = async (item: any) => {
+    const id = item?.id
     const body = {
       step2: {
-        highlighted: !row?.highlighted,
+        highlighted: !item?.highlighted,
       },
     }
+
     try {
       await updateProperty({ id, ...body }).unwrap()
-      if (row?.highlighted) {
-        showNotification('success', 'Eliminada de destacadas', '')
-      } else {
-        showNotification('success', 'Guardada como destacada', '')
-      }
+      showNotification(
+        'success',
+        item?.highlighted
+          ? 'Eliminada de destacadas'
+          : 'Guardada como destacada',
+        ''
+      )
     } catch (error: any) {
       showNotification('danger', 'Error', `Error: ${error?.message}`)
-      throw new Error(error.message)
     }
   }
 
@@ -101,106 +87,46 @@ const ActionColumn = ({ row, className }) => {
     navigate(`/mis-propiedades/visit/${propertyId}`)
   }
 
-  const handleUpdateExchange = (item) => {
-    setSelectedItem(item)
-    setDialogState({
-      updateStatus: false,
-      updateExchange: true,
-      deleteProperty: false,
-    })
-  }
-
   const handleDelete = () => {
     setDialogState({
       updateStatus: false,
-      updateExchange: false,
       deleteProperty: true,
     })
   }
 
-  // 🔥 Eliminación en cascada con token PDP
-  const handleConfirm = async () => {
-    const code = String(row?.id) // en tu mapeo, el "code" del portal es el id local
-    setIsCascadeDeleting(true)
+  // ✅ Pulso ONLY delete + manejo de error 400
+  const handleConfirmDelete = async () => {
     try {
-      // 1) conseguir token PDP válido
-      const pdpToken = await ensureToken()
-
-      // 2) buscar en portal por code usando ese token
-      let uuids: string[] = []
-      try {
-        const found = await findPortalByCode({
-          code,
-          page: 1,
-          page_size: 100,
-          pdpToken,
-        }).unwrap()
-
-        const items: any[] = Array.isArray(found) ? found : found?.items ?? []
-
-        uuids = items
-          .filter(
-            (i) =>
-              String(i?.portal ?? '')
-                .trim()
-                .toLowerCase() === 'pulsopropiedades' &&
-              typeof i?.uuid === 'string'
-          )
-          .map((i) => i.uuid as string)
-      } catch (e) {
-        // si falla la búsqueda en portal, igual intentamos borrar en pulsoPropiedades
-      }
-
-      // 3) borrar en portal de portales (si hay)
-      if (uuids.length > 0) {
-        const results = await Promise.allSettled(
-          uuids.map((uuid) => secureDelete(uuid))
-        )
-        const ok = results.filter((r) => r.status === 'fulfilled').length
-        const fail = uuids.length - ok
-        if (ok > 0) {
-          showNotification(
-            'success',
-            'Portal de Portales',
-            `Eliminadas ${ok}/${uuids.length} publicaciones en Portal.`
-          )
-        }
-        if (fail > 0) {
-          showNotification(
-            'warning',
-            'Portal de Portales',
-            `No se pudieron eliminar ${fail}/${uuids.length} publicaciones en Portal.`
-          )
-        }
-      }
-
-      // 4) borrar en Pulso
       await deleteProperty(row?.id).unwrap()
 
       showNotification(
         'success',
         'Eliminación completada',
-        'Propiedad eliminada en Pulso Propiedades y sincronizada con Portal de Portales.'
+        'Propiedad eliminada correctamente.'
       )
 
       setDialogState({
         updateStatus: false,
-        updateExchange: false,
         deleteProperty: false,
       })
     } catch (error: any) {
-      showNotification(
-        'danger',
-        'Error',
-        `Ocurrió un error al eliminar: ${error?.message || 'Error desconocido'}`
-      )
+      const apiMessage =
+        error?.data?.message ||
+        error?.message ||
+        'Ocurrió un error al eliminar la propiedad.'
+
+      // backend:
+      // { message, error: "Bad Request", statusCode: 400 }
+      if (error?.status === 400 || error?.data?.statusCode === 400) {
+        showNotification('warning', 'No se puede eliminar', apiMessage)
+      } else {
+        showNotification('danger', 'Error', apiMessage)
+      }
+
       setDialogState({
         updateStatus: false,
-        updateExchange: false,
         deleteProperty: false,
       })
-    } finally {
-      setIsCascadeDeleting(false)
     }
   }
 
@@ -208,7 +134,6 @@ const ActionColumn = ({ row, className }) => {
     setSelectedItem(null)
     setDialogState({
       updateStatus: false,
-      updateExchange: false,
       deleteProperty: false,
     })
   }
@@ -221,16 +146,20 @@ const ActionColumn = ({ row, className }) => {
     }
   }
 
+  // Red de seguridad por si alguien usa el error del hook
   useEffect(() => {
-    if (isDeletePropertyError) {
-      const apiError = deletePropertyError as any
-      showNotification(
-        'danger',
-        'Error',
-        `Ha ocurrido un error al eliminar esta propiedad: ${
-          apiError?.data?.message || 'Error desconocido'
-        }`
-      )
+    if (!isDeletePropertyError) return
+    const apiError = deletePropertyError as any
+
+    const apiMessage =
+      apiError?.data?.message ||
+      apiError?.message ||
+      'Error desconocido al eliminar.'
+
+    if (apiError?.status === 400 || apiError?.data?.statusCode === 400) {
+      showNotification('warning', 'No se puede eliminar', apiMessage)
+    } else {
+      showNotification('danger', 'Error', apiMessage)
     }
   }, [isDeletePropertyError, deletePropertyError, showNotification])
 
@@ -246,7 +175,7 @@ const ActionColumn = ({ row, className }) => {
       >
         <Tooltip title="Cargar Imágenes">
           <span
-            className="cursor-pointer p-2 hover:text-green-500  bg-gray-50 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-800 rounded-full"
+            className="cursor-pointer p-2 hover:text-green-500 bg-gray-50 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-800 rounded-full"
             onClick={onUpload}
           >
             <MdFileUpload className="text-lg lg:text-xl" />
@@ -255,7 +184,7 @@ const ActionColumn = ({ row, className }) => {
 
         <Tooltip title="Estado de Propiedad">
           <span
-            className="cursor-pointer p-2 hover:text-blue-500  bg-gray-50 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-800 rounded-full"
+            className="cursor-pointer p-2 hover:text-blue-500 bg-gray-50 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-800 rounded-full"
             onClick={() => handleUpdateStatus(row)}
           >
             <FaHouseCircleCheck className="text-lg lg:text-xl" />
@@ -295,12 +224,11 @@ const ActionColumn = ({ row, className }) => {
           </Tooltip>
         ) : null}
 
-        <Tooltip title="Eliminar (Pulso Propiedades + Portal de Portales)">
+        <Tooltip title="Eliminar">
           <span
             className={classNames(
               'cursor-pointer p-2 hover:text-red-500 rounded-full bg-gray-50 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-800',
-              (isDeletePropertyLoading || isCascadeDeleting) &&
-                'opacity-60 pointer-events-none'
+              isDeletePropertyLoading && 'opacity-60 pointer-events-none'
             )}
             onClick={handleDelete}
           >
@@ -311,7 +239,7 @@ const ActionColumn = ({ row, className }) => {
 
       {/* Update status dialog */}
       <Dialog
-        isOpen={dialogState.updateStatus}
+        isOpen={Boolean(dialogState.updateStatus)}
         onClose={handleCloseDialog}
         onRequestClose={handleCloseDialog}
       >
@@ -319,22 +247,20 @@ const ActionColumn = ({ row, className }) => {
         <UpdateStatusForm property={selectedItem} onClose={handleCloseDialog} />
       </Dialog>
 
-      {/* Delete dialog (cascada) */}
+      {/* Delete dialog */}
       <ConfirmDialog
-        isOpen={dialogState.deleteProperty}
+        isOpen={Boolean(dialogState.deleteProperty)}
         type="danger"
         title="Eliminar Propiedad"
         confirmButtonColor="red-600"
-        isLoading={isDeletePropertyLoading || isCascadeDeleting}
+        isLoading={isDeletePropertyLoading}
         onClose={handleCloseDialog}
         onRequestClose={handleCloseDialog}
         onCancel={handleCloseDialog}
-        onConfirm={handleConfirm}
+        onConfirm={handleConfirmDelete}
       >
         <p className="text-sm">
-          Esta acción eliminará la propiedad en <b>Pulso Propiedades</b> y
-          también intentará eliminar sus publicaciones vinculadas en
-          <b> Portal de Portales</b> (búsqueda por <code>code</code>).
+          Esta acción eliminará la propiedad seleccionada.
           <br />
           No se puede deshacer.
         </p>

@@ -3,9 +3,7 @@ import pdpAuth, { PdpAuthState } from '@/store/slices/auth/pdpAuthSlice'
 import propertiesList, {
   PropertiesListState,
 } from '@/views/my-properties/store/propertyListSlice'
-import toolsAndServices, {
-  ToolsAndServicesState,
-} from '@/views/tools-and-services/store/toolsAndServicesSlice'
+
 import { AnyAction, CombinedState, Reducer, combineReducers } from 'redux'
 import auth, { AuthState } from './slices/auth'
 import base, { BaseState } from './slices/base'
@@ -21,7 +19,6 @@ export type RootState = CombinedState<{
   base: CombinedState<BaseState>
   locale: LocaleState
   theme: ThemeState
-  toolsAndServices: ToolsAndServicesState
   propertiesList: PropertiesListState
   crmCalendar: CalendarState
   pdpAuth: PdpAuthState
@@ -38,7 +35,6 @@ const staticReducers = {
   base,
   locale,
   theme,
-  toolsAndServices,
   propertiesList,
   crmCalendar,
   pdpAuth,

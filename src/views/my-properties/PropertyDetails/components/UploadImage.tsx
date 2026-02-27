@@ -1,11 +1,7 @@
 /* eslint-disable react/jsx-sort-props */
 import { Button } from '@/components/ui'
-import {
-  useCreatePropertyImagesMutation,
-  useLazyFindPortalPublicationsQuery,
-} from '@/services/RtkQueryService'
+import { useCreatePropertyImagesMutation } from '@/services/RtkQueryService'
 import useNotification from '@/utils/hooks/useNotification'
-import { usePdpSecureActions } from '@/utils/hooks/usePdpSecureActions'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { HiOutlineTrash, HiOutlineUpload } from 'react-icons/hi'
 import { PiDotsSixVerticalBold } from 'react-icons/pi'
@@ -29,16 +25,6 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
-/**
- * Reglas Pulso:
- * - Máximo global: 30
- * - Mínimo depende del tipo de inmueble (propertyType)
- * - Formatos válidos: jpg, jpeg, png
- * - Resolución mínima: 800x600
- * - Orientación: horizontal (width > height)
- */
-
-const API_BASE = import.meta.env.VITE_API_URL
 const MAX_IMAGES = 30
 const MIN_RESOLUTION = { w: 800, h: 600 }
 
@@ -64,46 +50,18 @@ type UploadImageProps = {
   propertyType?: PropertyType
 }
 
-const buildPropertyImageUrl = (name: string) =>
-  `${API_BASE}/properties/image/${encodeURIComponent(name)}`
-
-const extractImageUrls = (res: any): string[] => {
-  if (Array.isArray(res?.urls)) return res.urls.filter(Boolean)
-  if (Array.isArray(res?.data?.urls)) return res.data.urls.filter(Boolean)
-
-  const arr =
-    (Array.isArray(res?.images) && res.images) ||
-    (Array.isArray(res?.data?.images) && res.data.images) ||
-    []
-
-  const urls: string[] = []
-  for (const it of arr) {
-    const direct = it?.url
-    const nameOrPath = it?.name || it?.path
-    if (typeof direct === 'string' && direct) {
-      urls.push(direct)
-    } else if (typeof nameOrPath === 'string' && nameOrPath) {
-      const looksAbsolute = /^https?:\/\//i.test(nameOrPath)
-      urls.push(looksAbsolute ? nameOrPath : buildPropertyImageUrl(nameOrPath))
-    }
-  }
-  return urls.filter(Boolean)
-}
-
 const getMinImagesByType = (type?: PropertyType) => {
   if (!type) return 12
 
   switch (type) {
     case 'Estacionamiento':
       return 4
-
     case 'Local Comercial':
     case 'Agrícola':
     case 'Sitio':
     case 'Terreno':
     case 'Bodega':
       return 6
-
     case 'Casa':
     case 'Departamento':
     case 'Oficina':
@@ -111,11 +69,9 @@ const getMinImagesByType = (type?: PropertyType) => {
     case 'Departamento Amoblado':
     case 'Casa Amoblada':
       return 12
-
     case 'Industrial':
     case 'Sepultura':
       return 6
-
     default:
       return 12
   }
@@ -310,9 +266,8 @@ const SelectedImagesSortable: React.FC<{
 }
 
 /* ---------------------------
-   ✅ MAIN COMPONENT (PULSO)
+   ✅ MAIN COMPONENT (PULSO ONLY)
 ---------------------------- */
-
 const UploadImagePulso: React.FC<UploadImageProps> = ({
   images,
   propertyType,
@@ -323,6 +278,21 @@ const UploadImagePulso: React.FC<UploadImageProps> = ({
   const { propertyId } = useParams()
   const { showNotification } = useNotification()
 
+  const [publishedImages, setPublishedImages] = useState<any[]>(() =>
+    Array.isArray(images) ? [...(images as any[])] : []
+  )
+
+  useEffect(() => {
+    setPublishedImages(Array.isArray(images) ? [...(images as any[])] : [])
+  }, [images])
+
+  const imageListKey = useMemo(() => {
+    const ids = (publishedImages ?? [])
+      .map((img) => String(img?.id ?? ''))
+      .filter(Boolean)
+    return ids.join('|') || 'empty'
+  }, [publishedImages])
+
   // UX
   const [isOnline, setIsOnline] = useState<boolean>(() => navigator.onLine)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -330,18 +300,11 @@ const UploadImagePulso: React.FC<UploadImageProps> = ({
 
   const minRequired = getMinImagesByType(propertyType)
 
-  // Pulso: subir imágenes
+  // ✅ Pulso: subir imágenes
   const [createPropertyImages, { isLoading, error }] =
     useCreatePropertyImagesMutation()
 
-  // PDP: buscar por code
-  const [findPortalByCode] = useLazyFindPortalPublicationsQuery()
-
-  // 🔐 hook seguro PDP
-  const { ensureToken, secureUpdate } = usePdpSecureActions()
-  const [isSyncingPortal, setIsSyncingPortal] = useState(false)
-
-  const alreadyPublished = images?.length ?? 0
+  const alreadyPublished = publishedImages?.length ?? 0
   const isPublishedFull = alreadyPublished >= MAX_IMAGES
 
   const remainingSlots = Math.max(
@@ -472,75 +435,6 @@ const UploadImagePulso: React.FC<UploadImageProps> = ({
     resetInput()
   }
 
-  const syncImagesToPortal = async (urls: string[]) => {
-    if (!propertyId || urls.length === 0) return
-
-    try {
-      setIsSyncingPortal(true)
-
-      const pdpToken = await ensureToken()
-
-      const found = await findPortalByCode({
-        code: String(propertyId),
-        page: 1,
-        page_size: 100,
-        pdpToken,
-      }).unwrap()
-
-      const items: any[] = Array.isArray(found)
-        ? found
-        : found?.items ?? found?.data ?? []
-
-      const uuids = items
-        .filter((i) => {
-          const portal = String(i?.portal ?? '')
-            .trim()
-            .toLowerCase()
-          return portal === 'pulsopropiedades' && typeof i?.uuid === 'string'
-        })
-        .map((i) => i.uuid as string)
-
-      if (uuids.length === 0) {
-        showNotification(
-          'warning',
-          'Portal de Portales',
-          'No se encontró publicación para esta propiedad; se sincronizarán las imágenes cuando esté publicada.'
-        )
-        return
-      }
-
-      const results = await Promise.allSettled(
-        uuids.map((uuid) => secureUpdate(uuid, { images: urls }))
-      )
-
-      const ok = results.filter((r) => r.status === 'fulfilled').length
-      const fail = uuids.length - ok
-
-      if (ok > 0) {
-        showNotification(
-          'success',
-          'Portal de Portales',
-          `Imágenes sincronizadas (${ok}/${uuids.length}).`
-        )
-      }
-      if (fail > 0) {
-        showNotification(
-          'warning',
-          'Portal de Portales',
-          `Algunas publicaciones no pudieron actualizarse (${fail}/${uuids.length}).`
-        )
-      }
-    } catch (err: any) {
-      showNotification(
-        'danger',
-        'Portal de Portales',
-        err?.message || 'No se pudo sincronizar imágenes en el portal.'
-      )
-    } finally {
-      setIsSyncingPortal(false)
-    }
-  }
-
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -594,11 +488,10 @@ const UploadImagePulso: React.FC<UploadImageProps> = ({
     }
 
     const formData = new FormData()
-    // ✅ respeta el orden actual del DnD
     files.forEach((file) => formData.append('images', file, file.name))
 
     try {
-      const res = await createPropertyImages({
+      await createPropertyImages({
         id: String(propertyId),
         body: formData,
       }).unwrap()
@@ -610,17 +503,6 @@ const UploadImagePulso: React.FC<UploadImageProps> = ({
         } en Pulso Propiedades`,
         ''
       )
-
-      const urls = extractImageUrls(res)
-      if (urls.length > 0) {
-        await syncImagesToPortal(urls)
-      } else {
-        showNotification(
-          'warning',
-          'Imágenes publicadas, pero sin URLs para el portal',
-          'Revisa el payload de respuesta del backend.'
-        )
-      }
 
       setFiles([])
       resetInput()
@@ -667,7 +549,7 @@ const UploadImagePulso: React.FC<UploadImageProps> = ({
     }
   }, [])
 
-  const disabledAll = isLoading || isProcessing || isSyncingPortal
+  const disabledAll = isLoading || isProcessing
   const totalAfterPublish = alreadyPublished + files.length
 
   return (
@@ -763,7 +645,7 @@ const UploadImagePulso: React.FC<UploadImageProps> = ({
               type="submit"
               variant="solid"
               shape="circle"
-              loading={isLoading || isSyncingPortal}
+              loading={isLoading}
               disabled={
                 isPublishedFull ||
                 files.length === 0 ||
@@ -773,8 +655,8 @@ const UploadImagePulso: React.FC<UploadImageProps> = ({
               }
               icon={<HiOutlineUpload />}
             >
-              {isSyncingPortal ? 'Sincronizando…' : 'Publicar'}
-              {files.length > 0 && !isSyncingPortal && ` (${files.length})`}
+              Publicar
+              {files.length > 0 && ` (${files.length})`}
             </Button>
 
             <Button
@@ -788,9 +670,8 @@ const UploadImagePulso: React.FC<UploadImageProps> = ({
               Cancelar
             </Button>
 
-            {/* Aviso de mínimo requerido (solo informativo) */}
             <p className="text-xs font-semibold text-neutral-500">
-              Mínimo requerido para "{String(propertyType ?? 'Inmueble')}":{' '}
+              Mínimo requerido para `{String(propertyType ?? 'Inmueble')}`:{' '}
               {minRequired} · Total al publicar: {totalAfterPublish}
             </p>
           </div>
@@ -804,8 +685,11 @@ const UploadImagePulso: React.FC<UploadImageProps> = ({
           />
         )}
 
-        {/* LISTA DE YA PUBLICADAS */}
-        <ImageList images={images as any} />
+        <ImageList
+          key={imageListKey}
+          images={publishedImages as any}
+          onImagesChange={(next: any[]) => setPublishedImages(next)}
+        />
       </div>
     </form>
   )
