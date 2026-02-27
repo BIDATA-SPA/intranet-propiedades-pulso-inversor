@@ -46,18 +46,6 @@ const authRoute: Routes = [
     component: lazy(() => import('@/views/auth/SignUpCustomer')),
     authority: [],
   },
-  {
-    key: 'signUp-webinar',
-    path: `/webinar`,
-    component: lazy(() => import('@/views/auth/SignUpWebinar')),
-    authority: [],
-  },
-  {
-    key: 'signUp-webinar2',
-    path: `/iniciar-sesion?redirectUrl=/webinar`,
-    component: lazy(() => import('@/views/auth/SignUpWebinar')),
-    authority: [],
-  },
 ]
 
 export default authRoute

@@ -3,12 +3,7 @@ import type { SignInCredential, SignUpCredential } from '@/@types/auth'
 import appConfig from '@/configs/app.config'
 import { REDIRECT_URL_KEY } from '@/constants/app.constant'
 import { RolesEnum } from '@/enums/roles.enum'
-import {
-  apiSignIn,
-  apiSignUp,
-  apiSignUpCustomer,
-  apiSignUpWebinar,
-} from '@/services/AuthService'
+import { apiSignIn, apiSignUp, apiSignUpCustomer } from '@/services/AuthService'
 import { useGetPdpTokenMutation } from '@/services/RtkQueryService'
 import {
   addRefreshTimeout,
@@ -205,48 +200,6 @@ function useAuth() {
     }
   }
 
-  const signUpWebinar = async (values: SignUpCredential) => {
-    try {
-      const resp = await apiSignUpWebinar(values)
-      if (resp.data) {
-        openNotification(
-          'success',
-          'Registro Completo',
-          '¡Registro exitoso! Redireccionando...',
-          4
-        )
-
-        setTimeout(() => {
-          window.location.href = ''
-        }, 4 * 1000)
-
-        return {
-          status: 'success' as const,
-          message: 'ok',
-        }
-      }
-    } catch (errors: any) {
-      openNotification(
-        'warning',
-        'Error al crear cuenta',
-        'Al parecer este correo ya se encuentra registrado. Por favor, utiliza un correo diferente.',
-        4
-      )
-
-      setTimeout(() => {
-        navigate('/webinar')
-      }, 4 * 1000)
-
-      return {
-        status: 'failed' as const,
-        message:
-          errors?.response?.data?.message ||
-          errors.toString() ||
-          'Este correo ya se encuentra registrado',
-      }
-    }
-  }
-
   const signOut = async () => {
     handleSignOut()
     navigate('/iniciar-sesion')
@@ -259,7 +212,6 @@ function useAuth() {
     signUp,
     signOut,
     signUpCustomer,
-    signUpWebinar,
   }
 }
 

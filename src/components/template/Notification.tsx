@@ -1,44 +1,114 @@
-import Badge from '@/components/ui/Badge'
-import Button from '@/components/ui/Button'
+import { useMemo, useState, useCallback } from 'react'
+import classNames from 'classnames'
+import withHeaderItem from '@/utils/hoc/withHeaderItem'
+import Avatar from '@/components/ui/Avatar'
 import Dropdown from '@/components/ui/Dropdown'
 import ScrollBar from '@/components/ui/ScrollBar'
+import Spinner from '@/components/ui/Spinner'
+import Badge from '@/components/ui/Badge'
+import Button from '@/components/ui/Button'
 import Tooltip from '@/components/ui/Tooltip'
-import { useAppSelector } from '@/store'
-import withHeaderItem from '@/utils/hoc/withHeaderItem'
-import useResponsive from '@/utils/hooks/useResponsive'
-import useThemeClass from '@/utils/hooks/useThemeClass'
-import isLastChild from '@/utils/isLastChild'
-import classNames from 'classnames'
-import { useEffect, useState } from 'react'
-import { HiOutlineBell, HiOutlineMailOpen } from 'react-icons/hi'
-
 import {
-  useGetMyInfoQuery,
-  useGetNotificationsQuery,
-  useMarkAllNotificationsAsReadMutation,
-  useMarkNotificationAsReadMutation,
-} from '@/services/RtkQueryService'
-import { Notification as NotificationType } from '@/services/notification/types/notification.type'
-import openNotification from '@/utils/openNotification'
-import socket from '../../utils/socket'
-import { Tabs } from '../ui'
-import TabContent from '../ui/Tabs/TabContent'
-import TabList from '../ui/Tabs/TabList'
-import TabNav from '../ui/Tabs/TabNav'
+  HiOutlineBell,
+  HiOutlineCalendar,
+  HiOutlineClipboardCheck,
+  HiOutlineBan,
+  HiOutlineMailOpen,
+} from 'react-icons/hi'
+
+import { Link } from 'react-router-dom'
+import isLastChild from '@/utils/isLastChild'
+import useTwColorByName from '@/utils/hooks/useTwColorByName'
+import useThemeClass from '@/utils/hooks/useThemeClass'
+import { useAppSelector } from '@/store'
+import useResponsive from '@/utils/hooks/useResponsive'
+import acronym from '@/utils/acronym'
+
+type NotificationList = {
+  id: string
+  target: string
+  description: string
+  date: string
+  image: string
+  type: number
+  location: string
+  locationLabel: string
+  status: string
+  readed: boolean
+}
+
+const notificationHeight = 'h-72'
+const imagePath = '/img/avatars/'
+
+const GeneratedAvatar = ({ target }: { target: string }) => {
+  const color = useTwColorByName()
+  return (
+    <Avatar shape="circle" className={`${color(target)}`}>
+      {acronym(target)}
+    </Avatar>
+  )
+}
+
+const notificationTypeAvatar = (data: {
+  type: number
+  target: string
+  image: string
+  status: string
+}) => {
+  const { type, target, image, status } = data
+
+  switch (type) {
+    case 0:
+      return image ? (
+        <Avatar shape="circle" src={`${imagePath}${image}`} />
+      ) : (
+        <GeneratedAvatar target={target} />
+      )
+
+    case 1:
+      return (
+        <Avatar
+          shape="circle"
+          className="bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-100"
+          icon={<HiOutlineCalendar />}
+        />
+      )
+
+    case 2:
+      return (
+        <Avatar
+          shape="circle"
+          className={
+            status === 'succeed'
+              ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-100'
+              : 'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-100'
+          }
+          icon={
+            status === 'succeed' ? (
+              <HiOutlineClipboardCheck />
+            ) : (
+              <HiOutlineBan />
+            )
+          }
+        />
+      )
+
+    default:
+      return <Avatar />
+  }
+}
 
 const NotificationToggle = ({
   className,
   dot,
-  content,
 }: {
   className?: string
   dot: boolean
-  content?: string
 }) => {
   return (
     <div className={classNames('text-2xl', className)}>
       {dot ? (
-        <Badge content={content} badgeStyle={{ top: '3px', right: '6px' }}>
+        <Badge badgeStyle={{ top: '3px', right: '6px' }}>
           <HiOutlineBell />
         </Badge>
       ) : (
@@ -49,223 +119,140 @@ const NotificationToggle = ({
 }
 
 const _Notification = ({ className }: { className?: string }) => {
-  const { data: notificationsData, refetch: refetchNotificationsData } =
-    useGetNotificationsQuery(
-      { paginated: false },
-      { refetchOnMountOrArgChange: true }
-    ) as { data: NotificationType[]; refetch: any }
-  const [markAllNotificationsAsRead] = useMarkAllNotificationsAsReadMutation()
-  const { data: myInfo } = useGetMyInfoQuery({}, {})
-  const [markNotificationAsRead] = useMarkNotificationAsReadMutation()
-
-  const [unreadNotifications, setUnreadNotification] = useState([])
-  const [readNotifications, setReadNotification] = useState([])
-  const [generalNotifications, setGeneralNotifications] = useState([])
+  // ✅ Estado local, sin API
+  const [notificationList, setNotificationList] = useState<NotificationList[]>(
+    []
+  )
+  const [loading] = useState(false)
 
   const { bgTheme } = useThemeClass()
-
   const { larger } = useResponsive()
-
   const direction = useAppSelector((state) => state.theme.direction)
 
-  const onNotificationOpen = async () => {
-    // Fetch NotificationList
-  }
+  // ✅ derivado: hay no leídas?
+  const unreadNotification = useMemo(
+    () => notificationList.some((n) => !n.readed),
+    [notificationList]
+  )
 
-  const onMarkAsRead = async (id: string) => {
-    markNotificationAsRead({ id })
-  }
+  // ✅ derivado: no hay resultados? (y no está cargando)
+  const noResult = useMemo(
+    () => !loading && notificationList.length === 0,
+    [loading, notificationList.length]
+  )
 
-  const onMarkAllAsRead = async () => {
-    markAllNotificationsAsRead({
-      notificationsId: unreadNotifications.map(
-        (notification) => notification.id
-      ),
-    })
-  }
+  // ✅ Mantener handler por compatibilidad (no hace nada)
+  const onNotificationOpen = useCallback(() => {
+    // no-op (sin API)
+  }, [])
 
-  const drawNotificationList = ({
-    notifications,
-    withBadge = true,
-    readable = true,
-  }: {
-    notifications: Array<NotificationType>
-    withBadge?: boolean
-    readable?: boolean
-  }) => {
-    if (!notifications.length) {
-      return (
-        <div className="flex justify-center items-center h-[100%]">
-          <span className="text-[16px] font-bold">Sin Notificaciones</span>
-        </div>
-      )
-    }
+  const onMarkAllAsRead = useCallback(() => {
+    setNotificationList((prev) => prev.map((n) => ({ ...n, readed: true })))
+  }, [])
 
-    return notifications.map((item, index) => (
-      <div
-        key={item?.id}
-        className={`relative flex px-4 py-4 cursor-pointer hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-black dark:hover:bg-opacity-20 ${
-          !isLastChild(unreadNotifications, index)
-            ? 'border-b border-gray-200 dark:border-gray-600'
-            : ''
-        }`}
-        onClick={() => readable && onMarkAsRead(item?.id)}
-      >
-        <div className="ltr:ml-3 rtl:mr-3">
-          <div>
-            {item?.title && (
-              <span className="font-semibold heading-text">{item?.title} </span>
-            )}
-            <span>{item?.description}</span>
-          </div>
-          <span className="text-xs">
-            {new Date(item?.createdAt).toLocaleString('es-ES', {
-              timeZone: 'UTC',
-              year: 'numeric',
-              month: 'short',
-              day: '2-digit',
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
-            hrs
-          </span>
-        </div>
-        {withBadge && (
-          <Badge
-            className="absolute top-4 ltr:right-3 rtl:left-4 mt-1.5"
-            innerClass={`${item?.openAt ? 'bg-gray-300' : bgTheme}`}
-          />
-        )}
-      </div>
-    ))
-  }
-
-  useEffect(() => {
-    if (!socket || !myInfo) return
-
-    const handleNotification = (notification: NotificationType) => {
-      if (myInfo.id === notification.user?.id || !notification.user) {
-        refetchNotificationsData()
-
-        openNotification(
-          'info',
-          notification?.title,
-          notification?.description,
-          5
-        )
-      }
-    }
-
-    socket.on('notification', handleNotification)
-
-    return () => {
-      socket.off('notification', handleNotification)
-    }
-  }, [socket, myInfo, refetchNotificationsData])
-
-  useEffect(() => {
-    if (notificationsData) {
-      setUnreadNotification(
-        notificationsData.filter(
-          (notification) => !notification.openAt && notification.user
-        )
-      )
-      setReadNotification(
-        notificationsData.filter(
-          (notification) => notification.openAt && notification.user
-        )
-      )
-
-      setGeneralNotifications(
-        notificationsData.filter((notification) => !notification.user)
-      )
-    }
-  }, [notificationsData])
+  const onMarkAsRead = useCallback((id: string) => {
+    setNotificationList((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, readed: true } : n))
+    )
+  }, [])
 
   return (
     <Dropdown
       renderTitle={
-        <NotificationToggle
-          content={`${
-            (unreadNotifications as NotificationType[])?.filter(
-              (notification) => !notification.openAt
-            ).length
-          }`}
-          dot={Boolean(unreadNotifications.length)}
-          className={className}
-        />
+        <NotificationToggle dot={unreadNotification} className={className} />
       }
       menuClass="p-0 min-w-[280px] md:min-w-[340px]"
       placement={larger.md ? 'bottom-end' : 'bottom-center'}
       onOpen={onNotificationOpen}
     >
       <Dropdown.Item variant="header">
-        <div className=" dark:border-gray-600 px-4 py-2 flex items-center justify-between">
-          <h6>Notificaciones</h6>
-          <Tooltip title="Marcar todas como leídas">
+        <div className="border-b border-gray-200 dark:border-gray-600 px-4 py-2 flex items-center justify-between">
+          <h6>Notifications</h6>
+          <Tooltip title="Mark all as read">
             <Button
               variant="plain"
               shape="circle"
               size="sm"
               icon={<HiOutlineMailOpen className="text-xl" />}
-              onClick={() => {
-                onMarkAllAsRead()
-              }}
+              onClick={onMarkAllAsRead}
+              disabled={notificationList.length === 0}
             />
           </Tooltip>
         </div>
       </Dropdown.Item>
-      <div>
-        <Tabs defaultValue="tab1">
-          <TabList className="justify-center">
-            <TabNav value="tab1">Pendientes</TabNav>
-            <TabNav value="tab2">Leídas</TabNav>
-            <TabNav value="tab3">Generales</TabNav>
-          </TabList>
-          <div className="p-4">
-            <TabContent value="tab1">
-              <ScrollBar
-                direction={direction}
-                style={{ width: '100%', height: '300px' }}
+
+      <div className={classNames('overflow-y-auto', notificationHeight)}>
+        <ScrollBar direction={direction}>
+          {notificationList.length > 0 &&
+            notificationList.map((item, index) => (
+              <div
+                key={item.id}
+                className={classNames(
+                  'relative flex px-4 py-4 cursor-pointer hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-black dark:hover:bg-opacity-20',
+                  !isLastChild(notificationList, index) &&
+                    'border-b border-gray-200 dark:border-gray-600'
+                )}
+                onClick={() => onMarkAsRead(item.id)}
               >
-                {drawNotificationList({ notifications: unreadNotifications })}
-              </ScrollBar>
-            </TabContent>
-            <TabContent value="tab2">
-              <ScrollBar
-                direction={direction}
-                style={{ width: '100%', height: '300px' }}
-              >
-                {drawNotificationList({
-                  notifications: readNotifications,
-                  readable: false,
-                })}
-              </ScrollBar>
-            </TabContent>
-            <TabContent value="tab3">
-              <ScrollBar
-                direction={direction}
-                style={{ width: '100%', height: '300px' }}
-              >
-                {drawNotificationList({
-                  notifications: generalNotifications,
-                  withBadge: false,
-                  readable: false,
-                })}
-              </ScrollBar>
-            </TabContent>
-          </div>
-        </Tabs>
+                <div>{notificationTypeAvatar(item)}</div>
+                <div className="ltr:ml-3 rtl:mr-3">
+                  <div>
+                    {item.target && (
+                      <span className="font-semibold heading-text">
+                        {item.target}{' '}
+                      </span>
+                    )}
+                    <span>{item.description}</span>
+                  </div>
+                  <span className="text-xs">{item.date}</span>
+                </div>
+                <Badge
+                  className="absolute top-4 ltr:right-4 rtl:left-4 mt-1.5"
+                  innerClass={`${item.readed ? 'bg-gray-300' : bgTheme}`}
+                />
+              </div>
+            ))}
+
+          {loading && (
+            <div
+              className={classNames(
+                'flex items-center justify-center',
+                notificationHeight
+              )}
+            >
+              <Spinner size={40} />
+            </div>
+          )}
+
+          {noResult && (
+            <div
+              className={classNames(
+                'flex items-center justify-center',
+                notificationHeight
+              )}
+            >
+              <div className="text-center">
+                <img
+                  className="mx-auto mb-2 max-w-[150px]"
+                  src="/img/others/no-notification.png"
+                  alt="no-notification"
+                />
+                <h6 className="font-semibold">No notifications!</h6>
+                <p className="mt-1">Please try again later</p>
+              </div>
+            </div>
+          )}
+        </ScrollBar>
       </div>
 
       <Dropdown.Item variant="header">
         <div className="flex justify-center border-t border-gray-200 dark:border-gray-600 px-4 py-2">
-          <Button
-            className="font-semibold cursor-pointer border-none p-2 px-3 text-gray-600 hover:text-gray-900 dark:text-gray-200 dark:hover:text-white"
-            onClick={() => refetchNotificationsData()}
+          <Link
+            to="/app/account/activity-log"
+            className="font-semibold cursor-pointer p-2 px-3 text-gray-600 hover:text-gray-900 dark:text-gray-200 dark:hover:text-white"
           >
-            Actualizar actividad
-          </Button>
+            View All Activity
+          </Link>
         </div>
       </Dropdown.Item>
     </Dropdown>
