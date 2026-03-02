@@ -36,24 +36,6 @@ const EspaciosComunesFields = ({ values }: FieldNameProps) => {
             }}
           </Field>
         </FormItem>
-        <FormItem label="Salón de fiestas">
-          <Field name="characteristics.hasPartyRoom">
-            {({ field, form }: FieldProps) => {
-              return (
-                <Switcher
-                  checked={values.characteristics?.hasPartyRoom}
-                  className="my-3"
-                  onChange={() => {
-                    form.setFieldValue(
-                      field.name,
-                      !values.characteristics?.hasPartyRoom
-                    )
-                  }}
-                />
-              )
-            }}
-          </Field>
-        </FormItem>
         <FormItem label="Salón de usos múltiples">
           <Field name="characteristics.hasMultipurposeRoom">
             {({ field, form }: FieldProps) => {

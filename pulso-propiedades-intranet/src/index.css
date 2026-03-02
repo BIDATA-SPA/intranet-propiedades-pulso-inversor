@@ -1,6 +1,0 @@
-@import "./assets/styles/app.css";
-@import "mapbox-gl/dist/mapbox-gl.css";
-
-html{
-  scroll-behavior: smooth;
-}

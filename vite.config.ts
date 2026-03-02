@@ -20,8 +20,7 @@ export default defineConfig({
         display_override: ['window-controls-overlay'],
         lang: 'es-ES',
         name: 'Pulso Propiedades',
-        short_name:
-          'Pulso Propiedades | La Plataforma Líder en Canje de Propiedades Inmobiliarias',
+        short_name: 'Pulso Propiedades',
         description:
           'Descubre Pulso Propiedades, tu aliado definitivo en el corretaje de propiedades. Conéctate con una red ética de corredores y maximiza tus oportunidades de canje con seguridad y eficiencia. Únete a la comunidad de corretaje más innovadora y confiable de Chile.',
         theme_color: '#19223c',
