@@ -171,19 +171,6 @@ const FilterForm = forwardRef<FormikProps<FormModel>, FilterFormProps>(
                 <FormItem>
                   <h6 className="mb-4">Filtrar</h6>
                   <div className="w-full flex flex-col gap-5">
-                    <Field name="filters.inExchange">
-                      {() => (
-                        <Checkbox
-                          name="inExchange"
-                          checked={values.inExchange}
-                          onChange={(e) => {
-                            handleCheckboxChange('inExchange', e)
-                          }}
-                        >
-                          En canje
-                        </Checkbox>
-                      )}
-                    </Field>
                     <Field name="sold">
                       {() => (
                         <Checkbox
