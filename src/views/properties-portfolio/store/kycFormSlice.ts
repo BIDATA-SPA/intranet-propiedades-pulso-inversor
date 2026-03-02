@@ -224,15 +224,6 @@ export type Address = {
   addressPublic: string
 }
 
-export type FinancialInformation = {
-  isExchanged: boolean
-  timeInExchange: {
-    start?: null
-    end?: null
-  }
-  propertyDescriptionInExchange: string
-}
-
 export type Portal =
   | 'portal-inmobiliario'
   | 'emol'
@@ -291,7 +282,6 @@ type FormData = {
   informacionPrincipal: InformacionPrincipal
   caracteristicas: Caracteristicas
   addressInformation: Address
-  financialInformation: FinancialInformation
   portalOfPortals: PortalOfPortals
 }
 
@@ -529,14 +519,6 @@ export const initialState: KycFormState = {
       address: '',
       addressPublic: '',
     },
-    financialInformation: {
-      isExchanged: false,
-      timeInExchange: {
-        start: null,
-        end: null,
-      },
-      propertyDescriptionInExchange: '',
-    },
     portalOfPortals: {
       portal: '',
       listing_type: '',
@@ -559,7 +541,7 @@ export const initialState: KycFormState = {
     1: { status: 'pending' },
     2: { status: 'pending' },
     3: { status: 'pending' },
-    4: { status: 'pending' },
+    // 4: { status: 'pending' },
     5: { status: 'pending' },
   },
   currentStep: 0,

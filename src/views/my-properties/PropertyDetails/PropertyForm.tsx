@@ -65,12 +65,10 @@ const PropertyForm = ({
       typeOfPropertyId,
       currencyId,
       propertyPrice,
-      timeInExchange,
       highlighted,
       isActive,
       observations,
       characteristics,
-      propertyDescriptionInExchange,
       externalLink,
       address: {
         countryId,
@@ -190,14 +188,6 @@ const PropertyForm = ({
         number,
         references,
         addressPublic,
-      },
-      step4: {
-        isExchanged: values?.isExchanged,
-        timeInExchange: {
-          start: timeInExchange?.start,
-          end: timeInExchange?.end,
-        },
-        propertyDescriptionInExchange,
       },
     }
 

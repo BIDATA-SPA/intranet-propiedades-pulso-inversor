@@ -36,12 +36,6 @@ const PropertyDetails = () => {
     propertyPrice: 0,
     highlighted: false,
     observations: '',
-    isExchanged: false,
-    timeInExchange: {
-      start: null,
-      end: null,
-    },
-    propertyDescriptionInExchange: '',
     user: {
       id: '',
       name: '',
@@ -136,12 +130,6 @@ const PropertyDetails = () => {
         propertyPrice: data?.propertyPrice,
         highlighted: data?.highlighted,
         observations: data?.observations,
-        isExchanged: data?.isExchanged,
-        timeInExchange: {
-          start: data?.timeInExchangeStart,
-          end: data?.timeInExchangeEnd,
-        },
-        propertyDescriptionInExchange: data?.propertyDescriptionInExchange,
         user: {
           id: data?.user?.id,
           name: !data?.user?.name ? '' : data?.user?.name,
@@ -214,12 +202,6 @@ const PropertyDetails = () => {
         propertyPrice: 0,
         highlighted: false,
         observations: '',
-        isExchanged: false,
-        timeInExchange: {
-          start: null,
-          end: null,
-        },
-        propertyDescriptionInExchange: '',
         user: {
           id: '', // ⚠️
           name: '', // ⚠️

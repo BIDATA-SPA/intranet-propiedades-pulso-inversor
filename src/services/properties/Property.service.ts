@@ -14,7 +14,6 @@ export function getPropertiesQuery(builder: EndpointBuilderType) {
         limit,
         page,
         search = '',
-        inExchange = false,
         sold = false,
         deRegistered = false,
         disabled = false,
@@ -23,7 +22,7 @@ export function getPropertiesQuery(builder: EndpointBuilderType) {
         orderByPrice = 'asc',
         currencyId = '',
       }) => ({
-        url: `properties?page=${page}&limit=${limit}&search=${search}&inExchange=${inExchange}&sold=${sold}&deRegistered=${deRegistered}&disabled=${disabled}&favorites=${favorites}&orderById=${orderById}&orderByPrice=${orderByPrice}&currencyId=${currencyId}`,
+        url: `properties?page=${page}&limit=${limit}&search=${search}&sold=${sold}&deRegistered=${deRegistered}&disabled=${disabled}&favorites=${favorites}&orderById=${orderById}&orderByPrice=${orderByPrice}&currencyId=${currencyId}`,
         method: 'get',
       }),
       providesTags: ['Properties'] as any,

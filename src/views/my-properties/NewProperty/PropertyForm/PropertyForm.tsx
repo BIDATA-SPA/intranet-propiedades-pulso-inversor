@@ -68,14 +68,6 @@ const PropertyForm = () => {
           ),
         },
       },
-      step4: {
-        ...values.step4,
-        timeInExchange: {
-          ...values.step4.timeInExchange,
-          start: values.step4.timeInExchange?.start,
-          end: values.step4.timeInExchange?.end,
-        },
-      },
     }
 
     try {
@@ -195,8 +187,7 @@ const PropertyForm = () => {
   }
 
   const isStep4Complete = (values) => {
-    // Asumiendo que el paso 4 puede no tener campos obligatorios.
-    return true // Siempre devuelve true si no hay campos obligatorios.
+    //
   }
 
   const isLastStep = () => {
@@ -269,17 +260,6 @@ const PropertyForm = () => {
           letter: '',
           references: '',
           addressPublic: '',
-        },
-        step4: {
-          isExchanged: userAuthority === 3 ? true : false,
-          timeInExchange: {
-            start: userAuthority === 3 ? new Date() : null,
-            end:
-              userAuthority === 3
-                ? new Date(new Date().setDate(new Date().getDate() + 30))
-                : null,
-          },
-          propertyDescriptionInExchange: '',
         },
       }}
       validationSchema={validationSchema}
@@ -370,37 +350,6 @@ const PropertyForm = () => {
                       </Button>
                     )}
                   </div>
-
-                  {/* <div className="flex justify-end gap-4">
-                    {step > 0 && <Button onClick={onPrevious}>Atrás</Button>}
-                    {isLastStep() ? (
-                      <Button
-                        type="submit"
-                        variant="solid"
-                        disabled={!isStep4Complete(values)}
-                        loading={isLoading}
-                      >
-                        Publicar
-                      </Button>
-                    ) : (
-                      <Button
-                        type="button"
-                        variant="solid"
-                        disabled={
-                          step === 0
-                            ? !isStep1Complete(values)
-                            : step === 1
-                            ? !isStep2Complete(values)
-                            : step === 2
-                            ? !isStep3Complete(values)
-                            : !isStep4Complete(values)
-                        }
-                        onClick={onNext}
-                      >
-                        Siguiente
-                      </Button>
-                    )}
-                  </div> */}
                 </Form>
               </div>
             </Tabs>

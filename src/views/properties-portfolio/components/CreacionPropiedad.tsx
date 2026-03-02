@@ -31,6 +31,17 @@ type AccountReviewProps = {
   onError?: (err?: any) => void
 }
 
+const pickPropertyPayload = (payload: any) => {
+  const allowed = ['step1', 'step2', 'step3', 'step5'] as const
+  const safe: any = {}
+
+  for (const k of allowed) {
+    if (payload?.[k] != null) safe[k] = payload[k]
+  }
+
+  return safe
+}
+
 const computeExternalLink = (id: string | number) =>
   `https://pulsopropiedades.cl/propiedades/${id}`
 
@@ -534,20 +545,11 @@ const CreacionPropiedad = ({
       lng: toStr(values?.addressInformation?.lng),
     }
 
-    const step4 = {
-      isExchanged: false,
-      timeInExchange: {
-        start: null,
-        end: null,
-      },
-      propertyDescriptionInExchange: '',
-    }
-
     const step5 = {
       portals: [PORTAL_TAG],
     }
 
-    return stripNulls({ step1, step2, step3, step4, step5 })
+    return stripNulls({ step1, step2, step3, step5 })
   }
 
   return (
