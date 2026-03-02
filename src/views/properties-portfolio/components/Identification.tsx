@@ -378,19 +378,7 @@ const Identification = ({
                 )}
 
                 <div className="grid grid-cols-1 gap-0 md:grid-cols-2 md:gap-3">
-                  <FormItem
-                    label="Número de pisos"
-                    asterisk={
-                      formData.personalInformation.typeOfPropertyId ===
-                        'Casa' ||
-                      formData.personalInformation.typeOfPropertyId ===
-                        'Departamento'
-                    }
-                    invalid={
-                      errors.characteristics?.numberOfFloors &&
-                      touched.characteristics?.numberOfFloors
-                    }
-                  >
+                  <FormItem label="Número de pisos">
                     <Field name="characteristics.numberOfFloors">
                       {({ field, form }: FieldProps<FormModel>) => {
                         return (

@@ -260,24 +260,6 @@ const AmbientesFields = ({ values }: FieldNameProps) => {
             }}
           </Field>
         </FormItem>
-        <FormItem label="Caballeriza">
-          <Field name="characteristics.hasHorseStable">
-            {({ field, form }: FieldProps) => {
-              return (
-                <Switcher
-                  checked={values.characteristics?.hasHorseStable}
-                  className="my-3"
-                  onChange={() => {
-                    form.setFieldValue(
-                      field.name,
-                      !values.characteristics?.hasHorseStable
-                    )
-                  }}
-                />
-              )
-            }}
-          </Field>
-        </FormItem>
       </div>
     </>
   )

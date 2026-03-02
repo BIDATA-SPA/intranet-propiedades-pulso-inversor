@@ -1,6 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Button from '@/components/ui/Button'
 import { FormContainer } from '@/components/ui/Form'
+import {
+  useCreatePropertyMutation,
+  useGetMyInfoQuery,
+  useUpdatePropertyMutation,
+} from '@/services/RtkQueryService'
 import openNotification from '@/utils/openNotification'
 import {
   stripNulls,
@@ -14,12 +19,6 @@ import { Field, Form, Formik } from 'formik'
 import { useRef, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 
-import {
-  useCreatePropertyMutation,
-  useGetMyInfoQuery,
-  useUpdatePropertyMutation,
-} from '@/services/RtkQueryService'
-
 import { injectReducer } from '@/store'
 import reducer, { resetFormState, useAppDispatch } from '../store'
 
@@ -29,17 +28,6 @@ type AccountReviewProps = {
   data: any
   onSuccess?: (payload?: any) => void
   onError?: (err?: any) => void
-}
-
-const pickPropertyPayload = (payload: any) => {
-  const allowed = ['step1', 'step2', 'step3', 'step5'] as const
-  const safe: any = {}
-
-  for (const k of allowed) {
-    if (payload?.[k] != null) safe[k] = payload[k]
-  }
-
-  return safe
 }
 
 const computeExternalLink = (id: string | number) =>

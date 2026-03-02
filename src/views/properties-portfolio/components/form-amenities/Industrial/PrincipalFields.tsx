@@ -5,8 +5,6 @@ import Addon from '@/components/ui/InputGroup/Addon'
 import { RichTextEditor } from '@/components/shared'
 import { injectReducer } from '@/store'
 import {
-  filterCeilingType,
-  filterFlooringType,
   filterGeography,
   filterOrientation,
   filterTypeOfHeating,
@@ -273,50 +271,6 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
                   value={filterOrientation?.filter(
                     (option) =>
                       option.value === values.characteristics.orientation
-                  )}
-                  onChange={(option) => {
-                    form.setFieldValue(field.name, option?.value)
-                  }}
-                />
-              )
-            }}
-          </Field>
-        </FormItem>
-
-        <FormItem label="Cielo/Techo">
-          <Field name="characteristics.ceilingType">
-            {({ field, form }: FieldProps) => {
-              return (
-                <Select
-                  isClearable
-                  field={field}
-                  options={filterCeilingType}
-                  placeholder="Seleccionar..."
-                  value={filterCeilingType?.filter(
-                    (option) =>
-                      option.value === values.characteristics?.ceilingType
-                  )}
-                  onChange={(option) => {
-                    form.setFieldValue(field.name, option?.value)
-                  }}
-                />
-              )
-            }}
-          </Field>
-        </FormItem>
-
-        <FormItem label="Tipo Piso">
-          <Field name="characteristics.flooringType">
-            {({ field, form }: FieldProps) => {
-              return (
-                <Select
-                  isClearable
-                  field={field}
-                  options={filterFlooringType}
-                  placeholder="Seleccionar..."
-                  value={filterFlooringType?.filter(
-                    (option) =>
-                      option.value === values.characteristics?.flooringType
                   )}
                   onChange={(option) => {
                     form.setFieldValue(field.name, option?.value)

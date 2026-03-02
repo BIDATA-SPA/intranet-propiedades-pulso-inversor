@@ -6,8 +6,6 @@ import { RichTextEditor } from '@/components/shared'
 import { injectReducer } from '@/store'
 import {
   filterBathrooms,
-  filterCeilingType,
-  filterFlooringType,
   filterFloors,
   filterGeography,
   filterOrientation,
@@ -455,17 +453,7 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
           </Field>
         </FormItem>
 
-        <FormItem
-          label="Número de pisos"
-          asterisk={
-            formData.informacionPrincipal.typeOfPropertyId === 'Casa' ||
-            formData.informacionPrincipal.typeOfPropertyId === 'Departamento'
-          }
-          invalid={
-            errors.characteristics?.numberOfFloors &&
-            touched.characteristics?.numberOfFloors
-          }
-        >
+        <FormItem label="Número de pisos">
           <Field name="characteristics.numberOfFloors">
             {({ field, form }: FieldProps) => {
               return (
@@ -543,50 +531,6 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
                   value={filterStorageCount?.filter(
                     (option) =>
                       option.value === values.characteristics?.storageCount
-                  )}
-                  onChange={(option) => {
-                    form.setFieldValue(field.name, option?.value)
-                  }}
-                />
-              )
-            }}
-          </Field>
-        </FormItem>
-
-        <FormItem label="Cielo/Techo">
-          <Field name="characteristics.ceilingType">
-            {({ field, form }: FieldProps) => {
-              return (
-                <Select
-                  isClearable
-                  field={field}
-                  options={filterCeilingType}
-                  placeholder="Seleccionar..."
-                  value={filterCeilingType?.filter(
-                    (option) =>
-                      option.value === values.characteristics?.ceilingType
-                  )}
-                  onChange={(option) => {
-                    form.setFieldValue(field.name, option?.value)
-                  }}
-                />
-              )
-            }}
-          </Field>
-        </FormItem>
-
-        <FormItem label="Tipo Piso">
-          <Field name="characteristics.flooringType">
-            {({ field, form }: FieldProps) => {
-              return (
-                <Select
-                  isClearable
-                  field={field}
-                  options={filterFlooringType}
-                  placeholder="Seleccionar..."
-                  value={filterFlooringType?.filter(
-                    (option) =>
-                      option.value === values.characteristics?.flooringType
                   )}
                   onChange={(option) => {
                     form.setFieldValue(field.name, option?.value)

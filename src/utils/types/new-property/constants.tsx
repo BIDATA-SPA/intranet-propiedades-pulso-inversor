@@ -183,7 +183,6 @@ export const filterStorageCount: TSelect[] = [
 ]
 
 export const filterTypeOfBuilding: TSelect[] = [
-  { value: 'Casa Comercial', label: 'Casa Comercial' },
   { value: 'Edificio Antiguo', label: 'Edificio Antiguo' },
   { value: 'Edificio Moderno', label: 'Edificio Moderno' },
   { value: 'Edificio Nuevo', label: 'Edificio Nuevo' },
@@ -257,14 +256,15 @@ export const filterTypeOfWinery: TSelect[] = [
 ]
 
 export const filterOrientation: TSelect[] = [
-  { value: 'DESCONOCIDA', label: 'Desconocida (No Usa)' },
-  { value: 'NO', label: 'NO' },
-  { value: 'SO', label: 'SO' },
-  { value: 'SP', label: 'SP' },
-  { value: 'NOSP', label: 'NOSP' },
-  { value: 'S', label: 'S' },
-  { value: 'P', label: 'P' },
-  { value: 'O', label: 'O' },
+  { value: 'DESCONOCIDA', label: 'Desconocida (No usa)' },
+  { value: 'N', label: 'Norte (N)' },
+  { value: 'E', label: 'Este (E)' },
+  { value: 'S', label: 'Sur (S)' },
+  { value: 'O', label: 'Oeste / Poniente (O)' },
+  { value: 'NE', label: 'Nororiente (NE)' },
+  { value: 'NO', label: 'Norponiente (NO)' },
+  { value: 'SE', label: 'Suroriente (SE)' },
+  { value: 'SO', label: 'Surponiente (SO)' },
 ]
 
 export const filterTypeOfKitchens = [
