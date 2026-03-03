@@ -236,6 +236,9 @@ dependencies:
   twin.macro:
     specifier: ^3.3.0
     version: 3.4.1(tailwindcss@3.4.18)
+  yet-another-react-lightbox:
+    specifier: ^3.27.0
+    version: 3.27.0(@types/react-dom@18.3.7)(@types/react@18.3.26)(react-dom@18.3.1)(react@18.3.1)
   yup:
     specifier: ^1.1.1
     version: 1.7.1
@@ -12951,6 +12954,46 @@ packages:
       yargs-parser: 21.1.1
     dev: true
 
+  /yet-another-react-lightbox@3.27.0(@types/react-dom@18.3.7)(@types/react@18.3.26)(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-SV4U0s7vZfwNWPOqyEP81VyquBu/7m9mVJhKEAgWTWUpsIRD6FFLn5+9RvJ4N0wMrxr7v517GzUNqoDPC2EdHg==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      '@types/react': ^16 || ^17 || ^18 || ^19
+      '@types/react-dom': ^16 || ^17 || ^18 || ^19
+      react: ^16.8.0 || ^17 || ^18 || ^19
+      react-dom: ^16.8.0 || ^17 || ^18 || ^19
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+    dependencies:
+      '@types/react': 18.3.26
+      '@types/react-dom': 18.3.7(@types/react@18.3.26)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+    dev: false
+
+  /yet-another-react-lightbox@3.29.1(@types/react-dom@18.3.7)(@types/react@18.3.26)(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-0cpa+wlleiy2cWNjS9qrcY0+SgZQH/4PDx2uupLMI9Ofip1f7pCgZ95PlVp/EsFsO4ufwOTea51bkLhcEXJJSg==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      '@types/react': ^16 || ^17 || ^18 || ^19
+      '@types/react-dom': ^16 || ^17 || ^18 || ^19
+      react: ^16.8.0 || ^17 || ^18 || ^19
+      react-dom: ^16.8.0 || ^17 || ^18 || ^19
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+    dependencies:
+      '@types/react': 18.3.26
+      '@types/react-dom': 18.3.7(@types/react@18.3.26)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+    dev: false
+
   /yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
@@ -13025,6 +13068,7 @@ packages:
       react: 18.3.1
       react-apexcharts: 1.8.0(apexcharts@3.54.1)(react@18.3.1)
       react-beautiful-dnd: 13.1.1(react-dom@18.3.1)(react@18.3.1)
+      react-collapsible: 2.10.0(react-dom@18.3.1)(react@18.3.1)
       react-countdown: 2.3.6(react-dom@18.3.1)(react@18.3.1)
       react-custom-scrollbars-2: 4.5.0(react-dom@18.3.1)(react@18.3.1)
       react-dom: 18.3.1(react@18.3.1)
@@ -13055,6 +13099,7 @@ packages:
       slick-carousel: 1.8.1(jquery@3.7.1)
       socket.io-client: 4.8.1
       twin.macro: 3.4.1(tailwindcss@3.4.18)
+      yet-another-react-lightbox: 3.29.1(@types/react-dom@18.3.7)(@types/react@18.3.26)(react-dom@18.3.1)(react@18.3.1)
       yup: 1.7.1
     transitivePeerDependencies:
       - '@types/react'

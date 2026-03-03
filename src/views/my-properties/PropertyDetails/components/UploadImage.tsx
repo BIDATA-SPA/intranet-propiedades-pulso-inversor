@@ -26,7 +26,6 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 
 const MAX_IMAGES = 30
-const MIN_RESOLUTION = { w: 800, h: 600 }
 
 export type PropertyType =
   | 'Casa'
@@ -50,51 +49,7 @@ type UploadImageProps = {
   propertyType?: PropertyType
 }
 
-const getMinImagesByType = (type?: PropertyType) => {
-  if (!type) return 12
-
-  switch (type) {
-    case 'Estacionamiento':
-      return 4
-    case 'Local Comercial':
-    case 'Agrícola':
-    case 'Sitio':
-    case 'Terreno':
-    case 'Bodega':
-      return 6
-    case 'Casa':
-    case 'Departamento':
-    case 'Oficina':
-    case 'Parcela':
-    case 'Departamento Amoblado':
-    case 'Casa Amoblada':
-      return 12
-    case 'Industrial':
-    case 'Sepultura':
-      return 6
-    default:
-      return 12
-  }
-}
-
 const ALLOWED_MIME = new Set(['image/jpeg', 'image/jpg', 'image/png'])
-
-const getImageMeta = (file: File): Promise<{ width: number; height: number }> =>
-  new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file)
-    const img = new Image()
-    img.onload = () => {
-      const width = img.naturalWidth || img.width
-      const height = img.naturalHeight || img.height
-      URL.revokeObjectURL(url)
-      resolve({ width, height })
-    }
-    img.onerror = () => {
-      URL.revokeObjectURL(url)
-      reject(new Error('No se pudo leer la imagen.'))
-    }
-    img.src = url
-  })
 
 /** Helpers */
 const isImageFile = (f: File) => f.type?.startsWith('image/')
@@ -298,8 +253,6 @@ const UploadImagePulso: React.FC<UploadImageProps> = ({
   const [isProcessing, setIsProcessing] = useState(false)
   const [processingText, setProcessingText] = useState<string | null>(null)
 
-  const minRequired = getMinImagesByType(propertyType)
-
   // ✅ Pulso: subir imágenes
   const [createPropertyImages, { isLoading, error }] =
     useCreatePropertyImagesMutation()
@@ -332,29 +285,17 @@ const UploadImagePulso: React.FC<UploadImageProps> = ({
     )
   }
 
+  // ✅ Validación actualizada:
+  // - Se mantiene: tipo imagen + formato permitido
+  // - Se elimina: resolución mínima + orientación
   const validateFile = async (
     file: File
   ): Promise<{ ok: boolean; reason?: string }> => {
     if (!isImageFile(file))
       return { ok: false, reason: 'Archivo no es una imagen.' }
+
     if (!ALLOWED_MIME.has(file.type))
       return { ok: false, reason: 'Formato no permitido. Solo JPG/JPEG/PNG.' }
-
-    const { width, height } = await getImageMeta(file)
-
-    if (width < MIN_RESOLUTION.w || height < MIN_RESOLUTION.h) {
-      return {
-        ok: false,
-        reason: `Resolución insuficiente (${width}x${height}). Mínimo ${MIN_RESOLUTION.w}x${MIN_RESOLUTION.h}px.`,
-      }
-    }
-
-    if (!(width > height)) {
-      return {
-        ok: false,
-        reason: `La imagen debe ser horizontal. (${width}x${height}).`,
-      }
-    }
 
     return { ok: true }
   }
@@ -416,6 +357,7 @@ const UploadImagePulso: React.FC<UploadImageProps> = ({
           )
           continue
         }
+
         accepted.push(f)
       } catch {
         done++
@@ -458,17 +400,8 @@ const UploadImagePulso: React.FC<UploadImageProps> = ({
 
     const totalAfter = alreadyPublished + files.length
 
-    if (totalAfter < minRequired) {
-      showNotification(
-        'danger',
-        'Cantidad insuficiente de imágenes',
-        `Debes tener al menos ${minRequired} fotos para "${String(
-          propertyType ?? 'Inmueble'
-        )}". Actualmente tienes ${totalAfter}.`
-      )
-      return
-    }
-
+    // ✅ Se elimina validación mínimo de imágenes por tipo.
+    // ✅ Se mantiene máximo 30.
     if (totalAfter > MAX_IMAGES || willExceedOnPublish) {
       showNotification(
         'danger',
@@ -562,13 +495,9 @@ const UploadImagePulso: React.FC<UploadImageProps> = ({
 
         <p>
           Tipo: <strong>{String(propertyType ?? 'Sin definir')}</strong>.
-          Reglas: mínimo <strong>{minRequired}</strong>, máximo{' '}
-          <strong>{MAX_IMAGES}</strong>. Formatos: <strong>JPG/JPEG/PNG</strong>
-          . Resolución mínima:{' '}
-          <strong>
-            {MIN_RESOLUTION.w}x{MIN_RESOLUTION.h}px
-          </strong>{' '}
-          · Solo horizontal.
+          Reglas: máximo <strong>{MAX_IMAGES}</strong>. Formatos:{' '}
+          <strong>JPG/JPEG/PNG</strong>. Resolución: <strong>cualquiera</strong>{' '}
+          (vertical u horizontal).
         </p>
       </div>
 
@@ -671,8 +600,8 @@ const UploadImagePulso: React.FC<UploadImageProps> = ({
             </Button>
 
             <p className="text-xs font-semibold text-neutral-500">
-              Mínimo requerido para `{String(propertyType ?? 'Inmueble')}`:{' '}
-              {minRequired} · Total al publicar: {totalAfterPublish}
+              Puedes publicar 1 o más imágenes · Total al publicar:{' '}
+              {totalAfterPublish}/{MAX_IMAGES}
             </p>
           </div>
         </div>
