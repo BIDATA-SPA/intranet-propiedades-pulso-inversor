@@ -317,18 +317,11 @@ export const filterTypeOfHeating = [
 ]
 
 export const filterTypeOfSecurity = [
-  { value: 'Portero de Seguridad', label: 'Portero de Seguridad' },
-  {
-    value: 'Portón eléctrico y Cámara con altavoz',
-    label: 'Portón eléctrico y Cámara con altavoz',
-  },
-  {
-    value: 'Cámaras de seguridad interior - Forma remota',
-    label: 'Cámaras de seguridad interior - Forma remota',
-  },
-  { value: 'Alarma comunitaria', label: 'Alarma comunitaria' },
-  { value: 'Conserjería las 24hrs', label: 'Conserjería las 24hrs' },
-  { value: 'Acceso controlado', label: 'Acceso controlado' },
+  { value: 'Recepción', label: 'Recepción' },
+  { value: 'Cámaras de Seguridad', label: 'Cámaras de Seguridad' },
+  { value: 'Alarma', label: 'Alarma' },
+  { value: 'Sistema contra incendios', label: 'Sistema contra incendios' },
+  { value: 'Acceso con código ', label: 'Acceso con código ' },
 ]
 
 // CLP Range Price

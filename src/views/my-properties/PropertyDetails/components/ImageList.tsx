@@ -28,12 +28,25 @@ interface ImageListProps {
   isSyncingPortal?: boolean
 }
 
+const normalizeImages = (
+  imgs: { id: number; path: string; number: number }[]
+) =>
+  [...(imgs ?? [])]
+    .filter((x) => x?.path)
+    .sort((a, b) => {
+      const an = Number.isFinite(a.number) ? a.number : Number.POSITIVE_INFINITY
+      const bn = Number.isFinite(b.number) ? b.number : Number.POSITIVE_INFINITY
+      if (an !== bn) return an - bn
+      return String(a.id).localeCompare(String(b.id))
+    })
+
 const ImageList = ({
   images,
   onSyncPortalOrder,
   isSyncingPortal,
 }: ImageListProps) => {
-  const [imageOrder, setImageOrder] = useState(images)
+  const [imageOrder, setImageOrder] = useState(() => normalizeImages(images))
+  //   const [imageOrder, setImageOrder] = useState(images)
   const [isOrderChanged, setIsOrderChanged] = useState(false)
   const [updateImageOrder, { isLoading }] = useUpdateImageOrderMutation()
   const { propertyId } = useParams()
@@ -140,17 +153,30 @@ const ImageList = ({
   }, [imageOrder.length, isPreviewOpen, previewIndex])
 
   useEffect(() => {
-    const next = images ?? []
+    const next = normalizeImages(images ?? [])
 
     setImageOrder((prev) => {
-      const prevIds = prev.map((i) => i.id).join('|')
-      const nextIds = next.map((i) => i.id).join('|')
-      if (prevIds === nextIds) return prev
+      const prevSig = prev.map((i) => `${i.id}:${i.number}`).join('|')
+      const nextSig = next.map((i) => `${i.id}:${i.number}`).join('|')
+      if (prevSig === nextSig) return prev
       return next
     })
 
     setIsOrderChanged(false)
   }, [images])
+
+  //   useEffect(() => {
+  //     const next = images ?? []
+
+  //     setImageOrder((prev) => {
+  //       const prevIds = prev.map((i) => i.id).join('|')
+  //       const nextIds = next.map((i) => i.id).join('|')
+  //       if (prevIds === nextIds) return prev
+  //       return next
+  //     })
+
+  //     setIsOrderChanged(false)
+  //   }, [images])
 
   if (!imageOrder?.length) {
     return (
@@ -187,7 +213,10 @@ const ImageList = ({
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
-          <SortableContext items={imageOrder} strategy={rectSortingStrategy}>
+          <SortableContext
+            items={imageOrder.map((img) => img.id)}
+            strategy={rectSortingStrategy}
+          >
             <div className="text-center flex justify-end dark:bg-gray-800 my-4">
               <Button
                 variant="solid"

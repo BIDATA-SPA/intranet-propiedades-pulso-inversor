@@ -275,7 +275,7 @@ export type PortalOfPortals = {
   currency: Currency
   area_total?: number | null
   area_useful?: number | null
-  unit: Unit
+  unit: string
 }
 
 type FormData = {
@@ -330,7 +330,7 @@ export const initialState: KycFormState = {
         terraceM2: '', //✅
         bathrooms: '', //✅
         bedrooms: '', //✅
-        surfaceUnit: 'm2', //✅
+        surfaceUnit: '', //✅
         typeOfKitchen: '', //✅
         hasHeating: false, //✅
         numberOfParkingSpaces: '', //✅
@@ -442,11 +442,11 @@ export const initialState: KycFormState = {
         hasVentilationSystem: false, //✅
         typeOfWinery: '', //✅
         cellarHeight: 0, //✅
-        cellarHeightUnit: 'm', //✅
+        cellarHeightUnit: '', //✅
         pricePerUnitOfArea: 0, //✅
-        pricePerUnitOfAreaUnit: '$/ha', //✅ REVISION DE TIPADO
+        pricePerUnitOfAreaUnit: '', //✅ REVISION DE TIPADO
         floorStand: 0, //✅
-        floorStandUnit: 't/m2', //✅
+        floorStandUnit: '', //✅
         flatbedTrailers: 0, //✅
         hasAlarm: false, //✅
         hasFireProtectionSystem: false, //✅
@@ -490,7 +490,7 @@ export const initialState: KycFormState = {
 
         typeOfFarm: '',
         coveredHullAread: 0,
-        coveredHullAreadUnit: 'm2',
+        coveredHullAreadUnit: '',
 
         // DEPARTAMENTO AMOBLADO
         hasCowork: false,
@@ -500,13 +500,13 @@ export const initialState: KycFormState = {
         // SEPULTURA
         sectionWithinTheCemetery: '',
         depth: 0,
-        depthUnit: 'm',
+        depthUnit: '',
         cementeryName: '',
         width: 0,
-        widthUnit: 'm',
+        widthUnit: '',
         typeOfCemeteryPlot: '',
         long: 0,
-        longUnit: 'm',
+        longUnit: '',
       },
     },
     addressInformation: {
@@ -533,7 +533,7 @@ export const initialState: KycFormState = {
       currency: '',
       area_total: null,
       area_useful: null,
-      unit: 'mt2',
+      unit: '',
     },
   },
   stepStatus: {

@@ -368,10 +368,10 @@ const CreacionPropiedad = ({
         deepMeters: Number(
           values?.caracteristicas?.characteristics?.deepMeters
         ),
-        isUrbanized: Boolean(
+        isUrbanized: toBool(
           values?.caracteristicas?.characteristics?.isUrbanized
         ),
-        hasFlatSurface: Boolean(
+        hasFlatSurface: toBool(
           values?.caracteristicas?.characteristics?.hasFlatSurface
         ),
 
@@ -461,23 +461,23 @@ const CreacionPropiedad = ({
         ),
 
         // TERRENO
-        hasReforestation: Boolean(
+        hasReforestation: toBool(
           values?.caracteristicas?.characteristics?.hasReforestation
         ),
 
         // INDUSTRIAL
-        hasWarehouses: Boolean(
+        hasWarehouses: toBool(
           values?.caracteristicas?.characteristics?.hasWarehouses
         ),
-        hasLocationCentral: Boolean(
+        hasLocationCentral: toBool(
           values?.caracteristicas?.characteristics?.hasLocationCentral
         ),
 
         // LOCAL COMERCIAL
-        hasWheelchairRamp: Boolean(
+        hasWheelchairRamp: toBool(
           values?.caracteristicas?.characteristics?.hasWheelchairRamp
         ),
-        hasFittingRoom: Boolean(
+        hasFittingRoom: toBool(
           values?.caracteristicas?.characteristics?.hasFittingRoom
         ),
 

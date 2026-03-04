@@ -155,7 +155,7 @@ const PortalPresence: React.FC<Props> = ({
         currencyId: toStr(p?.currencyId),
         propertyPrice: toNum(p?.propertyPrice),
       },
-      step2 = {
+      step2: {
         externalLink: toStr(p?.identification?.externalLink),
         highlighted: toBool(p?.identification?.highlighted),
         propertyStatusId: toNum(p?.identification?.propertyStatusId),

@@ -6,15 +6,16 @@ import { injectReducer } from '@/store'
 import {
   filterBathrooms,
   filterFloors,
-  filterGeography,
   filterOrientation,
   filterParkingSpaces,
   filterStorageCount,
-  filterTypeOfBuilding,
+  filterTerraces,
+  filterTypeOfHeating,
+  filterTypeOfKitchens,
 } from '@/utils/types/new-property/constants'
 import { Field, FieldProps } from 'formik'
 import { TbWorldSearch } from 'react-icons/tb'
-import reducer, { useAppSelector } from '../../../store'
+import reducer from '../../../store'
 
 injectReducer('accountDetailForm', reducer)
 
@@ -25,10 +26,6 @@ interface FieldNameProps {
 }
 
 const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
-  const formData = useAppSelector(
-    (state) => state.accountDetailForm.data.formData
-  )
-
   return (
     <>
       <div className="w-full">
@@ -78,77 +75,25 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
             }}
           </Field>
         </FormItem>
-        {/* surface ✅ */}
-        <FormItem
-          label="Superficie de terreno"
-          invalid={
-            errors.characteristics?.surface && touched.characteristics?.surface
-          }
-          errorMessage={errors.characteristics?.surface}
-        >
-          <Field name="characteristics.surface">
-            {({ field, form }: FieldProps) => {
-              return (
-                <InputGroup>
-                  <Input
-                    type="number"
-                    field={field}
-                    size="md"
-                    placeholder="Ej: 200 - 100.5"
-                    value={values.characteristics?.surface}
-                    onChange={(e) => {
-                      form.setFieldValue(field.name, e.target.value)
-                    }}
-                  />
-                  <Addon size="md">m2</Addon>
-                </InputGroup>
-              )
-            }}
-          </Field>
-        </FormItem>
 
-        {/* constructedSurface surface ✅ */}
         <FormItem
-          label="Superficie total construida"
+          label="Orientación"
           invalid={
-            errors.characteristics?.constructedSurface &&
-            touched.characteristics?.constructedSurface
+            errors.characteristics?.orientation &&
+            touched.characteristics?.orientation
           }
-          errorMessage={errors.characteristics?.constructedSurface}
         >
-          <Field name="characteristics.constructedSurface">
-            {({ field, form }: FieldProps) => {
-              return (
-                <InputGroup>
-                  <Input
-                    type="number"
-                    field={field}
-                    size="md"
-                    placeholder="Ej: 180 - 80.5"
-                    value={values.characteristics?.constructedSurface}
-                    onChange={(e) => {
-                      form.setFieldValue(field.name, e.target.value)
-                    }}
-                  />
-                  <Addon size="md">m2</Addon>
-                </InputGroup>
-              )
-            }}
-          </Field>
-        </FormItem>
-
-        <FormItem label="Geografía">
-          <Field name="characteristics.geography">
+          <Field name="characteristics.orientation">
             {({ field, form }: FieldProps) => {
               return (
                 <Select
                   isClearable
                   field={field}
-                  options={filterGeography}
+                  options={filterOrientation}
                   placeholder="Seleccionar..."
-                  value={filterGeography?.filter(
+                  value={filterOrientation?.filter(
                     (option) =>
-                      option.value === values.characteristics?.geography
+                      option.value === values.characteristics.orientation
                   )}
                   onChange={(option) => {
                     form.setFieldValue(field.name, option?.value)
@@ -159,18 +104,21 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
           </Field>
         </FormItem>
 
-        <FormItem label="Gastos Comunes">
-          <Field name="characteristics.commonExpenses">
+        <FormItem label="Baño(s)">
+          <Field name="characteristics.bathrooms">
             {({ field, form }: FieldProps) => {
               return (
-                <Input
-                  type="text"
+                <Select
+                  isClearable
                   field={field}
-                  size="md"
-                  placeholder="Aprox."
-                  value={values.characteristics?.commonExpenses}
-                  onChange={(e) => {
-                    form.setFieldValue(field.name, e.target.value)
+                  options={filterBathrooms}
+                  placeholder="Seleccionar..."
+                  value={filterBathrooms?.filter(
+                    (option) =>
+                      option.value === values.characteristics.bathrooms
+                  )}
+                  onChange={(option) => {
+                    form.setFieldValue(field.name, option?.value)
                   }}
                 />
               )
@@ -178,16 +126,39 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
           </Field>
         </FormItem>
 
-        <FormItem label="Número de privados">
-          <Field name="characteristics.numberOfPrivate">
+        <FormItem label="Bodegas">
+          <Field name="characteristics.storageCount">
+            {({ field, form }: FieldProps) => {
+              return (
+                <Select
+                  isClearable
+                  field={field}
+                  options={filterStorageCount}
+                  placeholder="Seleccionar..."
+                  value={filterStorageCount?.filter(
+                    (option) =>
+                      option.value === values.characteristics?.storageCount
+                  )}
+                  onChange={(option) => {
+                    form.setFieldValue(field.name, option?.value)
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
+        <FormItem label="Número de piso">
+          <Field name="characteristics.floorNumber">
             {({ field, form }: FieldProps) => {
               return (
                 <Input
                   field={field}
                   type="number"
                   size="md"
-                  placeholder="Ej: 2"
-                  value={values?.characteristics?.numberOfPrivate}
+                  className="mb-2"
+                  placeholder="Ej: 12"
+                  value={values.characteristics?.floorNumber}
                   onChange={(e) => {
                     form.setFieldValue(field.name, e.target.value)
                   }}
@@ -197,20 +168,167 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
           </Field>
         </FormItem>
 
-        <FormItem label="Nombre Edificio">
-          <Field name="characteristics.buildingName">
+        <FormItem
+          label="Número de Piso(s)"
+          invalid={
+            errors.characteristics?.numberOfFloors &&
+            touched.characteristics?.numberOfFloors
+          }
+          errorMessage={errors.characteristics?.numberOfFloors}
+        >
+          <Field name="characteristics.numberOfFloors">
             {({ field, form }: FieldProps) => {
               return (
-                <Input
-                  type="text"
+                <Select
+                  isClearable
                   field={field}
-                  size="md"
-                  placeholder=""
-                  value={values.characteristics?.buildingName}
-                  onChange={(e) => {
-                    form.setFieldValue(field.name, e.target.value)
+                  options={filterFloors}
+                  placeholder="Seleccionar"
+                  value={filterFloors?.filter(
+                    (option) =>
+                      option.value === values.characteristics?.numberOfFloors
+                  )}
+                  onChange={(option) => {
+                    form.setFieldValue(field.name, option?.value)
                   }}
                 />
+              )
+            }}
+          </Field>
+        </FormItem>
+      </div>
+
+      <div className="w-full grid grid-cols-1 gap-0 md:grid-cols-2 xl:grid-cols-3 md:gap-3">
+        <FormItem label="Cocina">
+          <Field name="characteristics.hasKitchen">
+            {({ field, form }: FieldProps) => {
+              return (
+                <Switcher
+                  checked={values.characteristics.hasKitchen}
+                  className="my-3"
+                  onChange={() => {
+                    if (values.characteristics.hasKitchen) {
+                      form.setFieldValue('characteristics.typeOfKitchen', '')
+                    }
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics.hasKitchen
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
+        <FormItem label="Tipo de Cocina">
+          <Field name="characteristics.typeOfKitchen">
+            {({ field, form }: FieldProps) => {
+              return (
+                <Select
+                  isClearable
+                  isDisabled={!values.characteristics?.hasKitchen}
+                  field={field}
+                  options={filterTypeOfKitchens}
+                  placeholder="Seleccionar..."
+                  value={filterTypeOfKitchens?.filter(
+                    (option) =>
+                      option.value === values.characteristics?.typeOfKitchen
+                  )}
+                  onChange={(option) => {
+                    form.setFieldValue(field.name, option?.value)
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+      </div>
+
+      <div className="grid grid-cols-1 gap-0 md:grid-cols-2 xl:grid-cols-3 md:gap-3">
+        <FormItem label="Kitchenette">
+          <Field name="characteristics.hasKitchenet">
+            {({ field, form }: FieldProps) => {
+              return (
+                <Switcher
+                  checked={values?.characteristics?.hasKitchenet}
+                  className="mt-3"
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values?.characteristics?.hasKitchenet
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
+        <FormItem label="Comedor">
+          <Field name="characteristics.hasDiningRoom">
+            {({ field, form }: FieldProps) => {
+              return (
+                <Switcher
+                  checked={values.characteristics?.hasDiningRoom}
+                  className="my-3"
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.hasDiningRoom
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
+        <FormItem label="Terraza(s)">
+          <Field name="characteristics.terraces">
+            {({ field, form }: FieldProps) => {
+              return (
+                <Select
+                  isClearable
+                  field={field}
+                  options={filterTerraces}
+                  placeholder="Seleccionar..."
+                  value={filterTerraces?.filter(
+                    (option) => option.value === values.characteristics.terraces
+                  )}
+                  onChange={(option) => {
+                    form.setFieldValue(field.name, option?.value)
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
+        <FormItem
+          label="M2 Terraza"
+          invalid={
+            errors.characteristics?.terraceM2 &&
+            touched.characteristics?.terraceM2
+          }
+          errorMessage={errors.characteristics?.terraceM2}
+        >
+          <Field name="characteristics.terraceM2">
+            {({ field, form }: FieldProps) => {
+              return (
+                <InputGroup>
+                  <Input
+                    type="number"
+                    field={field}
+                    size="md"
+                    placeholder="Ej: 20 - 10.5"
+                    value={values.characteristics?.terraceM2}
+                    onChange={(e) => {
+                      form.setFieldValue(field.name, e.target.value)
+                    }}
+                  />
+                  <Addon size="md">m2</Addon>
+                </InputGroup>
               )
             }}
           </Field>
@@ -267,6 +385,62 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
           </FormItem>
         )}
 
+        <FormItem label="Frente a la Calle">
+          <Field name="characteristics.locatedFacingTheStreet">
+            {({ field, form }: FieldProps) => {
+              return (
+                <Switcher
+                  checked={values.characteristics?.locatedFacingTheStreet}
+                  className="my-3"
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.locatedFacingTheStreet
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
+        <FormItem label="¿Ubicado/a en Galería?">
+          <Field name="characteristics.locatedInGallery">
+            {({ field, form }: FieldProps) => {
+              return (
+                <Switcher
+                  checked={values.characteristics.locatedInGallery}
+                  className="mt-3"
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.locatedInGallery
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
+        <FormItem label="Probador">
+          <Field name="characteristics.hasFittingRoom">
+            {({ field, form }: FieldProps<any>) => {
+              return (
+                <Switcher
+                  checked={values.characteristics?.hasFittingRoom}
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.hasFittingRoom
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
         <FormItem label="Aire acondicionado">
           <Field name="characteristics.hasAirConditioning">
             {({ field, form }: FieldProps) => {
@@ -285,7 +459,9 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
             }}
           </Field>
         </FormItem>
+      </div>
 
+      <div className="w-full grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 gap-3">
         <FormItem label="Calefacción">
           <Field name="characteristics.hasHeating">
             {({ field, form }: FieldProps) => {
@@ -308,17 +484,42 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
           </Field>
         </FormItem>
 
-        <FormItem label="2Do. Nivel">
-          <Field name="characteristics.hasSecondLevel">
+        <FormItem label="Tipo" className="relative">
+          <Field name="characteristics.typeOfHeating">
+            {({ field, form }: FieldProps) => {
+              return (
+                <Select
+                  isClearable
+                  isDisabled={!values.characteristics?.hasHeating}
+                  field={field}
+                  options={filterTypeOfHeating}
+                  placeholder="Seleccionar"
+                  value={filterTypeOfHeating?.filter(
+                    (option) =>
+                      option.value === values.characteristics?.typeOfHeating
+                  )}
+                  onChange={(option) => {
+                    form.setFieldValue(field.name, option?.value)
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+      </div>
+
+      <div className="w-full grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 gap-3">
+        <FormItem label="Ascensor">
+          <Field name="characteristics.hasElevator">
             {({ field, form }: FieldProps) => {
               return (
                 <Switcher
-                  checked={values.characteristics?.hasSecondLevel}
+                  checked={values.characteristics?.hasElevator}
                   className="my-3"
                   onChange={() => {
                     form.setFieldValue(
                       field.name,
-                      !values.characteristics?.hasSecondLevel
+                      !values.characteristics?.hasElevator
                     )
                   }}
                 />
@@ -327,17 +528,17 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
           </Field>
         </FormItem>
 
-        <FormItem label="En Galería">
-          <Field name="characteristics.locatedInGallery">
+        <FormItem label="Áreas verdes">
+          <Field name="characteristics.hasGreenAreas">
             {({ field, form }: FieldProps) => {
               return (
                 <Switcher
-                  checked={values.characteristics?.locatedInGallery}
+                  checked={values.characteristics?.hasGreenAreas}
                   className="my-3"
                   onChange={() => {
                     form.setFieldValue(
                       field.name,
-                      !values.characteristics?.locatedInGallery
+                      !values.characteristics?.hasGreenAreas
                     )
                   }}
                 />
@@ -346,133 +547,16 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
           </Field>
         </FormItem>
 
-        <FormItem
-          label="Orientación"
-          invalid={
-            errors.characteristics?.orientation &&
-            touched.characteristics?.orientation
-          }
-        >
-          <Field name="characteristics.orientation">
-            {({ field, form }: FieldProps) => {
-              return (
-                <Select
-                  isClearable
-                  field={field}
-                  options={filterOrientation}
-                  placeholder="Seleccionar..."
-                  value={filterOrientation?.filter(
-                    (option) =>
-                      option.value === values.characteristics.orientation
-                  )}
-                  onChange={(option) => {
-                    form.setFieldValue(field.name, option?.value)
-                  }}
-                />
-              )
-            }}
-          </Field>
-        </FormItem>
-
-        <FormItem label="Número de pisos">
-          <Field name="characteristics.numberOfFloors">
-            {({ field, form }: FieldProps) => {
-              return (
-                <Select
-                  isClearable
-                  field={field}
-                  options={filterFloors}
-                  placeholder="Seleccionar..."
-                  value={filterFloors?.filter(
-                    (option) =>
-                      option.value === values.characteristics.numberOfFloors
-                  )}
-                  onChange={(option) => {
-                    form.setFieldValue(field.name, option?.value)
-                  }}
-                />
-              )
-            }}
-          </Field>
-        </FormItem>
-
-        <FormItem label="Baño(s)">
-          <Field name="characteristics.bathrooms">
-            {({ field, form }: FieldProps) => {
-              return (
-                <Select
-                  isClearable
-                  field={field}
-                  options={filterBathrooms}
-                  placeholder="Seleccionar..."
-                  value={filterBathrooms?.filter(
-                    (option) =>
-                      option.value === values.characteristics.bathrooms
-                  )}
-                  onChange={(option) => {
-                    form.setFieldValue(field.name, option?.value)
-                  }}
-                />
-              )
-            }}
-          </Field>
-        </FormItem>
-
-        <FormItem label="Tipo Edificio">
-          <Field name="characteristics.typeOfBuilding">
-            {({ field, form }: FieldProps) => {
-              return (
-                <Select
-                  isClearable
-                  field={field}
-                  options={filterTypeOfBuilding}
-                  placeholder="Seleccionar..."
-                  value={filterTypeOfBuilding?.filter(
-                    (option) =>
-                      option.value === values.characteristics?.typeOfBuilding
-                  )}
-                  onChange={(option) => {
-                    form.setFieldValue(field.name, option?.value)
-                  }}
-                />
-              )
-            }}
-          </Field>
-        </FormItem>
-
-        <FormItem label="Bodegas">
-          <Field name="characteristics.storageCount">
-            {({ field, form }: FieldProps) => {
-              return (
-                <Select
-                  isClearable
-                  field={field}
-                  options={filterStorageCount}
-                  placeholder="Seleccionar..."
-                  value={filterStorageCount?.filter(
-                    (option) =>
-                      option.value === values.characteristics?.storageCount
-                  )}
-                  onChange={(option) => {
-                    form.setFieldValue(field.name, option?.value)
-                  }}
-                />
-              )
-            }}
-          </Field>
-        </FormItem>
-
-        <FormItem label="A la calle">
-          <Field name="characteristics.locatedFacingTheStreet">
-            {({ field, form }: FieldProps) => {
+        <FormItem label="Rampa para silla de Ruedas">
+          <Field name="characteristics.hasWheelchairRamp">
+            {({ field, form }: FieldProps<any>) => {
               return (
                 <Switcher
-                  checked={values.characteristics?.locatedFacingTheStreet}
-                  className="my-3"
+                  checked={values.characteristics?.hasWheelchairRamp}
                   onChange={() => {
                     form.setFieldValue(
                       field.name,
-                      !values.characteristics?.locatedFacingTheStreet
+                      !values.characteristics?.hasWheelchairRamp
                     )
                   }}
                 />

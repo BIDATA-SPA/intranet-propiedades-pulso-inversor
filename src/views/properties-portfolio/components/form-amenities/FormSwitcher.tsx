@@ -36,13 +36,13 @@ import SeguridadBodegaFields from './Bodega/SeguridadFields'
 import ServiciosBodegaFields from './Bodega/ServiciosFields'
 
 // OFICINA
-import AmbientesOficinaFields from './Oficina/AmbientesFields'
-import ComodidadesYEquipamientoOficinaFields from './Oficina/ComodidadesYEquipamientoOficinaFields'
-import EspaciosComunesOficinaFields from './Oficina/EspaciosComunesOficinaFields'
-import FichaTecnicaOficinaFields from './Oficina/FichaTecnica'
+// import AmbientesOficinaFields from './Oficina/AmbientesFields'
+// import ComodidadesYEquipamientoOficinaFields from './Oficina/ComodidadesYEquipamientoOficinaFields'
+// import EspaciosComunesOficinaFields from './Oficina/EspaciosComunesOficinaFields'
+// import FichaTecnicaOficinaFields from './Oficina/FichaTecnica'
 import PrincipalOficinaFields from './Oficina/PrincipalFields'
-import SeguridadOficinaFields from './Oficina/SeguridadOficinaFields'
-import ServiciosOficinaFields from './Oficina/ServiciosOficinaFields'
+// import SeguridadOficinaFields from './Oficina/SeguridadOficinaFields'
+// import ServiciosOficinaFields from './Oficina/ServiciosOficinaFields'
 
 // ESTACIONAMIENTO
 import FichaTecnicaEstacionamientoFields from './Estacionamiento/FichaTecnicaFields'
@@ -64,12 +64,12 @@ import SeguridadIndustrialFields from './Industrial/SeguridadFields'
 import ServiciosIndustrialFields from './Industrial/ServiciosFields'
 
 // LOCAL COMERCIAL
-import AmbientesLocalComercialFields from './LocalComercial/AmbientesFields'
-import ComodidadesYEquipamientoLocalComercialFields from './LocalComercial/ComodidadesYEquipamientoOficinaFields'
-import FichaTecnicaLocalComercialFields from './LocalComercial/FichaTecnicaFields'
+// import AmbientesLocalComercialFields from './LocalComercial/AmbientesFields'
+// import ComodidadesYEquipamientoLocalComercialFields from './LocalComercial/ComodidadesYEquipamientoOficinaFields'
+// import FichaTecnicaLocalComercialFields from './LocalComercial/FichaTecnicaFields'
 import PrincipalLocalComercialFields from './LocalComercial/PrincipalFields'
-import SeguridadLocalComercialFields from './LocalComercial/SeguridadFields'
-import ServiciosLocalComercialFields from './LocalComercial/ServiciosFields'
+// import SeguridadLocalComercialFields from './LocalComercial/SeguridadFields'
+// import ServiciosLocalComercialFields from './LocalComercial/ServiciosFields'
 
 // AGRICOLA
 import ComodidadesYEquipamientoAgricolaFields from './Agricola/ComodidadesYEquipamientoFields'
@@ -418,7 +418,7 @@ const FormSwitcher = ({
             />
           </div>
 
-          <div className="my-2">
+          {/* <div className="my-2">
             <CollapsibleForm title="Ambientes">
               <AmbientesOficinaFields
                 values={values}
@@ -426,9 +426,9 @@ const FormSwitcher = ({
                 errors={errors}
               />
             </CollapsibleForm>
-          </div>
+          </div> */}
 
-          <div className="my-2">
+          {/* <div className="my-2">
             <CollapsibleForm title="Comodidades y Equipamiento">
               <ComodidadesYEquipamientoOficinaFields
                 values={values}
@@ -436,9 +436,9 @@ const FormSwitcher = ({
                 errors={errors}
               />
             </CollapsibleForm>
-          </div>
+          </div> */}
 
-          <div className="my-2">
+          {/* <div className="my-2">
             <CollapsibleForm title="Espacios Comunes">
               <EspaciosComunesOficinaFields
                 values={values}
@@ -446,9 +446,9 @@ const FormSwitcher = ({
                 errors={errors}
               />
             </CollapsibleForm>
-          </div>
+          </div> */}
 
-          <div className="my-2">
+          {/* <div className="my-2">
             <CollapsibleForm title="Ficha Técnica">
               <FichaTecnicaOficinaFields
                 values={values}
@@ -456,9 +456,9 @@ const FormSwitcher = ({
                 errors={errors}
               />
             </CollapsibleForm>
-          </div>
+          </div> */}
 
-          <div className="my-2">
+          {/* <div className="my-2">
             <CollapsibleForm title="Seguridad">
               <SeguridadOficinaFields
                 values={values}
@@ -466,9 +466,9 @@ const FormSwitcher = ({
                 errors={errors}
               />
             </CollapsibleForm>
-          </div>
+          </div> */}
 
-          <div className="my-2">
+          {/* <div className="my-2">
             <CollapsibleForm title="Servicios">
               <ServiciosOficinaFields
                 values={values}
@@ -476,7 +476,7 @@ const FormSwitcher = ({
                 errors={errors}
               />
             </CollapsibleForm>
-          </div>
+          </div> */}
         </>
       )
 
@@ -630,7 +630,7 @@ const FormSwitcher = ({
             />
           </div>
 
-          <div className="my-2">
+          {/* <div className="my-2">
             <CollapsibleForm title="Ambientes">
               <AmbientesLocalComercialFields
                 values={values}
@@ -638,9 +638,9 @@ const FormSwitcher = ({
                 errors={errors}
               />
             </CollapsibleForm>
-          </div>
+          </div> */}
 
-          <div className="my-2">
+          {/* <div className="my-2">
             <CollapsibleForm title="Comodidades y Equipamiento">
               <ComodidadesYEquipamientoLocalComercialFields
                 values={values}
@@ -648,9 +648,9 @@ const FormSwitcher = ({
                 errors={errors}
               />
             </CollapsibleForm>
-          </div>
+          </div> */}
 
-          <div className="my-2">
+          {/* <div className="my-2">
             <CollapsibleForm title="Ficha Técnica">
               <FichaTecnicaLocalComercialFields
                 values={values}
@@ -658,9 +658,9 @@ const FormSwitcher = ({
                 errors={errors}
               />
             </CollapsibleForm>
-          </div>
+          </div> */}
 
-          <div className="my-2">
+          {/* <div className="my-2">
             <CollapsibleForm title="Seguridad">
               <SeguridadLocalComercialFields
                 values={values}
@@ -668,9 +668,9 @@ const FormSwitcher = ({
                 errors={errors}
               />
             </CollapsibleForm>
-          </div>
+          </div> */}
 
-          <div className="my-2">
+          {/* <div className="my-2">
             <CollapsibleForm title="Servicios">
               <ServiciosLocalComercialFields
                 values={values}
@@ -678,7 +678,7 @@ const FormSwitcher = ({
                 errors={errors}
               />
             </CollapsibleForm>
-          </div>
+          </div> */}
         </>
       )
     case 'Agrícola':
