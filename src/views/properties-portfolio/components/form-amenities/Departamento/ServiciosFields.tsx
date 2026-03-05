@@ -12,7 +12,7 @@ interface FieldNameProps {
   values: any
 }
 
-const ServiciosFields = ({ values }: FieldNameProps) => {
+const Servicios = ({ values }: FieldNameProps) => {
   return (
     <>
       <div className="w-full grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 gap-3">
@@ -33,40 +33,7 @@ const ServiciosFields = ({ values }: FieldNameProps) => {
             }}
           </Field>
         </FormItem>
-        <FormItem label="Gas Natural">
-          <Field name="characteristics.hasNaturalGas">
-            {({ field, form }: FieldProps<any>) => {
-              return (
-                <Switcher
-                  checked={values.characteristics?.hasNaturalGas}
-                  onChange={() => {
-                    form.setFieldValue(
-                      field.name,
-                      !values.characteristics?.hasNaturalGas
-                    )
-                  }}
-                />
-              )
-            }}
-          </Field>
-        </FormItem>
-        <FormItem label="Agua Corriente">
-          <Field name="characteristics.hasRunningWater">
-            {({ field, form }: FieldProps<any>) => {
-              return (
-                <Switcher
-                  checked={values.characteristics?.hasRunningWater}
-                  onChange={() => {
-                    form.setFieldValue(
-                      field.name,
-                      !values.characteristics?.hasRunningWater
-                    )
-                  }}
-                />
-              )
-            }}
-          </Field>
-        </FormItem>
+
         <FormItem label="Línea Telefónica">
           <Field name="characteristics.hasTelephoneLine">
             {({ field, form }: FieldProps<any>) => {
@@ -84,6 +51,7 @@ const ServiciosFields = ({ values }: FieldNameProps) => {
             }}
           </Field>
         </FormItem>
+
         <FormItem label="Generador eléctrico">
           <Field name="characteristics.hasElectricGenerator">
             {({ field, form }: FieldProps<any>) => {
@@ -101,16 +69,17 @@ const ServiciosFields = ({ values }: FieldNameProps) => {
             }}
           </Field>
         </FormItem>
-        <FormItem label="Luz Electrica">
-          <Field name="characteristics.hasElectricity">
+
+        <FormItem label="Energía Solar">
+          <Field name="characteristics.hasSolarEnergy">
             {({ field, form }: FieldProps<any>) => {
               return (
                 <Switcher
-                  checked={values.characteristics?.hasElectricity}
+                  checked={values.characteristics?.hasSolarEnergy}
                   onChange={() => {
                     form.setFieldValue(
                       field.name,
-                      !values.characteristics?.hasElectricity
+                      !values.characteristics?.hasSolarEnergy
                     )
                   }}
                 />
@@ -118,16 +87,17 @@ const ServiciosFields = ({ values }: FieldNameProps) => {
             }}
           </Field>
         </FormItem>
-        <FormItem label="Cisterna">
-          <Field name="characteristics.hasCistern">
+
+        <FormItem label="Gas Natural">
+          <Field name="characteristics.hasNaturalGas">
             {({ field, form }: FieldProps<any>) => {
               return (
                 <Switcher
-                  checked={values.characteristics?.hasCistern}
+                  checked={values.characteristics?.hasNaturalGas}
                   onChange={() => {
                     form.setFieldValue(
                       field.name,
-                      !values.characteristics?.hasCistern
+                      !values.characteristics?.hasNaturalGas
                     )
                   }}
                 />
@@ -135,6 +105,25 @@ const ServiciosFields = ({ values }: FieldNameProps) => {
             }}
           </Field>
         </FormItem>
+
+        <FormItem label="Agua Corriente">
+          <Field name="characteristics.hasRunningWater">
+            {({ field, form }: FieldProps<any>) => {
+              return (
+                <Switcher
+                  checked={values.characteristics?.hasRunningWater}
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.hasRunningWater
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
         <FormItem label="Caldera">
           <Field name="characteristics.hasBoiler">
             {({ field, form }: FieldProps<any>) => {
@@ -157,4 +146,4 @@ const ServiciosFields = ({ values }: FieldNameProps) => {
   )
 }
 
-export default ServiciosFields
+export default Servicios

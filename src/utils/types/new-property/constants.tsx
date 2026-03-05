@@ -282,9 +282,11 @@ export const filterAccessToParking = [
 ]
 
 export const filterAccessToParkingCoverage = [
-  { value: 'Semi Cubierta', label: 'Semi Cubierta' },
-  { value: 'Cubierta', label: 'Cubierta' },
-  { value: 'Descubierta', label: 'Descubierta' },
+  { value: 'Techado', label: 'Techado' },
+  { value: 'Subterráneo', label: 'Subterráneo' },
+  { value: 'Semi Techado', label: 'Semi Techado' },
+  { value: 'Descubierto', label: 'Descubierto' },
+  { value: 'Plataforma', label: 'Plataforma' },
 ]
 
 export const filterDepartmentType = [

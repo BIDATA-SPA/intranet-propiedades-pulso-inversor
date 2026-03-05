@@ -23,7 +23,6 @@ const Seguridad = ({ values }: FieldNameProps) => {
               return (
                 <Switcher
                   checked={values.characteristics?.hasSecurity}
-                  className="my-3"
                   onChange={() => {
                     if (values.characteristics.hasSecurity) {
                       form.setFieldValue('characteristics.typeOfSecurity', [])
@@ -39,6 +38,7 @@ const Seguridad = ({ values }: FieldNameProps) => {
             }}
           </Field>
         </FormItem>
+
         <FormItem label="Tipo de seguridad">
           <Field name="characteristics.typeOfSecurity">
             {({ field, form }: FieldProps) => {
@@ -58,24 +58,97 @@ const Seguridad = ({ values }: FieldNameProps) => {
             }}
           </Field>
         </FormItem>
+
+        <FormItem label="Condominio Cerrado">
+          <Field name="characteristics.hasClosedCondominium">
+            {({ field, form }: FieldProps<any>) => {
+              return (
+                <Switcher
+                  checked={values.characteristics?.hasClosedCondominium}
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.hasClosedCondominium
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
+        <FormItem label="Conserjería 24hrs">
+          <Field name="characteristics.has24hConcierge">
+            {({ field, form }: FieldProps<any>) => {
+              return (
+                <Switcher
+                  checked={values.characteristics?.has24hConcierge}
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.has24hConcierge
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
+        <FormItem label="Alarma">
+          <Field name="characteristics.hasAlarm">
+            {({ field, form }: FieldProps<any>) => {
+              return (
+                <Switcher
+                  checked={values.characteristics?.hasAlarm}
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.hasAlarm
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
+        <FormItem label="Acceso Controlado">
+          <Field name="characteristics.hasControlledAccess">
+            {({ field, form }: FieldProps<any>) => {
+              return (
+                <Switcher
+                  checked={values.characteristics?.hasControlledAccess}
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.hasControlledAccess
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
+        <FormItem label="Cámara de Seguridad">
+          <Field name="characteristics.hasSurveillanceCamera">
+            {({ field, form }: FieldProps<any>) => {
+              return (
+                <Switcher
+                  checked={values.characteristics?.hasSurveillanceCamera}
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.hasSurveillanceCamera
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
       </div>
-      <FormItem label="Conserjería">
-        <Field name="characteristics.has24hConcierge">
-          {({ field, form }: FieldProps<any>) => {
-            return (
-              <Switcher
-                checked={values.characteristics?.has24hConcierge}
-                onChange={() => {
-                  form.setFieldValue(
-                    field.name,
-                    !values.characteristics?.has24hConcierge
-                  )
-                }}
-              />
-            )
-          }}
-        </Field>
-      </FormItem>
     </>
   )
 }

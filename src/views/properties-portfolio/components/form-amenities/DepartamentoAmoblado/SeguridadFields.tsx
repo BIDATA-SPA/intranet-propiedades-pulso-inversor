@@ -13,7 +13,7 @@ interface FieldNameProps {
   values: any
 }
 
-const SeguridadFields = ({ values }: FieldNameProps) => {
+const Seguridad = ({ values }: FieldNameProps) => {
   return (
     <>
       <div className="w-full grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 gap-3">
@@ -23,7 +23,6 @@ const SeguridadFields = ({ values }: FieldNameProps) => {
               return (
                 <Switcher
                   checked={values.characteristics?.hasSecurity}
-                  className="my-3"
                   onChange={() => {
                     if (values.characteristics.hasSecurity) {
                       form.setFieldValue('characteristics.typeOfSecurity', [])
@@ -39,6 +38,7 @@ const SeguridadFields = ({ values }: FieldNameProps) => {
             }}
           </Field>
         </FormItem>
+
         <FormItem label="Tipo de seguridad">
           <Field name="characteristics.typeOfSecurity">
             {({ field, form }: FieldProps) => {
@@ -76,7 +76,8 @@ const SeguridadFields = ({ values }: FieldNameProps) => {
             }}
           </Field>
         </FormItem>
-        <FormItem label="Conserjería">
+
+        <FormItem label="Conserjería 24hrs">
           <Field name="characteristics.has24hConcierge">
             {({ field, form }: FieldProps<any>) => {
               return (
@@ -93,16 +94,53 @@ const SeguridadFields = ({ values }: FieldNameProps) => {
             }}
           </Field>
         </FormItem>
-        <FormItem label="Conexión para Lavarropas">
-          <Field name="characteristics.hasWashingMachineConnection">
+
+        <FormItem label="Alarma">
+          <Field name="characteristics.hasAlarm">
             {({ field, form }: FieldProps<any>) => {
               return (
                 <Switcher
-                  checked={values.characteristics?.hasWashingMachineConnection}
+                  checked={values.characteristics?.hasAlarm}
                   onChange={() => {
                     form.setFieldValue(
                       field.name,
-                      !values.characteristics?.hasWashingMachineConnection
+                      !values.characteristics?.hasAlarm
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
+        <FormItem label="Acceso Controlado">
+          <Field name="characteristics.hasControlledAccess">
+            {({ field, form }: FieldProps<any>) => {
+              return (
+                <Switcher
+                  checked={values.characteristics?.hasControlledAccess}
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.hasControlledAccess
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
+        <FormItem label="Cámara de Seguridad">
+          <Field name="characteristics.hasSurveillanceCamera">
+            {({ field, form }: FieldProps<any>) => {
+              return (
+                <Switcher
+                  checked={values.characteristics?.hasSurveillanceCamera}
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.hasSurveillanceCamera
                     )
                   }}
                 />
@@ -115,4 +153,4 @@ const SeguridadFields = ({ values }: FieldNameProps) => {
   )
 }
 
-export default SeguridadFields
+export default Seguridad
