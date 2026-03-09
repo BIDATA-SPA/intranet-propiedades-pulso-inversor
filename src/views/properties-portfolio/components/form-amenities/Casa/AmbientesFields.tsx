@@ -329,7 +329,41 @@ const AmbientesFields = ({ values }: FieldNameProps) => {
           </Field>
         </FormItem>
 
-        {/* aca */}
+        <FormItem label="Cuenta con Termopanel">
+          <Field name="characteristics.hasThermalPanel">
+            {({ field, form }: FieldProps<any>) => {
+              return (
+                <Switcher
+                  checked={values.characteristics?.hasThermalPanel}
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.hasThermalPanel
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
+        <FormItem label="Malla de Seguridad">
+          <Field name="characteristics.hasSecurityMesh">
+            {({ field, form }: FieldProps<any>) => {
+              return (
+                <Switcher
+                  checked={values.characteristics?.hasSecurityMesh}
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.hasSecurityMesh
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
       </div>
 
       <div className="border-b mb-4">
@@ -527,6 +561,24 @@ const AmbientesFields = ({ values }: FieldNameProps) => {
                     form.setFieldValue(
                       field.name,
                       !values.characteristics?.hasWheelchairRamp
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
+        <FormItem label="Salón de Eventos">
+          <Field name="characteristics.hasEventHall">
+            {({ field, form }: FieldProps<any>) => {
+              return (
+                <Switcher
+                  checked={values.characteristics?.hasEventHall}
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.hasEventHall
                     )
                   }}
                 />

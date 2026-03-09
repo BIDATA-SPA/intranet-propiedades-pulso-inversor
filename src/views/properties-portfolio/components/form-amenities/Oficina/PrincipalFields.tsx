@@ -306,6 +306,25 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
       </div>
 
       <div className="grid grid-cols-1 gap-0 md:grid-cols-2 xl:grid-cols-3 md:gap-3">
+        <FormItem label="Hall de Acceso">
+          <Field name="characteristics.hasEntryHall">
+            {({ field, form }: FieldProps) => {
+              return (
+                <Switcher
+                  checked={values?.characteristics?.hasEntryHall}
+                  className="mt-3"
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values?.characteristics?.hasEntryHall
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
         <FormItem label="Kitchenette">
           <Field name="characteristics.hasKitchenet">
             {({ field, form }: FieldProps) => {

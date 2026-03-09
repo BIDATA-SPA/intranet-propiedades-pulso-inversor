@@ -517,6 +517,33 @@ const CreacionPropiedad = ({
         long: Number(values?.caracteristicas?.characteristics?.width),
         widthUnit: values?.caracteristicas?.characteristics?.widthUnit,
         longUnit: values?.caracteristicas?.characteristics?.longUnit,
+
+        //✅ OFICINA LOCAL COMERCIAL
+        hasEntryHall: toBool(
+          values?.caracteristicas?.characteristics?.hasEntryHall
+        ),
+        hasOffice: toBool(values?.caracteristicas?.characteristics?.hasOffice),
+        hasDisplayCase: toBool(
+          values?.caracteristicas?.characteristics?.hasDisplayCase
+        ),
+
+        //✅ CASA/DEPARTAMENTO
+        ggcc: toNum(values?.caracteristicas?.characteristics?.ggcc),
+        hasHotWater: toBool(
+          values?.caracteristicas?.characteristics?.hasHotWater
+        ),
+        hasThermalPanel: toBool(
+          values?.caracteristicas?.characteristics?.hasThermalPanel
+        ),
+        hasSecurityMesh: toBool(
+          values?.caracteristicas?.characteristics?.hasSecurityMesh
+        ),
+        hasEventHall: toBool(
+          values?.caracteristicas?.characteristics?.hasEventHall
+        ),
+        hasAutomaticGate: toBool(
+          values?.caracteristicas?.characteristics?.hasAutomaticGate
+        ),
       },
     }
 

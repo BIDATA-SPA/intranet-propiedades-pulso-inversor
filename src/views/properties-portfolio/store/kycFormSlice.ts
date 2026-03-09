@@ -210,6 +210,19 @@ export type Caracteristicas = {
     long: number
     widthUnit: string
     longUnit: string
+
+    //✅ OFICINA LOCAL COMERCIAL
+    hasEntryHall: boolean
+    hasOffice: boolean
+    hasDisplayCase: boolean
+
+    //✅ CASA/DEPARTAMENTO
+    ggcc: number
+    hasHotWater: boolean
+    hasThermalPanel: boolean
+    hasSecurityMesh: boolean
+    hasEventHall: boolean
+    hasAutomaticGate: boolean
   }
 }
 
@@ -507,6 +520,19 @@ export const initialState: KycFormState = {
         typeOfCemeteryPlot: '',
         long: 0,
         longUnit: '',
+
+        //✅ OFICINA LOCAL COMERCIAL
+        hasEntryHall: false,
+        hasOffice: false,
+        hasDisplayCase: false,
+
+        //✅ CASA/DEPARTAMENTO
+        ggcc: 0,
+        hasHotWater: false,
+        hasThermalPanel: false,
+        hasSecurityMesh: false,
+        hasEventHall: false,
+        hasAutomaticGate: false,
       },
     },
     addressInformation: {

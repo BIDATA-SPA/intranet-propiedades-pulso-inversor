@@ -148,6 +148,24 @@ const Seguridad = ({ values }: FieldNameProps) => {
             }}
           </Field>
         </FormItem>
+
+        <FormItem label="Portón Automático">
+          <Field name="characteristics.hasAutomaticGate">
+            {({ field, form }: FieldProps<any>) => {
+              return (
+                <Switcher
+                  checked={values.characteristics?.hasAutomaticGate}
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.hasAutomaticGate
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
       </div>
     </>
   )

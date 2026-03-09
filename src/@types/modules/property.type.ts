@@ -218,6 +218,19 @@ export interface Property {
     long: number
     widthUnit: string
     longUnit: string
+
+    //✅ OFICINA LOCAL COMERCIAL
+    hasEntryHall: false
+    hasOffice: false
+    hasDisplayCase: false
+
+    //✅ CASA/DEPARTAMENTO
+    ggcc: 0
+    hasHotWater: false
+    hasThermalPanel: false
+    hasSecurityMesh: false
+    hasEventHall: false
+    hasAutomaticGate: false
   }
   address: {
     lng: number

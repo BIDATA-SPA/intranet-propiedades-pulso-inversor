@@ -423,6 +423,44 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
           </Field>
         </FormItem>
 
+        <FormItem label="Cuenta con Oficina/s">
+          <Field name="characteristics.hasOffice">
+            {({ field, form }: FieldProps) => {
+              return (
+                <Switcher
+                  checked={values.characteristics.hasOffice}
+                  className="mt-3"
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.hasOffice
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
+        <FormItem label="Cuenta con Vitrina">
+          <Field name="characteristics.hasDisplayCase">
+            {({ field, form }: FieldProps) => {
+              return (
+                <Switcher
+                  checked={values.characteristics.hasDisplayCase}
+                  className="mt-3"
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.hasDisplayCase
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
         <FormItem label="Probador">
           <Field name="characteristics.hasFittingRoom">
             {({ field, form }: FieldProps<any>) => {

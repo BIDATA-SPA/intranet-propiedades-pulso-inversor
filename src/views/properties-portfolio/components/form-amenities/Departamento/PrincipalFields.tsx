@@ -297,6 +297,43 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
           </Field>
         </FormItem>
 
+        <FormItem label="$ GGCC">
+          <Field name="characteristics.ggcc">
+            {({ field, form }: FieldProps) => {
+              return (
+                <Input
+                  field={field}
+                  type="number"
+                  size="md"
+                  placeholder=""
+                  value={values.characteristics?.ggcc}
+                  onChange={(e) => {
+                    form.setFieldValue(field.name, e.target.value)
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
+        <FormItem label="Incluye Agua Caliente">
+          <Field name="characteristics.hasHotWater">
+            {({ field, form }: FieldProps<any>) => {
+              return (
+                <Switcher
+                  checked={values.characteristics?.hasHotWater}
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.hasHotWater
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
         <FormItem label="Estacionamiento">
           <Field name="characteristics.hasParking">
             {({ field, form }: FieldProps) => {
