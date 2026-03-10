@@ -215,8 +215,6 @@ export type Caracteristicas = {
     hasEntryHall: boolean
     hasOffice: boolean
     hasDisplayCase: boolean
-
-    //✅ CASA/DEPARTAMENTO
     ggcc: number
     hasHotWater: boolean
     hasThermalPanel: boolean

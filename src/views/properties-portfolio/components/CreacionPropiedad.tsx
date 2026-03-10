@@ -526,8 +526,6 @@ const CreacionPropiedad = ({
         hasDisplayCase: toBool(
           values?.caracteristicas?.characteristics?.hasDisplayCase
         ),
-
-        //✅ CASA/DEPARTAMENTO
         ggcc: toNum(values?.caracteristicas?.characteristics?.ggcc),
         hasHotWater: toBool(
           values?.caracteristicas?.characteristics?.hasHotWater

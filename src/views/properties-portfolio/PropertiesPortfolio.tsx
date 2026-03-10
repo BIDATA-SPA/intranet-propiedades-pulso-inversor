@@ -393,12 +393,9 @@ const PropertiesPortfolio = () => {
         widthUnit: property?.characteristics?.widthUnit,
         longUnit: property?.characteristics?.longUnit,
 
-        //✅ OFICINA LOCAL COMERCIAL
         hasEntryHall: Boolean(property?.characteristics?.hasEntryHall),
         hasOffice: Boolean(property?.characteristics?.hasOffice),
         hasDisplayCase: Boolean(property?.characteristics?.hasDisplayCase),
-
-        //✅ CASA/DEPARTAMENTO
         ggcc: Number(property?.characteristics?.ggcc),
         hasHotWater: Boolean(property?.characteristics?.hasHotWater),
         hasThermalPanel: Boolean(property?.characteristics?.hasThermalPanel),
