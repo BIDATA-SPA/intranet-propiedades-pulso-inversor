@@ -92,7 +92,9 @@ export const filterFloors: TSelect[] = [
   { value: '3', label: '3' },
   { value: '4', label: '4' },
   { value: '5', label: '5' },
-  { value: '+5', label: 'Más de 5' },
+  { value: '+10', label: '+10' },
+  { value: '+20', label: '+20' },
+  { value: '+30', label: '+30' },
 ]
 
 export const filterTerraces: TSelect[] = [
@@ -107,7 +109,6 @@ export const filterBathrooms: TSelect[] = [
   { value: '3', label: '3' },
   { value: '4', label: '4' },
   { value: '5', label: '5' },
-  { value: '+5', label: 'Más de 5' },
 ]
 
 export const filterBedrooms: TSelect[] = [
@@ -116,7 +117,7 @@ export const filterBedrooms: TSelect[] = [
   { value: '3', label: '3' },
   { value: '4', label: '4' },
   { value: '5', label: '5' },
-  { value: '+5', label: 'Más de 5' },
+  { value: '+5', label: '+5' },
 ]
 
 export const filterParkingSpaces: TSelect[] = [
@@ -125,7 +126,7 @@ export const filterParkingSpaces: TSelect[] = [
   { value: '3', label: '3' },
   { value: '4', label: '4' },
   { value: '5', label: '5' },
-  { value: '+5', label: 'Más de 5' },
+  { value: '+5', label: '+5' },
 ]
 
 export const filterGeography: TSelect[] = [
@@ -179,7 +180,7 @@ export const filterStorageCount: TSelect[] = [
   { value: '3', label: '3' },
   { value: '4', label: '4' },
   { value: '5', label: '5' },
-  { value: '+5', label: 'Más de 5' },
+  { value: '+5', label: '+5' },
 ]
 
 export const filterTypeOfBuilding: TSelect[] = [

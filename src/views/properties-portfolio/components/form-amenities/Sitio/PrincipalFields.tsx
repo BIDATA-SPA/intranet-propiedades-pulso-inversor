@@ -71,7 +71,7 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
             }}
           </Field>
         </FormItem>
-        {/* surface ✅ */}
+
         <FormItem
           label="Superficie de terreno"
           invalid={
@@ -100,7 +100,6 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
           </Field>
         </FormItem>
 
-        {/* constructedSurface surface ✅ */}
         <FormItem
           label="Superficie total construida"
           invalid={

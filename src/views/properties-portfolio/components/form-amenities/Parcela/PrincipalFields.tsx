@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { FormItem, Input, Select } from '@/components/ui'
+import { FormItem, Input, InputGroup, Select } from '@/components/ui'
 import Switcher from '@/components/ui/Switcher'
 
 import { RichTextEditor } from '@/components/shared'
+import Addon from '@/components/ui/InputGroup/Addon'
 import { injectReducer } from '@/store'
 import {
   filterBathrooms,
@@ -137,6 +138,63 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
                     form.setFieldValue(field.name, option?.value)
                   }}
                 />
+              )
+            }}
+          </Field>
+        </FormItem>
+
+        <FormItem
+          label="Superficie de terreno"
+          invalid={
+            errors.characteristics?.surface && touched.characteristics?.surface
+          }
+          errorMessage={errors.characteristics?.surface}
+        >
+          <Field name="characteristics.surface">
+            {({ field, form }: FieldProps) => {
+              return (
+                <InputGroup>
+                  <Input
+                    type="number"
+                    field={field}
+                    size="md"
+                    placeholder="Ej: 200 - 100.5"
+                    value={values.characteristics?.surface}
+                    onChange={(e) => {
+                      form.setFieldValue(field.name, e.target.value)
+                    }}
+                  />
+                  <Addon size="md">m2</Addon>
+                </InputGroup>
+              )
+            }}
+          </Field>
+        </FormItem>
+
+        <FormItem
+          label="Superficie total construida"
+          invalid={
+            errors.characteristics?.constructedSurface &&
+            touched.characteristics?.constructedSurface
+          }
+          errorMessage={errors.characteristics?.constructedSurface}
+        >
+          <Field name="characteristics.constructedSurface">
+            {({ field, form }: FieldProps) => {
+              return (
+                <InputGroup>
+                  <Input
+                    type="number"
+                    field={field}
+                    size="md"
+                    placeholder="Ej: 180 - 80.5"
+                    value={values.characteristics?.constructedSurface}
+                    onChange={(e) => {
+                      form.setFieldValue(field.name, e.target.value)
+                    }}
+                  />
+                  <Addon size="md">m2</Addon>
+                </InputGroup>
               )
             }}
           </Field>
