@@ -57,7 +57,6 @@ const ModernLayout = () => {
   const requiredFields = [
     { key: 'name', label: 'Nombre' },
     { key: 'lastName', label: 'Apellido' },
-    { key: 'phone', label: 'Teléfono celular' },
     { key: 'rut', label: 'RUT' },
     { key: 'webPage', label: 'Página Web' },
     { key: 'address.country.name', label: 'País' },
