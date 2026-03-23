@@ -46,7 +46,7 @@ const UserDetails = () => {
 
   useEffect(() => {
     if (data && !isFetching) {
-      const lastPlanId = data.plan.at(-1)?.plan.id
+      const lastPlanId = data?.plan?.at(-1)?.plan.id
 
       setEditingInitialValues({
         name: data?.name,
