@@ -33,6 +33,96 @@ const SeguridadFields = ({ values }: FieldNameProps) => {
             }}
           </Field>
         </FormItem>
+
+        <FormItem label="Condominio Cerrado">
+          <Field name="characteristics.hasClosedCondominium">
+            {({ field, form }: FieldProps<any>) => {
+              return (
+                <Switcher
+                  checked={values.characteristics?.hasClosedCondominium}
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.hasClosedCondominium
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
+        <FormItem label="Portón Automático">
+          <Field name="characteristics.hasAutomaticGate">
+            {({ field, form }: FieldProps<any>) => {
+              return (
+                <Switcher
+                  checked={values.characteristics?.hasAutomaticGate}
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.hasAutomaticGate
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
+        <FormItem label="Alarma">
+          <Field name="characteristics.hasAlarm">
+            {({ field, form }: FieldProps<any>) => {
+              return (
+                <Switcher
+                  checked={values.characteristics?.hasAlarm}
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.hasAlarm
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
+        <FormItem label="Cámara de Seguridad">
+          <Field name="characteristics.hasSurveillanceCamera">
+            {({ field, form }: FieldProps<any>) => {
+              return (
+                <Switcher
+                  checked={values.characteristics?.hasSurveillanceCamera}
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.hasSurveillanceCamera
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
+
+        <FormItem label="Acceso Controlado">
+          <Field name="characteristics.hasControlledAccess">
+            {({ field, form }: FieldProps<any>) => {
+              return (
+                <Switcher
+                  checked={values.characteristics?.hasControlledAccess}
+                  onChange={() => {
+                    form.setFieldValue(
+                      field.name,
+                      !values.characteristics?.hasControlledAccess
+                    )
+                  }}
+                />
+              )
+            }}
+          </Field>
+        </FormItem>
       </div>
     </>
   )

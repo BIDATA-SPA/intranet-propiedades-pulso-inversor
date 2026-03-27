@@ -267,6 +267,7 @@ export const filterOrientation: TSelect[] = [
   { value: 'NO', label: 'Norponiente (NO)' },
   { value: 'SE', label: 'Suroriente (SE)' },
   { value: 'SO', label: 'Surponiente (SO)' },
+  { value: 'NESP', label: 'Noreste-Surponiente (NESP)' },
 ]
 
 export const filterTypeOfKitchens = [

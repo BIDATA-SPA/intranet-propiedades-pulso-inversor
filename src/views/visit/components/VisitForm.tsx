@@ -1,20 +1,20 @@
 import { Field, Form, Formik, type FormikHelpers } from 'formik'
-import * as Yup from 'yup'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import * as Yup from 'yup'
 
 import Button from '@/components/ui/Button'
+import DatePicker from '@/components/ui/DatePicker'
 import FormItem from '@/components/ui/FormItem'
 import Input from '@/components/ui/Input'
-import Select from '@/components/ui/Select'
-import DatePicker from '@/components/ui/DatePicker'
-import TimeInput from '@/components/ui/TimeInput'
 import Notification from '@/components/ui/Notification'
+import Select from '@/components/ui/Select'
+import TimeInput from '@/components/ui/TimeInput'
 import toast from '@/components/ui/toast'
-
 import {
   useGetAllCustomersQuery,
   useGetAllPropertiesQuery,
+  useGetMyInfoQuery,
 } from '@/services/RtkQueryService'
 
 import jsPDF from 'jspdf'
@@ -38,7 +38,43 @@ interface VisitFormValues {
   startTime: string
   endDate: Date | null
   endTime: string
-  description: string
+  observations: string
+}
+
+type VisitPdfPayload = {
+  customerName: string
+  customerRut: string
+  customerEmail: string
+  customerPhone: string
+
+  brokerName: string
+  brokerRut?: string
+  brokerEmail?: string
+  brokerPhone?: string
+
+  customerSignatureUrl?: string
+  brokerSignatureUrl?: string
+
+  propertyId: number
+  propertyAddress: string
+  operationType: string
+  propertyType: string
+  price: string
+  currency: string
+  externalLink?: string
+
+  startDateText: string
+  endDateText: string
+  startTime: string
+  endTime: string
+
+  observations?: string
+  mainImage?: string
+}
+
+type SelectOption = {
+  value: any
+  label: string
 }
 
 const validationSchema = Yup.object({
@@ -55,7 +91,7 @@ const validationSchema = Yup.object({
   startTime: Yup.string().required('Hora de inicio es requerida'),
   endDate: Yup.date().required('Fecha de término es requerida').nullable(),
   endTime: Yup.string().required('Hora de término es requerida'),
-  description: Yup.string(),
+  observations: Yup.string(),
 })
 
 const formatDate = (date: Date | null) => {
@@ -65,11 +101,14 @@ const formatDate = (date: Date | null) => {
 
 const parseNumeric = (value: string): number | null => {
   if (!value) return null
+
   const cleaned = value
     .replace(/[^\d,.-]/g, '')
     .replace(/\./g, '')
     .replace(',', '.')
+
   const num = Number(cleaned)
+
   return Number.isNaN(num) ? null : num
 }
 
@@ -80,11 +119,13 @@ const formatPriceForPdf = (
   if (value === null || value === undefined || value === '') return ''
 
   let num: number | null
+
   if (typeof value === 'string') {
     num = parseNumeric(value)
   } else {
     num = value
   }
+
   if (num === null || Number.isNaN(num)) return String(value)
 
   if (currency === 'CLP') {
@@ -103,19 +144,23 @@ const formatPriceForPdf = (
 const formatRutInput = (raw: string): string => {
   const clean = raw.replace(/[^0-9kK]/g, '').toUpperCase()
   if (!clean) return ''
+
   const body = clean.slice(0, -1)
   const dv = clean.slice(-1)
 
   let bodyWithDots = ''
   let counter = 0
+
   for (let i = body.length - 1; i >= 0; i--) {
     bodyWithDots = body[i] + bodyWithDots
     counter++
+
     if (counter === 3 && i !== 0) {
       bodyWithDots = `.${bodyWithDots}`
       counter = 0
     }
   }
+
   return `${bodyWithDots}-${dv}`
 }
 
@@ -132,11 +177,6 @@ const getCurrencyPrefix = (code: string): string => {
   }
 }
 
-/**
- * Formatea el valor con prefijo de moneda.
- * - Mantiene solo dígitos.
- * - Aplica separador de miles según es-CL.
- */
 const formatPriceInput = (inputValue: string, currencyCode: string): string => {
   const prefix = getCurrencyPrefix(currencyCode)
   const rawValue = inputValue.replace(prefix, '').replace(/[^\d]/g, '')
@@ -144,6 +184,7 @@ const formatPriceInput = (inputValue: string, currencyCode: string): string => {
   if (rawValue === '') return ''
 
   const numberValue = parseInt(rawValue, 10)
+
   if (Number.isNaN(numberValue)) return prefix
 
   const formattedNumber = numberValue.toLocaleString('es-CL', {
@@ -157,40 +198,129 @@ const loadImageAsDataUrl = (url: string): Promise<string> =>
   new Promise((resolve, reject) => {
     const img = new Image()
     img.crossOrigin = 'anonymous'
+
     img.onload = () => {
       const canvas = document.createElement('canvas')
       canvas.width = img.width
       canvas.height = img.height
+
       const ctx = canvas.getContext('2d')
+
       if (!ctx) {
         reject(new Error('No fue posible crear el contexto del canvas'))
         return
       }
+
       ctx.drawImage(img, 0, 0)
       resolve(canvas.toDataURL('image/jpeg', 0.9))
     }
+
     img.onerror = (err) => reject(err)
     img.src = url
   })
 
-type VisitPdfPayload = {
-  customerName: string
-  customerRut: string
-  customerEmail: string
-  customerPhone: string
-  propertyId: number
-  propertyAddress: string
-  operationType: string
-  propertyType: string
-  price: string
-  currency: string
-  externalLink?: string
-  startDateText: string
-  endDateText: string
-  startTime: string
-  endTime: string
-  description: string
-  propertyImages: Array<{ path: string }>
+const normalizeCollection = <T,>(result: any): T[] => {
+  if (!result) return []
+  if (Array.isArray(result)) return result
+
+  if (
+    typeof result === 'object' &&
+    'data' in result &&
+    Array.isArray(result.data)
+  ) {
+    return result.data as T[]
+  }
+
+  return []
+}
+
+const getOrderVisitAddress = (property: any): string => {
+  if (!property?.address) return ''
+
+  const addressPublic =
+    typeof property.address.addressPublic === 'string'
+      ? property.address.addressPublic.trim()
+      : ''
+
+  const city =
+    typeof property.address.city?.name === 'string'
+      ? property.address.city.name.trim()
+      : ''
+
+  const state =
+    typeof property.address.state?.name === 'string'
+      ? property.address.state.name.trim()
+      : ''
+
+  const fallbackAddress =
+    typeof property.address.address === 'string'
+      ? property.address.address.trim()
+      : ''
+
+  return [addressPublic || fallbackAddress, city, state]
+    .filter(Boolean)
+    .join(', ')
+}
+
+const getBrokerPhone = (broker: any): string => {
+  const dialCode =
+    typeof broker?.dialCode?.dialCode === 'string'
+      ? broker.dialCode.dialCode.trim()
+      : ''
+
+  const phone = typeof broker?.phone === 'string' ? broker.phone.trim() : ''
+
+  return [dialCode, phone].filter(Boolean).join(' ').trim()
+}
+
+const drawSignatureBlock = async ({
+  doc,
+  centerX,
+  lineY,
+  title,
+  name,
+  rut,
+  signatureUrl,
+}: {
+  doc: jsPDF
+  centerX: number
+  lineY: number
+  title: string
+  name: string
+  rut?: string
+  signatureUrl?: string
+}) => {
+  const signatureWidth = 120
+  const signatureHeight = 42
+
+  if (signatureUrl) {
+    try {
+      const signatureDataUrl = await loadImageAsDataUrl(signatureUrl)
+
+      doc.addImage(
+        signatureDataUrl,
+        'JPEG',
+        centerX - signatureWidth / 2,
+        lineY - 46,
+        signatureWidth,
+        signatureHeight
+      )
+    } catch (error) {
+      console.error('No fue posible cargar la firma:', error)
+    }
+  }
+
+  doc.setLineWidth(0.5)
+  doc.setDrawColor(0)
+  doc.line(centerX - 90, lineY, centerX + 90, lineY)
+
+  doc.setFont('times', 'bold')
+  doc.setFontSize(10)
+  doc.text(name || title, centerX, lineY + 14, { align: 'center' })
+
+  doc.setFont('times', 'normal')
+  doc.setFontSize(8)
+  doc.text(`RUT: ${rut || '—'}`, centerX, lineY + 26, { align: 'center' })
 }
 
 const generateVisitPdf = async (payload: VisitPdfPayload) => {
@@ -200,17 +330,14 @@ const generateVisitPdf = async (payload: VisitPdfPayload) => {
   const marginX = 40
   let y = 40
 
-  // Cargamos el logo una sola vez
   let logoDataUrl: string | null = null
+
   try {
     logoDataUrl = await loadImageAsDataUrl('/img/logo/logo.pdf.jpeg')
   } catch (err) {
-    // seguimos sin logo
-    // eslint-disable-next-line no-console
     console.log('No se pudo cargar logo local, seguimos sin logo.', err)
   }
 
-  // === MARCA DE AGUA ===
   if (logoDataUrl) {
     const wmWidth = 500
     const wmHeight = 500
@@ -218,10 +345,12 @@ const generateVisitPdf = async (payload: VisitPdfPayload) => {
     const wmY = (pageHeight - wmHeight) / 2
 
     const anyDoc = doc as any
+
     if (anyDoc.GState) {
-      const gState = anyDoc.GState({ opacity: 0.15, fillOpacity: 0.15 })
+      const gState = anyDoc.GState({ opacity: 0.12, fillOpacity: 0.12 })
       anyDoc.setGState(gState)
       anyDoc.addImage(logoDataUrl, 'PNG', wmX, wmY, wmWidth, wmHeight)
+
       const reset = anyDoc.GState({ opacity: 1, fillOpacity: 1 })
       anyDoc.setGState(reset)
     } else {
@@ -229,18 +358,19 @@ const generateVisitPdf = async (payload: VisitPdfPayload) => {
     }
   }
 
-  // Header
   if (logoDataUrl) {
     doc.addImage(logoDataUrl, 'PNG', marginX, y, 120, 40)
   }
 
   doc.setFont('times', 'normal')
   doc.setFontSize(9)
-  doc.text('Pulso Propiedades', pageWidth - marginX, y + 5, { align: 'right' })
+  doc.text('Pulso Propiedades', pageWidth - marginX, y + 5, {
+    align: 'right',
+  })
   doc.text('Email: contacto@pulsopropiedades.cl', pageWidth - marginX, y + 18, {
     align: 'right',
   })
-  doc.text('Teléfono: +56 9 XXXX XXXX', pageWidth - marginX, y + 31, {
+  doc.text('Teléfono: +56 9 94355075', pageWidth - marginX, y + 31, {
     align: 'right',
   })
 
@@ -253,6 +383,7 @@ const generateVisitPdf = async (payload: VisitPdfPayload) => {
   doc.setFont('times', 'normal')
   doc.setFontSize(10)
   y += 18
+
   doc.text(
     `Fecha visita programada ${payload.startDateText} a las ${payload.startTime}`,
     pageWidth / 2,
@@ -266,7 +397,6 @@ const generateVisitPdf = async (payload: VisitPdfPayload) => {
   const totalInnerWidth = pageWidth - marginX * 2
   const gapBetweenBoxes = 20
   const boxWidth = (totalInnerWidth - gapBetweenBoxes) / 2
-
   const clientBoxX = marginX
   const propBoxX = marginX + boxWidth + gapBetweenBoxes
   const innerPaddingX = 10
@@ -314,11 +444,17 @@ const generateVisitPdf = async (payload: VisitPdfPayload) => {
 
   propY += lineHeight
   doc.setFont('times', 'bold')
-  doc.text('Direccion:', propTextXLabel, propY)
+  doc.text('Dirección:', propTextXLabel, propY)
   doc.setFont('times', 'normal')
-  doc.text(payload.propertyAddress || '-', propTextXValue, propY)
 
-  propY += lineHeight
+  const addressLines = doc.splitTextToSize(
+    payload.propertyAddress || '-',
+    boxWidth - 105
+  )
+
+  doc.text(addressLines, propTextXValue, propY)
+  propY += Math.max(addressLines.length * 12, lineHeight)
+
   doc.setFont('times', 'bold')
   doc.text('Operación:', propTextXLabel, propY)
   doc.setFont('times', 'normal')
@@ -334,160 +470,98 @@ const generateVisitPdf = async (payload: VisitPdfPayload) => {
   doc.setFont('times', 'bold')
   doc.text('Valor:', propTextXLabel, propY)
   doc.setFont('times', 'normal')
+
   const formattedPrice = formatPriceForPdf(payload.price, payload.currency)
   doc.text(`${formattedPrice} ${payload.currency || ''}`, propTextXValue, propY)
 
   const propBottomY = propY
-
   const boxesBottom = Math.max(clientBottomY, propBottomY)
-  const boxesHeight = boxesBottom - sectionTop + innerPaddingY + 6
+  const boxesHeight = boxesBottom - sectionTop + innerPaddingY + 8
 
   doc.setDrawColor(180)
   doc.setLineWidth(0.6)
   doc.roundedRect(clientBoxX, sectionTop, boxWidth, boxesHeight, 4, 4)
   doc.roundedRect(propBoxX, sectionTop, boxWidth, boxesHeight, 4, 4)
 
-  y = sectionTop + boxesHeight + 32
+  y = sectionTop + boxesHeight + 26
+
+  if (payload.mainImage) {
+    doc.setFont('times', 'bold')
+    doc.setFontSize(10)
+    doc.text('Imagen principal de la propiedad', marginX, y)
+    y += 14
+
+    try {
+      const imageDataUrl = await loadImageAsDataUrl(payload.mainImage)
+      const imageWidth = pageWidth - marginX * 2
+      const imageHeight = 230
+
+      doc.addImage(imageDataUrl, 'JPEG', marginX, y, imageWidth, imageHeight)
+
+      y += imageHeight + 22
+    } catch (error) {
+      console.error('Error cargando imagen principal:', error)
+    }
+  }
 
   doc.setFont('times', 'bold')
   doc.setFontSize(10)
-  doc.text('DETALLE', marginX, y)
+  doc.text('OBSERVACIONES', marginX, y)
 
   y += 16
+
   doc.setFont('times', 'normal')
   doc.setFontSize(9)
 
-  const rawDetail =
-    payload.description ||
-    'Detalle de la propiedad proporcionado por el corredor.'
+  const observationsText =
+    payload.observations?.trim() ||
+    'Sin observaciones registradas para esta orden de visita.'
 
-  const paragraphs = rawDetail
-    .split(/\n\s*\n/)
-    .map((p) => p.replace(/\s+/g, ' ').trim())
-    .filter((p) => p.length > 0)
+  const observationLines = doc.splitTextToSize(
+    observationsText,
+    pageWidth - marginX * 2
+  )
 
-  const detailWidth = pageWidth - marginX * 2
-  const detailLineHeight = 11
-
-  if (paragraphs.length === 0) {
-    const lines = doc.splitTextToSize(rawDetail, detailWidth)
-    doc.text(lines, marginX, y)
-    y += lines.length * detailLineHeight + 10
-  } else {
-    for (let i = 0; i < paragraphs.length; i++) {
-      const lines = doc.splitTextToSize(paragraphs[i], detailWidth)
-      doc.text(lines, marginX, y)
-      y += lines.length * detailLineHeight
-      if (i < paragraphs.length - 1) y += 6
-    }
-    y += 10
-  }
-
-  if (payload.propertyImages?.length) {
-    doc.setFont('times', 'bold')
-    doc.setFontSize(10)
-    doc.text('Imágenes de la propiedad', marginX, y)
-    y += 14
-
-    const maxImages = Math.min(payload.propertyImages.length, 25)
-    const gap = 6
-    const thumbsPerRow = 6
-    const usableWidth = pageWidth - marginX * 2
-    const thumbWidth = (usableWidth - gap * (thumbsPerRow - 1)) / thumbsPerRow
-    const thumbHeight = thumbWidth * 0.7
-
-    for (let i = 0; i < maxImages; i++) {
-      const imgMeta = payload.propertyImages[i]
-      if (!imgMeta?.path) continue
-
-      const row = Math.floor(i / thumbsPerRow)
-      const col = i % thumbsPerRow
-
-      const imgX = marginX + col * (thumbWidth + gap)
-      const imgY = y + row * (thumbHeight + gap)
-
-      try {
-        const dataUrl = await loadImageAsDataUrl(imgMeta.path)
-        doc.addImage(dataUrl, 'JPEG', imgX, imgY, thumbWidth, thumbHeight)
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.log('Error cargando imagen de propiedad:', imgMeta, err)
-      }
-    }
-
-    const rowsUsed = Math.ceil(maxImages / thumbsPerRow)
-    y += rowsUsed * (thumbHeight + gap) + 10
-  }
+  doc.text(observationLines, marginX, y)
+  y += observationLines.length * 11 + 28
 
   const footerText =
-    'Agradeceremos confirmar su visita con anticipación. ' +
-    'Declaro que Pulso Propiedades es la primera oficina en ofrecerme los inmuebles especificados en esta Orden de Visita. ' +
-    'Me comprometo a cancelar, para el caso de arriendo, la mitad del primer mes de arriendo más el impuesto legal, ' +
-    'y para el caso de venta, el 2% del valor final de la operación más el impuesto legal por concepto de honorarios, ' +
-    'de acuerdo a lo estipulado por la ley.'
+    'Agradeceremos confirmar su visita con anticipación. Declaro que la presente propiedad fue informada y mostrada por el corredor indicado en esta Orden de Visita. Las partes dejan constancia de la información contenida en este documento.'
 
   const footerLines = doc.splitTextToSize(footerText, pageWidth - marginX * 2)
+
   doc.setFont('times', 'normal')
   doc.setFontSize(9)
   doc.text(footerLines, marginX, y)
 
   y += footerLines.length * 11 + 34
 
-  const lineWidth = (pageWidth - marginX * 2 - 80) / 2
-  const leftLineX = marginX
-  const rightLineX = marginX + lineWidth + 80
-  const lineY = y + 20
+  const leftCenterX = pageWidth * 0.28
+  const rightCenterX = pageWidth * 0.72
+  const signatureLineY = Math.min(y + 20, pageHeight - 90)
 
-  doc.setLineWidth(0.5)
-  doc.setDrawColor(0)
-  doc.line(leftLineX, lineY, leftLineX + lineWidth, lineY)
-  doc.line(rightLineX, lineY, rightLineX + lineWidth, lineY)
-
-  doc.setFont('times', 'bold')
-  doc.setFontSize(10)
-  doc.text(
-    payload.customerName || 'Cliente',
-    leftLineX + lineWidth / 2,
-    lineY + 12,
-    {
-      align: 'center',
-    }
-  )
-  doc.text('Pulso Propiedades', rightLineX + lineWidth / 2, lineY + 12, {
-    align: 'center',
+  await drawSignatureBlock({
+    doc,
+    centerX: leftCenterX,
+    lineY: signatureLineY,
+    title: 'Cliente',
+    name: payload.customerName || 'Cliente',
+    rut: payload.customerRut,
+    signatureUrl: payload.customerSignatureUrl,
   })
 
-  doc.setFont('times', 'normal')
-  doc.setFontSize(8)
-  doc.text(
-    `RUT: ${payload.customerRut || '—'}`,
-    leftLineX + lineWidth / 2,
-    lineY + 24,
-    {
-      align: 'center',
-    }
-  )
-  doc.text('RUT: XX.XXX.XXX-X', rightLineX + lineWidth / 2, lineY + 24, {
-    align: 'center',
+  await drawSignatureBlock({
+    doc,
+    centerX: rightCenterX,
+    lineY: signatureLineY,
+    title: 'Corredor',
+    name: payload.brokerName || 'Corredor',
+    rut: payload.brokerRut,
+    signatureUrl: payload.brokerSignatureUrl,
   })
 
   doc.save(`orden-visita-${payload.propertyId}.pdf`)
 }
-
-const normalizeCollection = <T,>(result: any): T[] => {
-  if (!result) return []
-  if (Array.isArray(result)) return result
-  if (
-    typeof result === 'object' &&
-    'data' in result &&
-    Array.isArray(result.data)
-  ) {
-    return result.data as T[]
-  }
-  return []
-}
-
-type SelectOption = { value: any; label: string }
 
 const VisitForm = ({ propertyId }: VisitFormProps) => {
   const navigate = useNavigate()
@@ -505,10 +579,16 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
     search: '',
   })
 
+  const { data: myInfo } = useGetMyInfoQuery(
+    {},
+    { refetchOnMountOrArgChange: true }
+  )
+
   const customers = useMemo(
     () => normalizeCollection<any>(customersData),
     [customersData]
   )
+
   const properties = useMemo(
     () => normalizeCollection<any>(propertiesData),
     [propertiesData]
@@ -554,16 +634,6 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
     [properties, propertyId]
   )
 
-  const getPropertyAddress = (property: any): string => {
-    if (!property) return ''
-    if (property.address?.addressPublic) return property.address.addressPublic
-    if (property.address?.address) {
-      const num = property.address?.number ? ` ${property.address.number}` : ''
-      return `${property.address.address}${num}`
-    }
-    return ''
-  }
-
   const getPropertyPrice = (property: any): string => {
     if (!property) return ''
     if (property.propertyPrice != null) return String(property.propertyPrice)
@@ -581,14 +651,14 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
       customerRut: '',
       customerEmail: '',
       customerPhone: '',
-      propertyAddress: getPropertyAddress(selectedProperty),
+      propertyAddress: getOrderVisitAddress(selectedProperty),
       price: getPropertyPrice(selectedProperty),
-      currency: 'CLP',
+      currency: selectedProperty?.currencyId || 'CLP',
       startDate: new Date(),
       startTime: '09:00',
       endDate: new Date(),
       endTime: '09:00',
-      description: '',
+      observations: '',
     }),
     [propertyId, selectedProperty]
   )
@@ -613,12 +683,15 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
       const startDateText = formatDate(values.startDate)
       const endDateText = formatDate(values.endDate)
 
-      const propertyImages: Array<{ path: string }> = (
-        (rawProperty?.images || []) as any[]
-      )
+      const mainImage =
+        Array.isArray(rawProperty?.images) && rawProperty.images.length > 0
+          ? rawProperty.images.find((img: any) => Boolean(img?.path))?.path
+          : undefined
+
+      const brokerName = [myInfo?.name, myInfo?.lastName]
         .filter(Boolean)
-        .map((img: any) => ({ path: img.path }))
-        .filter((img: any) => Boolean(img.path))
+        .join(' ')
+        .trim()
 
       const visitPayload: VisitPdfPayload = {
         customerName: customer
@@ -627,20 +700,31 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
         customerRut: values.customerRut,
         customerEmail: values.customerEmail,
         customerPhone: values.customerPhone,
+
+        brokerName: brokerName || 'Corredor',
+        brokerRut: myInfo?.rut ? formatRutInput(myInfo.rut) : '',
+        brokerEmail: myInfo?.session?.email || '',
+        brokerPhone: getBrokerPhone(myInfo),
+
         propertyId: Number(values.propertyId),
         propertyAddress:
-          values.propertyAddress || getPropertyAddress(rawProperty),
+          values.propertyAddress || getOrderVisitAddress(rawProperty),
         operationType: rawProperty?.typeOfOperationId || '',
         propertyType: rawProperty?.typeOfPropertyId || '',
         price: values.price || getPropertyPrice(rawProperty),
-        currency: values.currency,
+        currency: values.currency || rawProperty?.currencyId || 'CLP',
         externalLink: rawProperty?.externalLink,
+
         startDateText,
         endDateText,
         startTime: values.startTime,
         endTime: values.endTime,
-        description: values.description || rawProperty?.observations || '',
-        propertyImages,
+
+        observations: values.observations?.trim() || '',
+        mainImage,
+
+        customerSignatureUrl: customer?.signature || '',
+        brokerSignatureUrl: myInfo?.signature || '',
       }
 
       await generateVisitPdf(visitPayload)
@@ -655,8 +739,8 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
         navigate('/mis-propiedades')
       }, 1500)
     } catch (error: any) {
-      // eslint-disable-next-line no-console
       console.error('❌ Error al generar PDF:', error)
+
       toast.push(
         <Notification title="Error" type="danger">
           {error?.message || 'Error al generar la orden de visita'}
@@ -670,10 +754,10 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
 
   return (
     <Formik
+      enableReinitialize
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
-      enableReinitialize
     >
       {({ errors, touched, values, setFieldValue }) => {
         const currentProperty =
@@ -709,9 +793,10 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
                       {currentProperty.typeOfPropertyId}
                     </p>
                     <p className="text-xs text-gray-500">
-                      {getPropertyAddress(currentProperty)}
+                      {getOrderVisitAddress(currentProperty)}
                     </p>
                   </div>
+
                   <div className="text-right">
                     <p className="text-xs text-gray-500">Precio estimado</p>
                     <p className="font-semibold">
@@ -769,7 +854,8 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
                   Datos del cliente
                 </h4>
                 <p className="text-xs text-gray-500">
-                  Selecciona al cliente y completa sus datos de contacto.
+                  Selecciona el cliente y verifica sus datos antes de generar la
+                  orden.
                 </p>
               </div>
 
@@ -791,12 +877,12 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
 
                     if (!customer) return
 
-                    if (customer.rut)
-                      setFieldValue('customerRut', formatRutInput(customer.rut))
-                    if (customer.email)
-                      setFieldValue('customerEmail', customer.email)
-                    if (customer.phone)
-                      setFieldValue('customerPhone', customer.phone)
+                    setFieldValue(
+                      'customerRut',
+                      customer.rut ? formatRutInput(customer.rut) : ''
+                    )
+                    setFieldValue('customerEmail', customer.email || '')
+                    setFieldValue('customerPhone', customer.phone || '')
                   }}
                 />
               </FormItem>
@@ -880,19 +966,20 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
 
                     setFieldValue(
                       'propertyAddress',
-                      getPropertyAddress(property)
+                      getOrderVisitAddress(property)
                     )
                     setFieldValue('price', getPropertyPrice(property))
+                    setFieldValue('currency', property?.currencyId || 'CLP')
                   }}
                 />
               </FormItem>
 
               <FormItem label="Dirección de la propiedad">
                 <Field
+                  disabled
                   name="propertyAddress"
                   component={Input}
                   placeholder="Dirección"
-                  disabled
                 />
               </FormItem>
 
@@ -908,6 +995,7 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
                           e.target.value,
                           form.values.currency
                         )
+
                         form.setFieldValue('price', formatted)
                       }}
                     />
@@ -951,8 +1039,8 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
               >
                 <DatePicker
                   value={values.startDate}
-                  onChange={(date) => setFieldValue('startDate', date)}
                   placeholder="Seleccionar fecha"
+                  onChange={(date) => setFieldValue('startDate', date)}
                 />
               </FormItem>
 
@@ -967,12 +1055,12 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
                       ? new Date(`2000-01-01T${values.startTime}`)
                       : new Date()
                   }
+                  format="24"
                   onChange={(time: Date) => {
                     const hours = String(time.getHours()).padStart(2, '0')
                     const minutes = String(time.getMinutes()).padStart(2, '0')
                     setFieldValue('startTime', `${hours}:${minutes}`)
                   }}
-                  format="24"
                 />
               </FormItem>
 
@@ -983,8 +1071,8 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
               >
                 <DatePicker
                   value={values.endDate}
-                  onChange={(date) => setFieldValue('endDate', date)}
                   placeholder="Seleccionar fecha"
+                  onChange={(date) => setFieldValue('endDate', date)}
                 />
               </FormItem>
 
@@ -999,32 +1087,32 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
                       ? new Date(`2000-01-01T${values.endTime}`)
                       : new Date()
                   }
+                  format="24"
                   onChange={(time: Date) => {
                     const hours = String(time.getHours()).padStart(2, '0')
                     const minutes = String(time.getMinutes()).padStart(2, '0')
                     setFieldValue('endTime', `${hours}:${minutes}`)
                   }}
-                  format="24"
                 />
               </FormItem>
 
               <div className="mb-1 mt-4 border-t border-dashed border-gray-200 pt-3 md:col-span-2">
                 <h4 className="text-sm font-semibold text-gray-700">
-                  Notas adicionales
+                  Observaciones para la O.V
                 </h4>
                 <p className="text-xs text-gray-500">
-                  Información que quieras que aparezca en la orden
-                  (indicaciones, puntos de referencia, etc.).
+                  Texto opcional que aparecerá en el documento PDF. No se usará
+                  la descripción comercial de la propiedad.
                 </p>
               </div>
 
-              <FormItem label="Descripción" className="md:col-span-2">
+              <FormItem label="Observaciones" className="md:col-span-2">
                 <Field
                   as="textarea"
-                  name="description"
-                  className="input min-h-[96px]"
-                  rows={4}
-                  placeholder="Descripción adicional..."
+                  name="observations"
+                  className="input min-h-[120px]"
+                  rows={5}
+                  placeholder="Pega aquí el texto opcional enviado desde Word para que aparezca en la Orden de Visita."
                 />
               </FormItem>
             </div>
@@ -1036,11 +1124,12 @@ const VisitForm = ({ propertyId }: VisitFormProps) => {
               >
                 Regresar
               </Button>
+
               <Button
                 type="submit"
                 variant="solid"
                 loading={isSubmitting}
-                className="bg-yellow-400 text-black hover:bg-yellow-500"
+                className="bg-lime-500 text-black hover:bg-lime-600"
               >
                 Crear Visita
               </Button>

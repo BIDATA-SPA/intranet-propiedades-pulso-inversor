@@ -1,9 +1,9 @@
-import { useParams, useNavigate } from 'react-router-dom'
-import Container from '@/components/shared/Container'
 import AdaptableCard from '@/components/shared/AdaptableCard'
-import VisitForm from './components/VisitForm'
+import Container from '@/components/shared/Container'
 import Button from '@/components/ui/Button'
 import { HiArrowLeft } from 'react-icons/hi'
+import { useNavigate, useParams } from 'react-router-dom'
+import VisitForm from './components/VisitForm'
 
 const VisitPage = () => {
   const { id } = useParams<{ id: string }>()
@@ -45,8 +45,8 @@ const VisitPage = () => {
         <div className="mb-6 border-b border-gray-100 pb-4">
           <h3 className="text-lg font-semibold">Datos de la visita</h3>
           <p className="text-sm text-gray-500 mt-1">
-            Revisa que la propiedad y los datos del cliente estén correctos antes
-            de generar la orden.
+            Revisa que la propiedad y los datos del cliente estén correctos
+            antes de generar la orden.
           </p>
         </div>
 

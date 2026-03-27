@@ -20,6 +20,7 @@ const dropdownItemList: DropdownList[] = []
 const _UserDropdown = ({ className }: CommonProps) => {
   const { signOut } = useAuth()
   const { data } = useGetMyInfoQuery({}, { refetchOnMountOrArgChange: true })
+  console.log('data', data)
 
   const UserAvatar = (
     <div className={classNames(className, 'flex items-center gap-2')}>
