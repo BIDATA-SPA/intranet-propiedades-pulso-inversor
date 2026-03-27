@@ -1,7 +1,5 @@
 import AdaptableCard from '@/components/shared/AdaptableCard'
 import Container from '@/components/shared/Container'
-import Button from '@/components/ui/Button'
-import { HiArrowLeft } from 'react-icons/hi'
 import { useNavigate, useParams } from 'react-router-dom'
 import VisitForm from './components/VisitForm'
 
@@ -13,16 +11,16 @@ const VisitPage = () => {
     <Container>
       {/* Barra superior: back + contexto */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-3">
-        <div className="flex items-center gap-3">
-          <Button
+        <div className="flex items-center">
+          {/* <Button
             size="sm"
             variant="plain"
             icon={<HiArrowLeft />}
             onClick={() => navigate('/mis-propiedades')}
           >
             Volver a Mis Propiedades
-          </Button>
-          <div className="hidden md:block h-6 w-px bg-gray-200" />
+          </Button> */}
+
           <div>
             <h2 className="text-xl md:text-2xl font-semibold leading-tight">
               Crear Orden de Visita

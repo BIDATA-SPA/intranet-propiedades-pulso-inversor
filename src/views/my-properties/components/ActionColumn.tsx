@@ -13,8 +13,13 @@ import { FaRegFilePdf, FaRegStar, FaStar } from 'react-icons/fa'
 import { FaHouseCircleCheck } from 'react-icons/fa6'
 import { HiOutlineEye, HiTrash } from 'react-icons/hi'
 import { MdFileUpload } from 'react-icons/md'
+import { RiFileDownloadLine } from 'react-icons/ri'
 import { useNavigate } from 'react-router'
 import UpdateStatusForm from './dialog/UpdateStatusForm'
+
+import Notification from '@/components/ui/Notification'
+import toast from '@/components/ui/toast'
+import { generatePropertySheetPdf } from '@/views/visit/features/visit-order/pdf/generatePropertySheetPdf'
 
 type TDialogState = {
   updateStatus?: boolean
@@ -85,6 +90,33 @@ const ActionColumn = ({ row, className }: { row: any; className?: string }) => {
   const handleGenerateVisit = () => {
     const propertyId = row?.id
     navigate(`/mis-propiedades/visit/${propertyId}`)
+  }
+
+  const handleCreatePropertySheet = async (property: any) => {
+    try {
+      if (!property?.id) {
+        throw new Error('No se encontró el identificador de la propiedad.')
+      }
+
+      await generatePropertySheetPdf(property, {
+        logoUrl: '/img/logo/logo.pdf.jpeg',
+        fileName: `ficha-propiedad-${property.id}.pdf`,
+      })
+
+      toast.push(
+        <Notification title="Ficha generada" type="success">
+          Se descargó la ficha de la propiedad correctamente.
+        </Notification>
+      )
+    } catch (error: any) {
+      console.error('Error al generar ficha:', error)
+
+      toast.push(
+        <Notification title="Error" type="danger">
+          {error?.message || 'No fue posible generar la ficha de la propiedad.'}
+        </Notification>
+      )
+    }
   }
 
   const handleDelete = () => {
@@ -206,6 +238,15 @@ const ActionColumn = ({ row, className }: { row: any; className?: string }) => {
             onClick={handleGenerateVisit}
           >
             <FaRegFilePdf className="text-lg lg:text-xl" />
+          </span>
+        </Tooltip>
+
+        <Tooltip title="Crear Ficha">
+          <span
+            className="cursor-pointer rounded-full bg-gray-50 p-2 hover:bg-gray-200 hover:text-green-500 dark:bg-gray-600 dark:hover:bg-gray-800"
+            onClick={() => handleCreatePropertySheet(row)}
+          >
+            <RiFileDownloadLine className="text-lg lg:text-xl" />
           </span>
         </Tooltip>
 
