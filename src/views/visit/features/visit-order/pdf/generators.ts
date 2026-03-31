@@ -226,7 +226,27 @@ const drawCorporateTop = async (ctx: PdfContext, payload: VisitPdfPayload) => {
     align: 'center',
   })
 
-  ctx.y += 15
+  const eventTitle = payload.title?.trim()
+
+  if (eventTitle) {
+    ctx.y += 16
+
+    ctx.doc.setFont('times', 'italic')
+    ctx.doc.setFontSize(10)
+
+    const titleLines = ctx.doc.splitTextToSize(
+      eventTitle,
+      ctx.pageWidth - ctx.marginX * 4
+    )
+
+    ctx.doc.text(titleLines, ctx.pageWidth / 2, ctx.y, {
+      align: 'center',
+    })
+
+    ctx.y += titleLines.length * 12 + 8
+  } else {
+    ctx.y += 15
+  }
 
   ctx.doc.setFont('times', 'bold')
   ctx.doc.setFontSize(10)
@@ -500,7 +520,7 @@ const drawSignatures = async (ctx: PdfContext, payload: VisitPdfPayload) => {
 
     ctx.doc.setFont('times', 'normal')
     ctx.doc.setFontSize(8)
-    ctx.doc.text(`RUT: ${rut || '—'}`, centerX, lineY + 26, {
+    ctx.doc.text(`RUT: ${rut || '-'}`, centerX, lineY + 26, {
       align: 'center',
     })
   }

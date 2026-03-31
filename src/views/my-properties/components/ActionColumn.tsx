@@ -15,15 +15,13 @@ import { HiOutlineEye, HiTrash } from 'react-icons/hi'
 import { MdFileUpload } from 'react-icons/md'
 import { RiFileDownloadLine } from 'react-icons/ri'
 import { useNavigate } from 'react-router'
+import CreatePropertySheetDialog from './dialog/CreatePropertySheetDialog'
 import UpdateStatusForm from './dialog/UpdateStatusForm'
-
-import Notification from '@/components/ui/Notification'
-import toast from '@/components/ui/toast'
-import { generatePropertySheetPdf } from '@/views/visit/features/visit-order/pdf/generatePropertySheetPdf'
 
 type TDialogState = {
   updateStatus?: boolean
   deleteProperty?: boolean
+  createPropertySheet?: boolean
 }
 
 const PulsoRealtorIcon = ({ row }: { row: any }) => {
@@ -53,6 +51,7 @@ const ActionColumn = ({ row, className }: { row: any; className?: string }) => {
   const [dialogState, setDialogState] = useState<TDialogState>({
     updateStatus: false,
     deleteProperty: false,
+    createPropertySheet: false,
   })
 
   const handleUpdateStatus = (item: any) => {
@@ -60,6 +59,7 @@ const ActionColumn = ({ row, className }: { row: any; className?: string }) => {
     setDialogState({
       updateStatus: true,
       deleteProperty: false,
+      createPropertySheet: false,
     })
   }
 
@@ -92,39 +92,23 @@ const ActionColumn = ({ row, className }: { row: any; className?: string }) => {
     navigate(`/mis-propiedades/visit/${propertyId}`)
   }
 
-  const handleCreatePropertySheet = async (property: any) => {
-    try {
-      if (!property?.id) {
-        throw new Error('No se encontró el identificador de la propiedad.')
-      }
-
-      await generatePropertySheetPdf(property, {
-        logoUrl: '/img/logo/logo.pdf.jpeg',
-        fileName: `ficha-propiedad-${property.id}.pdf`,
-      })
-
-      toast.push(
-        <Notification title="Ficha generada" type="success">
-          Se descargó la ficha de la propiedad correctamente.
-        </Notification>
-      )
-    } catch (error: any) {
-      toast.push(
-        <Notification title="Error" type="danger">
-          {error?.message || 'No fue posible generar la ficha de la propiedad.'}
-        </Notification>
-      )
-    }
+  const handleOpenPropertySheetDialog = (property: any) => {
+    setSelectedItem(property)
+    setDialogState({
+      updateStatus: false,
+      deleteProperty: false,
+      createPropertySheet: true,
+    })
   }
 
   const handleDelete = () => {
     setDialogState({
       updateStatus: false,
       deleteProperty: true,
+      createPropertySheet: false,
     })
   }
 
-  // ✅ Pulso ONLY delete + manejo de error 400
   const handleConfirmDelete = async () => {
     try {
       await deleteProperty(row?.id).unwrap()
@@ -138,6 +122,7 @@ const ActionColumn = ({ row, className }: { row: any; className?: string }) => {
       setDialogState({
         updateStatus: false,
         deleteProperty: false,
+        createPropertySheet: false,
       })
     } catch (error: any) {
       const apiMessage =
@@ -145,8 +130,6 @@ const ActionColumn = ({ row, className }: { row: any; className?: string }) => {
         error?.message ||
         'Ocurrió un error al eliminar la propiedad.'
 
-      // backend:
-      // { message, error: "Bad Request", statusCode: 400 }
       if (error?.status === 400 || error?.data?.statusCode === 400) {
         showNotification('warning', 'No se puede eliminar', apiMessage)
       } else {
@@ -156,6 +139,7 @@ const ActionColumn = ({ row, className }: { row: any; className?: string }) => {
       setDialogState({
         updateStatus: false,
         deleteProperty: false,
+        createPropertySheet: false,
       })
     }
   }
@@ -165,6 +149,7 @@ const ActionColumn = ({ row, className }: { row: any; className?: string }) => {
     setDialogState({
       updateStatus: false,
       deleteProperty: false,
+      createPropertySheet: false,
     })
   }
 
@@ -176,7 +161,6 @@ const ActionColumn = ({ row, className }: { row: any; className?: string }) => {
     }
   }
 
-  // Red de seguridad por si alguien usa el error del hook
   useEffect(() => {
     if (!isDeletePropertyError) return
     const apiError = deletePropertyError as any
@@ -242,7 +226,7 @@ const ActionColumn = ({ row, className }: { row: any; className?: string }) => {
         <Tooltip title="Crear Ficha">
           <span
             className="cursor-pointer rounded-full bg-gray-50 p-2 hover:bg-gray-200 hover:text-green-500 dark:bg-gray-600 dark:hover:bg-gray-800"
-            onClick={() => handleCreatePropertySheet(row)}
+            onClick={() => handleOpenPropertySheetDialog(row)}
           >
             <RiFileDownloadLine className="text-lg lg:text-xl" />
           </span>
@@ -276,7 +260,6 @@ const ActionColumn = ({ row, className }: { row: any; className?: string }) => {
         </Tooltip>
       </div>
 
-      {/* Update status dialog */}
       <Dialog
         isOpen={Boolean(dialogState.updateStatus)}
         onClose={handleCloseDialog}
@@ -286,7 +269,6 @@ const ActionColumn = ({ row, className }: { row: any; className?: string }) => {
         <UpdateStatusForm property={selectedItem} onClose={handleCloseDialog} />
       </Dialog>
 
-      {/* Delete dialog */}
       <ConfirmDialog
         isOpen={Boolean(dialogState.deleteProperty)}
         type="danger"
@@ -304,6 +286,12 @@ const ActionColumn = ({ row, className }: { row: any; className?: string }) => {
           No se puede deshacer.
         </p>
       </ConfirmDialog>
+
+      <CreatePropertySheetDialog
+        isOpen={Boolean(dialogState.createPropertySheet)}
+        property={selectedItem}
+        onClose={handleCloseDialog}
+      />
     </div>
   )
 }

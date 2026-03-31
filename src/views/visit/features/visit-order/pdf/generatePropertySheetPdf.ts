@@ -8,10 +8,11 @@ type PropertySheetFeature = {
 type GeneratePropertySheetOptions = {
   logoUrl?: string
   fileName?: string
+  descriptionOverride?: string
 }
 
 const SHEET_COLORS = {
-  pageBg: [246, 246, 246] as const,
+  pageBg: [255, 255, 255] as const,
   border: [160, 160, 160] as const,
   text: [18, 18, 18] as const,
   muted: [110, 110, 110] as const,
@@ -489,6 +490,27 @@ const getPropertyDescription = (property: any) => {
   return stripHtml(rawDescription)
 }
 
+const buildPdfProperty = (
+  property: any,
+  options?: GeneratePropertySheetOptions
+) => {
+  const override = options?.descriptionOverride?.trim()
+
+  if (!override) return property
+
+  return {
+    ...property,
+    propertyDescription: override,
+    description: override,
+    publicationDescription: override,
+    summary: override,
+    characteristics: {
+      ...(property?.characteristics ?? {}),
+      propertyDescription: override,
+    },
+  }
+}
+
 const getMainFacts = (property: any) => {
   const bedrooms = pickFirstNumber(property, [
     'characteristics.bedrooms',
@@ -866,11 +888,12 @@ export const generatePropertySheetPdf = async (
   const pageWidth = doc.internal.pageSize.getWidth()
   const contentWidth = pageWidth - PAGE_PADDING * 2
   const logoUrl = options?.logoUrl || '/img/logo/logo.pdf.jpeg'
+  const pdfProperty = buildPdfProperty(property, options)
 
   drawPageFrame(doc)
 
-  const propertyType = toTitleCase(getPropertyTypeName(property))
-  const operationName = toTitleCase(getOperationName(property))
+  const propertyType = toTitleCase(getPropertyTypeName(pdfProperty))
+  const operationName = toTitleCase(getOperationName(pdfProperty))
 
   doc.setTextColor(...SHEET_COLORS.text)
   doc.setFont('helvetica', 'bold')
@@ -881,27 +904,22 @@ export const generatePropertySheetPdf = async (
   try {
     const logoDataUrl = await loadImageAsDataUrl(logoUrl)
 
-    doc.setFillColor(...SHEET_COLORS.white)
-    doc.roundedRect(pageWidth - 165, 28, 120, 54, 16, 16, 'F')
-
     doc.addImage(
       logoDataUrl,
       normalizeImageFormat(logoDataUrl),
       pageWidth - 150,
-      36,
+      28,
       95,
       32
     )
   } catch {
-    doc.setFillColor(...SHEET_COLORS.white)
-    doc.roundedRect(pageWidth - 165, 28, 120, 54, 16, 16, 'F')
-
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(12)
-    doc.text('Pulso Propiedades', pageWidth - 105, 60, { align: 'center' })
+    doc.setTextColor(...SHEET_COLORS.text)
+    doc.text('Pulso Propiedades', pageWidth - 50, 48, { align: 'right' })
   }
 
-  const images = getPropertyImages(property)
+  const images = getPropertyImages(pdfProperty)
   const heroImage = images[0]
   const thumbOne = images[1]
   const thumbTwo = images[2]
@@ -1028,7 +1046,8 @@ export const generatePropertySheetPdf = async (
   doc.setFontSize(14)
   doc.text('Características destacadas', leftColumnX, leftColumnY + 186)
 
-  const features = getHighlightedFeatures(property)
+  const features = getHighlightedFeatures(pdfProperty)
+  const descriptionText = getPropertyDescription(pdfProperty)
   const mainFeatures = features.slice(0, FIRST_PAGE_MAIN_FEATURE_COUNT)
   const additionalFeatures = features.slice(FIRST_PAGE_MAIN_FEATURE_COUNT)
 
@@ -1054,7 +1073,7 @@ export const generatePropertySheetPdf = async (
   const rowsUsed = Math.ceil(mainFeatures.length / 2)
   const mainFeaturesBottomY = featureY + rowsUsed * featureLineHeight + 10
 
-  const descriptionText = getPropertyDescription(property)
+  //   const descriptionText = getPropertyDescription(property)
 
   const canRenderDescriptionOnFirstPage = (() => {
     if (additionalFeatures.length > 0) return false
