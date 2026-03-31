@@ -195,12 +195,15 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
                   field={field}
                   options={filterStorageCount}
                   placeholder="Seleccionar..."
-                  value={filterStorageCount?.filter(
-                    (option) =>
-                      option.value === values.characteristics?.storageCount
-                  )}
+                  value={
+                    filterStorageCount?.find(
+                      (option) =>
+                        Number(option.value) ===
+                        Number(values.characteristics?.storageCount)
+                    ) ?? null
+                  }
                   onChange={(option) => {
-                    form.setFieldValue(field.name, option?.value)
+                    form.setFieldValue(field.name, Number(option?.value ?? 0))
                   }}
                 />
               )

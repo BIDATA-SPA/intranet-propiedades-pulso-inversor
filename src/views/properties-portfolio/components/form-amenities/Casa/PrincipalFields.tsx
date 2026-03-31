@@ -306,7 +306,7 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
                   type="number"
                   size="md"
                   placeholder=""
-                  value={values.characteristics?.ggcc}
+                  value={values?.characteristics?.ggcc}
                   onChange={(e) => {
                     form.setFieldValue(field.name, e.target.value)
                   }}
@@ -341,24 +341,57 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
                 <Switcher
                   checked={values.characteristics?.hasParking}
                   onChange={() => {
-                    if (field.name) {
+                    const nextHasParking = !values.characteristics?.hasParking
+
+                    form.setFieldValue(field.name, nextHasParking)
+
+                    if (!nextHasParking) {
                       form.setFieldValue(
                         'characteristics.numberOfParkingSpaces',
                         ''
                       )
                     }
-
-                    form.setFieldValue(
-                      field.name,
-                      !values.characteristics?.hasParking
-                    )
                   }}
                 />
               )
             }}
           </Field>
         </FormItem>
+
         {values.characteristics.hasParking && (
+          <FormItem label="Estacionamiento(s)">
+            <Field name="characteristics.numberOfParkingSpaces">
+              {({ field, form }: FieldProps) => {
+                return (
+                  <Select
+                    isClearable
+                    field={field}
+                    isDisabled={!values.characteristics.hasParking}
+                    options={filterParkingSpaces}
+                    placeholder="Seleccionar..."
+                    value={
+                      filterParkingSpaces?.find(
+                        (option) =>
+                          String(option.value) ===
+                          String(
+                            values.characteristics?.numberOfParkingSpaces ?? ''
+                          )
+                      ) ?? null
+                    }
+                    onChange={(option) => {
+                      form.setFieldValue(
+                        field.name,
+                        String(option?.value ?? '')
+                      )
+                    }}
+                  />
+                )
+              }}
+            </Field>
+          </FormItem>
+        )}
+
+        {/* {values.characteristics.hasParking && (
           <FormItem label="Estacionamiento(s)">
             <Field name="characteristics.numberOfParkingSpaces">
               {({ field, form }: FieldProps) => {
@@ -382,7 +415,7 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
               }}
             </Field>
           </FormItem>
-        )}
+        )} */}
 
         <FormItem label="Tipo de Covertura/Estacionamiento">
           <Field name="characteristics.typeOfParkingCoverage">
@@ -476,12 +509,15 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
                   field={field}
                   options={filterStorageCount}
                   placeholder="Seleccionar..."
-                  value={filterStorageCount?.filter(
-                    (option) =>
-                      option.value === values.characteristics?.storageCount
-                  )}
+                  value={
+                    filterStorageCount?.find(
+                      (option) =>
+                        Number(option.value) ===
+                        Number(values.characteristics?.storageCount)
+                    ) ?? null
+                  }
                   onChange={(option) => {
-                    form.setFieldValue(field.name, option?.value)
+                    form.setFieldValue(field.name, Number(option?.value ?? 0))
                   }}
                 />
               )

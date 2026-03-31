@@ -61,6 +61,7 @@ const CreacionPropiedad = ({
   const lastValuesRef = useRef<any>(null)
 
   const buildPayload = (values: any) => {
+    console.log('values', values)
     const step1 = {
       customerId: toNum(values?.informacionPrincipal?.customerId),
       typeOfOperationId: toStr(values?.informacionPrincipal?.typeOfOperationId),
@@ -508,15 +509,18 @@ const CreacionPropiedad = ({
         hasWashingMachineConnection: toBool(
           values?.caracteristicas?.characteristics?.hasWashingMachineConnection
         ),
-        depth: Number(values?.caracteristicas?.characteristics?.depth),
-        depthUnit: values?.caracteristicas?.characteristics?.depthUnit,
-        cementeryName: values?.caracteristicas?.characteristics?.cementeryName,
-        width: Number(values?.caracteristicas?.characteristics?.width),
-        typeOfCemeteryPlot:
-          values?.caracteristicas?.characteristics?.typeOfCemeteryPlot,
-        long: Number(values?.caracteristicas?.characteristics?.width),
-        widthUnit: values?.caracteristicas?.characteristics?.widthUnit,
-        longUnit: values?.caracteristicas?.characteristics?.longUnit,
+        depth: toNum(values?.caracteristicas?.characteristics?.depth),
+        depthUnit: toStr(values?.caracteristicas?.characteristics?.depthUnit),
+        cementeryName: toStr(
+          values?.caracteristicas?.characteristics?.cementeryName
+        ),
+        width: toNum(values?.caracteristicas?.characteristics?.width),
+        typeOfCemeteryPlot: toStr(
+          values?.caracteristicas?.characteristics?.typeOfCemeteryPlot
+        ),
+        long: toNum(values?.caracteristicas?.characteristics?.long),
+        widthUnit: toStr(values?.caracteristicas?.characteristics?.widthUnit),
+        longUnit: toStr(values?.caracteristicas?.characteristics?.longUnit),
 
         //✅ OFICINA LOCAL COMERCIAL
         hasEntryHall: toBool(
@@ -542,6 +546,8 @@ const CreacionPropiedad = ({
         hasAutomaticGate: toBool(
           values?.caracteristicas?.characteristics?.hasAutomaticGate
         ),
+        numberOfParkingSpaces:
+          values?.caracteristicas?.characteristics?.numberOfParkingSpaces,
       },
     }
 
@@ -584,6 +590,8 @@ const CreacionPropiedad = ({
             if (hasPropertyId) {
               // UPDATE Pulso
               await updateProperty({ id, ...payload }).unwrap()
+
+              console.log('update', payload)
 
               openNotification(
                 'success',

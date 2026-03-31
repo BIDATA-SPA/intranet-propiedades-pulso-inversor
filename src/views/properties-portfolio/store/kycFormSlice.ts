@@ -233,6 +233,8 @@ export type Address = {
   references: string
   address: string
   addressPublic: string
+  lat: string
+  lng: string
 }
 
 export type Portal =
@@ -461,8 +463,6 @@ export const initialState: KycFormState = {
         flatbedTrailers: 0, //✅
         hasAlarm: false, //✅
         hasFireProtectionSystem: false, //✅
-
-        // OFICINA
         hasMeetingRooms: false, // ✅
         hasFreeFloor: false, //✅
         hasValetParking: false, //✅
@@ -470,27 +470,17 @@ export const initialState: KycFormState = {
         hasReceptionArea: false, //✅
         bathroomsPerFloor: 0, //✅
         officesPerFloor: 0, //✅
-
-        // ESTACIONAMIENTO
         hasSimpleParking: false,
         hasDoubleParking: false,
         hasSubway: false,
         typeOfParking: '',
         accessToParking: '',
         typeOfParkingCoverage: '',
-
-        // TERRENO
         hasReforestation: false,
-
-        // INDUSTRIAL
         hasWarehouses: false,
         hasLocationCentral: false,
-
-        // LOCAL COMERCIAL
         hasWheelchairRamp: false,
         hasFittingRoom: false,
-
-        // AGRICOLA
         hectares: 0,
         hasDrinkingFountains: false,
         hasWaterTank: false,
@@ -498,17 +488,12 @@ export const initialState: KycFormState = {
         hasMills: false,
         hasCorral: false,
         hasSilos: false,
-
         typeOfFarm: '',
         coveredHullAread: 0,
         coveredHullAreadUnit: '',
-
-        // DEPARTAMENTO AMOBLADO
         hasCowork: false,
         hasClosedCondominium: false,
         hasWashingMachineConnection: false,
-
-        // SEPULTURA
         sectionWithinTheCemetery: '',
         depth: 0,
         depthUnit: '',
@@ -518,13 +503,9 @@ export const initialState: KycFormState = {
         typeOfCemeteryPlot: '',
         long: 0,
         longUnit: '',
-
-        //✅ OFICINA LOCAL COMERCIAL
         hasEntryHall: false,
         hasOffice: false,
         hasDisplayCase: false,
-
-        //✅ CASA/DEPARTAMENTO
         ggcc: 0,
         hasHotWater: false,
         hasThermalPanel: false,
@@ -542,6 +523,8 @@ export const initialState: KycFormState = {
       references: '',
       address: '',
       addressPublic: '',
+      lat: '',
+      lng: '',
     },
     portalOfPortals: {
       portal: '',

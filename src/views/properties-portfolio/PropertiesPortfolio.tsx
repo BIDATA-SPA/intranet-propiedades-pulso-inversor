@@ -110,6 +110,8 @@ const PropertiesPortfolio = () => {
     [stepStatus, currentStep]
   )
 
+  console.log('property detail', property)
+
   // Hidratación edit mode (solo campos que siguen existiendo en el wizard)
   useEffect(() => {
     if (!isEditMode || !property || propertyId !== property?.id) return
@@ -167,20 +169,23 @@ const PropertiesPortfolio = () => {
           hasAirConditioning: Boolean(
             property?.characteristics?.hasAirConditioning
           ),
-          orientation: property?.characteristics?.orientation,
-          typeOfHeating: property?.characteristics?.typeOfHeating,
+          orientation: property?.characteristics?.orientation ?? '',
+          typeOfHeating: property?.characteristics?.typeOfHeating ?? '',
           locatedInGallery: Boolean(
             property?.characteristics?.locatedInGallery
           ),
           locatedFacingTheStreet: Boolean(
             property?.characteristics?.locatedFacingTheStreet
           ),
-          numberOfPrivate: Number(property?.characteristics?.numberOfPrivate),
-          numberOfDepartment: property?.characteristics?.numberOfDepartment,
-          apartmentsPerFloor: Number(
-            property?.characteristics?.apartmentsPerFloor
+          numberOfPrivate: Number(
+            property?.characteristics?.numberOfPrivate ?? 0
           ),
-          departmentType: property?.characteristics?.departmentType,
+          numberOfDepartment:
+            property?.characteristics?.numberOfDepartment ?? '',
+          apartmentsPerFloor: Number(
+            property?.characteristics?.apartmentsPerFloor ?? 0
+          ),
+          departmentType: property?.characteristics?.departmentType ?? '',
           hasRooftop: Boolean(property?.characteristics?.hasRooftop),
           hasBoiler: Boolean(property?.characteristics?.hasBoiler),
           hasLoggia: Boolean(property?.characteristics?.hasLoggia),
@@ -288,15 +293,14 @@ const PropertiesPortfolio = () => {
           buildingType: property?.characteristics?.buildingType ?? '',
           hasSecondLevel: Boolean(property?.characteristics?.hasSecondLevel),
 
-          //   PARCELA
-          frontageMeters: Number(property?.characteristics?.frontageMeters),
-          deepMeters: Number(property?.characteristics?.deepMeters),
+          frontageMeters: Number(
+            property?.characteristics?.frontageMeters ?? 0
+          ),
+          deepMeters: Number(property?.characteristics?.deepMeters ?? 0),
           isUrbanized: Boolean(property?.characteristics?.isUrbanized),
           hasFlatSurface: Boolean(property?.characteristics?.hasFlatSurface),
 
-          //   POR INTEGRAR
-          //   BODEGA
-          typeOfBuilding: property?.characteristics?.typeOfBuilding,
+          typeOfBuilding: property?.characteristics?.typeOfBuilding ?? '',
           hasControlledAccess: Boolean(
             property?.characteristics?.hasControlledAccess
           ),
@@ -310,100 +314,112 @@ const PropertiesPortfolio = () => {
           hasVentilationSystem: Boolean(
             property?.characteristics?.hasVentilationSystem
           ),
-          typeOfWinery: property?.characteristics?.typeOfWinery,
-          cellarHeight: Number(property?.characteristics?.cellarHeight),
-          cellarHeightUnit: property?.characteristics?.cellarHeightUnit,
+          typeOfWinery: property?.characteristics?.typeOfWinery ?? '',
+          cellarHeight: Number(property?.characteristics?.cellarHeight ?? 0),
+          cellarHeightUnit: property?.characteristics?.cellarHeightUnit ?? '',
           pricePerUnitOfArea: Number(
-            property?.characteristics?.pricePerUnitOfArea
+            property?.characteristics?.pricePerUnitOfArea ?? 0
           ),
           pricePerUnitOfAreaUnit:
-            property?.characteristics?.pricePerUnitOfAreaUnit,
-          floorStand: Number(property?.characteristics?.floorStand),
-          floorStandUnit: property?.characteristics?.floorStandUnit,
-          flatbedTrailers: Number(property?.characteristics?.flatbedTrailers),
+            property?.characteristics?.pricePerUnitOfAreaUnit ?? '',
+          floorStand: Number(property?.characteristics?.floorStand ?? 0),
+          floorStandUnit: property?.characteristics?.floorStandUnit ?? '',
+          flatbedTrailers: Number(
+            property?.characteristics?.flatbedTrailers ?? 0
+          ),
           hasAlarm: Boolean(property?.characteristics?.hasAlarm),
           hasFireProtectionSystem: Boolean(
             property?.characteristics?.hasFireProtectionSystem
           ),
+
+          hasMeetingRooms: Boolean(property?.characteristics?.hasMeetingRooms),
+          hasFreeFloor: Boolean(property?.characteristics?.hasFreeFloor),
+          hasValetParking: Boolean(property?.characteristics?.hasValetParking),
+          hasLobby: Boolean(property?.characteristics?.hasLobby),
+          hasReceptionArea: Boolean(
+            property?.characteristics?.hasReceptionArea
+          ),
+          bathroomsPerFloor: Number(
+            property?.characteristics?.bathroomsPerFloor ?? 0
+          ),
+          officesPerFloor: Number(
+            property?.characteristics?.officesPerFloor ?? 0
+          ),
+
+          hasSimpleParking: Boolean(
+            property?.characteristics?.hasSimpleParking
+          ),
+          hasDoubleParking: Boolean(
+            property?.characteristics?.hasDoubleParking
+          ),
+          hasSubway: Boolean(property?.characteristics?.hasSubway),
+          typeOfParking: property?.characteristics?.typeOfParking ?? '',
+          accessToParking: property?.characteristics?.accessToParking ?? '',
+          typeOfParkingCoverage:
+            property?.characteristics?.typeOfParkingCoverage ?? '',
+
+          hasReforestation: Boolean(
+            property?.characteristics?.hasReforestation
+          ),
+
+          hasWarehouses: Boolean(property?.characteristics?.hasWarehouses),
+          hasLocationCentral: Boolean(
+            property?.characteristics?.hasLocationCentral
+          ),
+
+          hasWheelchairRamp: Boolean(
+            property?.characteristics?.hasWheelchairRamp
+          ),
+          hasFittingRoom: Boolean(property?.characteristics?.hasFittingRoom),
+
+          hectares: Number(property?.characteristics?.hectares ?? 0),
+          hasDrinkingFountains: Boolean(
+            property?.characteristics?.hasDrinkingFountains
+          ),
+          hasWaterTank: Boolean(property?.characteristics?.hasWaterTank),
+          hasBarn: Boolean(property?.characteristics?.hasBarn),
+          hasMills: Boolean(property?.characteristics?.hasMills),
+          hasCorral: Boolean(property?.characteristics?.hasCorral),
+          hasSilos: Boolean(property?.characteristics?.hasSilos),
+          typeOfFarm: property?.characteristics?.typeOfFarm ?? '',
+          coveredHullAread: Number(
+            property?.characteristics?.coveredHullAread ?? 0
+          ),
+          coveredHullAreadUnit:
+            property?.characteristics?.coveredHullAreadUnit ?? '',
+          hasCowork: Boolean(property?.characteristics?.hasCowork),
+          hasClosedCondominium: Boolean(
+            property?.characteristics?.hasClosedCondominium
+          ),
+          hasWashingMachineConnection: Boolean(
+            property?.characteristics?.hasWashingMachineConnection
+          ),
+
+          sectionWithinTheCemetery:
+            property?.characteristics?.sectionWithinTheCemetery ?? '',
+          depth: Number(property?.characteristics?.depth ?? 0),
+          depthUnit: property?.characteristics?.depthUnit ?? '',
+          cementeryName: property?.characteristics?.cementeryName ?? '',
+          width: Number(property?.characteristics?.width ?? 0),
+          typeOfCemeteryPlot:
+            property?.characteristics?.typeOfCemeteryPlot ?? '',
+          long: Number(property?.characteristics?.long ?? 0),
+          widthUnit: property?.characteristics?.widthUnit ?? '',
+          longUnit: property?.characteristics?.longUnit ?? '',
+
+          hasEntryHall: Boolean(property?.characteristics?.hasEntryHall),
+          hasOffice: Boolean(property?.characteristics?.hasOffice),
+          hasDisplayCase: Boolean(property?.characteristics?.hasDisplayCase),
+          ggcc: Number(property?.characteristics?.ggcc ?? 0),
+          hasHotWater: Boolean(property?.characteristics?.hasHotWater),
+          hasThermalPanel: Boolean(property?.characteristics?.hasThermalPanel),
+          hasSecurityMesh: Boolean(property?.characteristics?.hasSecurityMesh),
+          hasEventHall: Boolean(property?.characteristics?.hasEventHall),
+          hasAutomaticGate: Boolean(
+            property?.characteristics?.hasAutomaticGate
+          ),
         },
-
-        // OFICINA
-        hasMeetingRooms: Boolean(property?.characteristics?.hasMeetingRooms),
-        hasFreeFloor: Boolean(property?.characteristics?.hasFreeFloor),
-        hasValetParking: Boolean(property?.characteristics?.hasValetParking),
-        hasLobby: Boolean(property?.characteristics?.hasLobby),
-        hasReceptionArea: Boolean(property?.characteristics?.hasReceptionArea),
-        bathroomsPerFloor: Number(property?.characteristics?.bathroomsPerFloor),
-        officesPerFloor: Number(property?.characteristics?.officesPerFloor),
-
-        // ESTACIONAMIENTO
-        hasSimpleParking: Boolean(property?.characteristics?.hasSimpleParking),
-        hasDoubleParking: Boolean(property?.characteristics?.hasDoubleParking),
-        hasSubway: Boolean(property?.characteristics?.hasSubway),
-        typeOfParking: property?.characteristics?.typeOfParking,
-        accessToParking: property?.characteristics?.accessToParking,
-        typeOfParkingCoverage: property?.characteristics?.typeOfParkingCoverage,
-
-        // TERRENO
-        hasReforestation: Boolean(property?.characteristics?.hasReforestation),
-
-        // INDUSTRIAL
-        hasWarehouses: Boolean(property?.characteristics?.hasWarehouses),
-        hasLocationCentral: Boolean(
-          property?.characteristics?.hasLocationCentral
-        ),
-
-        // LOCAL COMERCIAL
-        hasWheelchairRamp: Boolean(
-          property?.characteristics?.hasWheelchairRamp
-        ),
-        hasFittingRoom: Boolean(property?.characteristics?.hasFittingRoom),
-
-        // AGRICOLA
-        hectares: Number(property?.characteristics?.hectares),
-        hasDrinkingFountains: Boolean(
-          property?.characteristics?.hasDrinkingFountains
-        ),
-        hasWaterTank: Boolean(property?.characteristics?.hasWaterTank),
-        hasBarn: Boolean(property?.characteristics?.hasBarn),
-        hasMills: Boolean(property?.characteristics?.hasMills),
-        hasCorral: Boolean(property?.characteristics?.hasCorral),
-        hasSilos: Boolean(property?.characteristics?.hasSilos),
-
-        typeOfFarm: property?.characteristics?.typeOfFarm,
-        coveredHullAread: Number(property?.characteristics?.coveredHullAread),
-        coveredHullAreadUnit: property?.characteristics?.coveredHullAreadUnit,
-        hasCowork: Boolean(property?.characteristics?.hasCowork),
-        hasClosedCondominium: Boolean(
-          property?.characteristics?.hasClosedCondominium
-        ),
-        hasWashingMachineConnection: Boolean(
-          property?.characteristics?.hasWashingMachineConnection
-        ),
-
-        // SEPULTURA
-        sectionWithinTheCemetery:
-          property?.characteristics?.sectionWithinTheCemetery,
-        depth: Number(property?.characteristics?.depth),
-        depthUnit: property?.characteristics?.depthUnit,
-        cementeryName: property?.characteristics?.cementeryName,
-        width: Number(property?.characteristics?.width),
-        typeOfCemeteryPlot: property?.characteristics?.typeOfCemeteryPlot,
-        long: Number(property?.characteristics?.width),
-        widthUnit: property?.characteristics?.widthUnit,
-        longUnit: property?.characteristics?.longUnit,
-
-        hasEntryHall: Boolean(property?.characteristics?.hasEntryHall),
-        hasOffice: Boolean(property?.characteristics?.hasOffice),
-        hasDisplayCase: Boolean(property?.characteristics?.hasDisplayCase),
-        ggcc: Number(property?.characteristics?.ggcc),
-        hasHotWater: Boolean(property?.characteristics?.hasHotWater),
-        hasThermalPanel: Boolean(property?.characteristics?.hasThermalPanel),
-        hasSecurityMesh: Boolean(property?.characteristics?.hasSecurityMesh),
-        hasEventHall: Boolean(property?.characteristics?.hasEventHall),
-        hasAutomaticGate: Boolean(property?.characteristics?.hasAutomaticGate),
       },
-
       addressInformation: {
         countryId: property?.address?.country?.id ?? null,
         stateId: property?.address?.state?.id ?? null,
