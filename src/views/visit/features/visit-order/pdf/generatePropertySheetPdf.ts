@@ -41,7 +41,71 @@ const CHARACTERISTIC_LABELS: Record<string, string> = {
   terraces: 'Terraza',
   terraceM2: 'Terraza m²',
   numberOfFloors: 'Número de pisos',
+  numberOfVacantFloors: 'Número de pisos libres',
+  numberOfMeetingRooms: 'Número de salas de reunión',
+  numberOfParkingSpaces: 'Cantidad de estacionamientos',
+  numberOfPrivate: 'Número de privados',
+  numberOfDepartment: 'Número de departamento',
   typeOfKitchen: 'Tipo de cocina',
+  typeOfHeating: 'Tipo de calefacción',
+  typeOfSecurity: 'Tipo de seguridad',
+  typeOfBuilding: 'Tipo de construcción',
+  typeOfWinery: 'Tipo de bodega',
+  typeOfFarm: 'Tipo de predio agrícola',
+  typeOfParking: 'Tipo de estacionamiento',
+  typeOfParkingCoverage: 'Cobertura del esta.',
+  typeOfCemeteryPlot: 'Tipo de sepultura',
+  typeOfProperty: 'Tipo de propiedad',
+  typeOfOperation: 'Tipo de operación',
+
+  officeNumber: 'Número de oficina',
+  floorLevelLocation: 'Ubicación en el nivel',
+  surfaceUnit: 'Unidad de superficie',
+  commonExpenses: 'Gastos comunes',
+  surface: 'Superficie',
+  constructedSurface: 'Superficie construida',
+  geography: 'Geografía',
+  storageCount: 'Bodegas',
+  ceilingType: 'Tipo de cielo',
+  flooringType: 'Tipo de piso',
+  contactHours: 'Horario de contacto',
+  yearOfConstruction: 'Año de construcción',
+  landShape: 'Forma del terreno',
+  distanceToAsphalt: 'Distancia al asfalto',
+  houseType: 'Tipo de casa',
+  floorNumber: 'Piso',
+  unitNumber: 'Número de unidad',
+  apartmentType: 'Tipo de departamento',
+  departmentType: 'Tipo de departamento',
+  unitsPerFloor: 'Unidades por piso',
+  apartmentsPerFloor: 'Departamentos por piso',
+  buildingName: 'Nombre del edificio',
+  buildingType: 'Tipo de edificio',
+  frontageMeters: 'Metros de frente',
+  deepMeters: 'Metros de fondo',
+  cellarHeight: 'Altura de bodega',
+  cellarHeightUnit: 'Unidad de altura de bodega',
+  pricePerUnitOfArea: 'Precio por unidad de superficie',
+  pricePerUnitOfAreaUnit: 'Unidad del precio por superficie',
+  floorStand: 'Resistencia de piso',
+  floorStandUnit: 'Unidad de resistencia de piso',
+  flatbedTrailers: 'Cantidad de rampas planas',
+  bathroomsPerFloor: 'Baños por piso',
+  officesPerFloor: 'Oficinas por piso',
+  hectares: 'Hectáreas',
+  coveredHullAread: 'Superficie de casco cubierto',
+  coveredHullAreadUnit: 'Unidad de casco cubierto',
+  sectionWithinTheCemetery: 'Sección dentro del cementerio',
+  depth: 'Profundidad',
+  depthUnit: 'Unidad de profundidad',
+  cementeryName: 'Nombre del cementerio',
+  width: 'Ancho',
+  widthUnit: 'Unidad de ancho',
+  long: 'Largo',
+  longUnit: 'Unidad de largo',
+  ggcc: 'Gastos comunes',
+  orientation: 'Orientación',
+
   hasHeating: 'Calefacción',
   hasAirConditioning: 'Aire acondicionado',
   hasParking: 'Estacionamiento',
@@ -49,19 +113,19 @@ const CHARACTERISTIC_LABELS: Record<string, string> = {
   hasElevator: 'Ascensor',
   hasGym: 'Gimnasio',
   hasKitchen: 'Cocina',
+  hasKitchenet: 'Kitchenette',
   hasSwimmingPool: 'Piscina',
   hasSecurity: 'Seguridad',
-  typeOfSecurity: 'Tipo de seguridad',
-  locatedInCondominium: 'En condominio',
+  locatedInCondominium: 'Ubicada en condominio',
   isFurnished: 'Amoblado',
   hasBarbecueArea: 'Quincho',
-  hasHomeOffice: 'Home office',
+  hasHomeOffice: 'Espacio para home office',
   hasYard: 'Patio',
   hasDiningRoom: 'Comedor',
   hasJacuzzi: 'Jacuzzi',
   hasSuite: 'Suite',
   hasLivingRoom: 'Living',
-  hasWalkInCloset: 'Walk-in closet',
+  hasWalkInCloset: 'Walking closet',
   hasFireplace: 'Chimenea',
   hasPlayground: 'Juegos infantiles',
   hasServiceRoom: 'Pieza de servicio',
@@ -73,20 +137,15 @@ const CHARACTERISTIC_LABELS: Record<string, string> = {
   hasTelephoneLine: 'Línea telefónica',
   hasSewerConnection: 'Alcantarillado',
   hasElectricity: 'Electricidad',
-  floorNumber: 'Piso',
   hasLaundryRoom: 'Lavandería',
   petsAllowed: 'Mascotas permitidas',
   hasElectricGenerator: 'Generador eléctrico',
   hasBoiler: 'Boiler',
   hasBolier: 'Boiler',
-  orientation: 'Orientación',
-  typeOfHeating: 'Tipo de calef.',
-  apartmentsPerFloor: 'Deptos. por piso',
-  hasRooftop: 'Rooftop',
+  hasRooftop: 'Azotea transitable',
   hasLoggia: 'Loggia',
-  storageCount: 'Bodegas',
   hasClosets: 'Closets',
-  hasVisitorParking: 'Est. de visita',
+  hasVisitorParking: 'Estacionamientos de visita',
   hasGreenAreas: 'Áreas verdes',
   hasRefrigerator: 'Refrigerador',
   hasSauna: 'Sauna',
@@ -95,24 +154,52 @@ const CHARACTERISTIC_LABELS: Record<string, string> = {
   hasAlarm: 'Alarma',
   hasClosedCondominium: 'Condominio cerrado',
   hasWheelchairRamp: 'Acceso universal',
-  commonExpenses: 'Gastos comunes',
-  numberOfParkingSpaces: 'Cantidad de estacionamientos',
   hasConcierge: 'Conserjería',
   hasPartyRoom: 'Salón de eventos',
   hasMultipurposeRoom: 'Sala multiuso',
   condominiumClosed: 'Condominio cerrado',
-  hasWasherConnection: 'Conexión lavadora',
-  unitNumber: 'Número de unidad',
-  apartmentType: 'Tipo de departamento',
-  departmentType: 'Tipo de departamento',
-  buildingName: 'Nombre del edificio',
-  buildingType: 'Tipo de edificio',
+  hasWasherConnection: 'Conexión para lavadora',
+  hasWashingMachineConnection: 'Conexión para lavadora',
   hasBalcony: 'Balcón',
   hasCinemaArea: 'Sala de cine',
-  hasCowork: 'Cowork',
+  hasCowork: 'Espacio de cowork',
   hasMeetingRooms: 'Salas de reunión',
   hasLobby: 'Lobby',
   hasReceptionArea: 'Recepción',
+  hasHouse: 'Casa',
+  hasMansard: 'Mansarda',
+  hasMultiSportsCourt: 'Cancha multideportiva',
+  hasSolarEnergy: 'Energía solar',
+  hasCistern: 'Cisterna',
+  hasSecondLevel: 'Segundo nivel',
+  hasFlatSurface: 'Superficie plana',
+  hasThreephaseCurrent: 'Corriente trifásica',
+  hasVentilationSystem: 'Sistema de ventilación',
+  hasFireProtectionSystem: 'Sistema contra incendios',
+  hasFreeFloor: 'Planta libre',
+  hasValetParking: 'Valet parking',
+  hasSimpleParking: 'Estacionamiento simple',
+  hasDoubleParking: 'Estacionamiento doble',
+  hasSubway: 'Cercano al metro',
+  hasReforestation: 'Reforestación',
+  hasWarehouses: 'Bodegas',
+  hasLocationCentral: 'Ubicación central',
+  hasFittingRoom: 'Probador',
+  hasDrinkingFountains: 'Bebederos',
+  hasWaterTank: 'Estanque de agua',
+  hasBarn: 'Granero',
+  hasMills: 'Molinos',
+  hasCorral: 'Corral',
+  hasSilos: 'Silos',
+  hasEntryHall: 'Hall de acceso',
+  hasOffice: 'Oficina',
+  hasDisplayCase: 'Vitrina',
+  hasHotWater: 'Agua caliente',
+  hasThermalPanel: 'Panel térmico',
+  hasSecurityMesh: 'Malla de seguridad',
+  hasEventHall: 'Salón de eventos',
+  hasAutomaticGate: 'Portón automático',
+  isUrbanized: 'Urbanizado',
 }
 
 const FEATURE_PRIORITY = [
@@ -170,6 +257,63 @@ const FEATURE_UNIT_SUFFIX: Record<string, string> = {
   surface: 'm²',
   constructedSurface: 'm²',
   terraceM2: 'm²',
+}
+
+const FALLBACK_TOKEN_TRANSLATIONS: Record<string, string> = {
+  type: 'tipo',
+  parking: 'estacionamiento',
+  coverage: 'cobertura',
+  access: 'acceso',
+  office: 'oficina',
+  offices: 'oficinas',
+  room: 'sala',
+  rooms: 'salas',
+  meeting: 'reunión',
+  washing: 'lavadora',
+  machine: '',
+  connection: 'conexión',
+  security: 'seguridad',
+  thermal: 'térmico',
+  panel: 'panel',
+  event: 'evento',
+  hall: 'hall',
+  entry: 'acceso',
+  display: 'vitrina',
+  case: '',
+  automatic: 'automático',
+  gate: 'portón',
+  free: 'libre',
+  floor: 'piso',
+  floors: 'pisos',
+  valet: 'valet',
+  hot: 'caliente',
+  water: 'agua',
+  lobby: 'lobby',
+  reception: 'recepción',
+  party: 'eventos',
+  multipurpose: 'multiuso',
+  wheelchairs: 'universal',
+  wheelchair: 'universal',
+  ramp: 'acceso',
+  controlled: 'controlado',
+  surveillance: 'vigilancia',
+  camera: 'cámara',
+  visitor: 'visita',
+  green: 'verdes',
+  areas: 'áreas',
+  natural: 'natural',
+  gas: 'gas',
+  electric: 'eléctrico',
+  generator: 'generador',
+  boiler: 'boiler',
+  balcony: 'balcón',
+  cinema: 'cine',
+  cowork: 'cowork',
+  rooftop: 'azotea',
+  closets: 'closets',
+  refrigerator: 'refrigerador',
+  sauna: 'sauna',
+  home: 'home',
 }
 
 const getByPath = (obj: any, path: string) => {
@@ -552,25 +696,29 @@ const getMainFacts = (property: any) => {
 }
 
 const prettifyCharacteristicKey = (key: string) => {
-  const cleaned = key
+  const normalized = key
     .replace(/^has/, '')
     .replace(/^is/, '')
-    .replace(/^numberOf/, 'Número de ')
+    .replace(/^numberOf/, 'number ')
     .replace(/([a-z])([A-Z])/g, '$1 $2')
     .trim()
 
-  return cleaned
+  return normalized
     .split(' ')
     .filter(Boolean)
     .map((word, index) => {
-      const lower = word.toLowerCase()
+      const translated =
+        FALLBACK_TOKEN_TRANSLATIONS[word.toLowerCase()] ?? word.toLowerCase()
+
+      if (!translated) return ''
 
       if (index === 0) {
-        return lower.charAt(0).toUpperCase() + lower.slice(1)
+        return translated.charAt(0).toUpperCase() + translated.slice(1)
       }
 
-      return lower
+      return translated
     })
+    .filter(Boolean)
     .join(' ')
 }
 
@@ -967,18 +1115,18 @@ export const generatePropertySheetPdf = async (
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(...SHEET_COLORS.text)
   doc.setFontSize(22)
-  doc.text(getPropertyDisplayTitle(property), leftColumnX, leftColumnY + 28)
+  doc.text(getPropertyDisplayTitle(pdfProperty), leftColumnX, leftColumnY + 28)
 
   doc.setFont('helvetica', 'normal')
   doc.setTextColor(...SHEET_COLORS.muted)
   doc.setFontSize(9)
-  doc.text(getPropertyLocation(property), leftColumnX, leftColumnY + 46)
+  doc.text(getPropertyLocation(pdfProperty), leftColumnX, leftColumnY + 46)
 
   doc.setTextColor(...SHEET_COLORS.text)
   doc.setFontSize(20)
-  doc.text(getPrimaryPrice(property), leftColumnX, leftColumnY + 78)
+  doc.text(getPrimaryPrice(pdfProperty), leftColumnX, leftColumnY + 78)
 
-  const secondaryPrice = getSecondaryPrice(property)
+  const secondaryPrice = getSecondaryPrice(pdfProperty)
 
   if (secondaryPrice) {
     doc.setFontSize(9)
@@ -986,7 +1134,7 @@ export const generatePropertySheetPdf = async (
     doc.text(secondaryPrice, leftColumnX, leftColumnY + 96)
   }
 
-  const commonExpenses = getCommonExpenses(property)
+  const commonExpenses = getCommonExpenses(pdfProperty)
 
   if (commonExpenses) {
     doc.setFontSize(8.5)
@@ -994,7 +1142,7 @@ export const generatePropertySheetPdf = async (
     doc.text(commonExpenses, leftColumnX, leftColumnY + 114)
   }
 
-  const facts = getMainFacts(property)
+  const facts = getMainFacts(pdfProperty)
 
   if (facts.length > 0) {
     doc.setFont('helvetica', 'normal')
@@ -1073,8 +1221,6 @@ export const generatePropertySheetPdf = async (
   const rowsUsed = Math.ceil(mainFeatures.length / 2)
   const mainFeaturesBottomY = featureY + rowsUsed * featureLineHeight + 10
 
-  //   const descriptionText = getPropertyDescription(property)
-
   const canRenderDescriptionOnFirstPage = (() => {
     if (additionalFeatures.length > 0) return false
 
@@ -1129,7 +1275,7 @@ export const generatePropertySheetPdf = async (
   drawFooter(doc)
 
   const safeName =
-    options?.fileName || `ficha-propiedad-${property?.id ?? 'sin-id'}.pdf`
+    options?.fileName || `ficha-propiedad-${pdfProperty?.id ?? 'sin-id'}.pdf`
 
   doc.save(safeName)
 }
