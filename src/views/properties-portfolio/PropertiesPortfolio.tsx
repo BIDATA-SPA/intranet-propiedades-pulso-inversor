@@ -110,8 +110,6 @@ const PropertiesPortfolio = () => {
     [stepStatus, currentStep]
   )
 
-  console.log('property detail', property)
-
   // Hidratación edit mode (solo campos que siguen existiendo en el wizard)
   useEffect(() => {
     if (!isEditMode || !property || propertyId !== property?.id) return

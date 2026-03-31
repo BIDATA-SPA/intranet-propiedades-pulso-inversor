@@ -61,7 +61,6 @@ const CreacionPropiedad = ({
   const lastValuesRef = useRef<any>(null)
 
   const buildPayload = (values: any) => {
-    console.log('values', values)
     const step1 = {
       customerId: toNum(values?.informacionPrincipal?.customerId),
       typeOfOperationId: toStr(values?.informacionPrincipal?.typeOfOperationId),
@@ -590,8 +589,6 @@ const CreacionPropiedad = ({
             if (hasPropertyId) {
               // UPDATE Pulso
               await updateProperty({ id, ...payload }).unwrap()
-
-              console.log('update', payload)
 
               openNotification(
                 'success',

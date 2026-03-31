@@ -109,8 +109,6 @@ const ActionColumn = ({ row, className }: { row: any; className?: string }) => {
         </Notification>
       )
     } catch (error: any) {
-      console.error('Error al generar ficha:', error)
-
       toast.push(
         <Notification title="Error" type="danger">
           {error?.message || 'No fue posible generar la ficha de la propiedad.'}
