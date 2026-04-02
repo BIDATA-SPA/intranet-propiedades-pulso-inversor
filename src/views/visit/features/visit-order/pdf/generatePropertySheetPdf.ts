@@ -47,7 +47,7 @@ const CHARACTERISTIC_LABELS: Record<string, string> = {
   numberOfPrivate: 'Número de privados',
   numberOfDepartment: 'Número de departamento',
   typeOfKitchen: 'Tipo de cocina',
-  typeOfHeating: 'Tipo de calefacción',
+  typeOfHeating: 'T. de calefa.',
   typeOfSecurity: 'Tipo de seguridad',
   typeOfBuilding: 'Tipo de construcción',
   typeOfWinery: 'Tipo de bodega',
@@ -78,7 +78,7 @@ const CHARACTERISTIC_LABELS: Record<string, string> = {
   apartmentType: 'Tipo de departamento',
   departmentType: 'Tipo de departamento',
   unitsPerFloor: 'Unidades por piso',
-  apartmentsPerFloor: 'Departamentos por piso',
+  apartmentsPerFloor: 'Deps. por piso',
   buildingName: 'Nombre del edificio',
   buildingType: 'Tipo de edificio',
   frontageMeters: 'Metros de frente',
@@ -488,8 +488,8 @@ const getPropertyTypeName = (property: any) => {
 
 const getPropertyPublicAddress = (property: any) => {
   return pickFirstString(property, [
-    'address.addressPublic',
     'address.address',
+    'address.addressPublic',
     'publicAddress',
     'addressPublic',
   ])
@@ -505,34 +505,6 @@ const getPropertyState = (property: any) => {
     'state.name',
     'state',
   ])
-}
-
-const getPropertyLocation = (property: any) => {
-  return [
-    toTitleCase(getPropertyPublicAddress(property)),
-    getPropertyCity(property),
-    getPropertyState(property),
-  ]
-    .filter(Boolean)
-    .join(', ')
-}
-
-const getPropertyDisplayTitle = (property: any) => {
-  const publicAddress = getPropertyPublicAddress(property)
-
-  if (publicAddress) {
-    return toTitleCase(publicAddress)
-  }
-
-  return (
-    pickFirstString(property, [
-      'propertyTitle',
-      'title',
-      'name',
-      'publicationTitle',
-      'characteristics.propertyTitle',
-    ]) || `Propiedad #${property?.id ?? ''}`
-  )
 }
 
 const getPrimaryPrice = (property: any) => {
@@ -1043,6 +1015,64 @@ export const generatePropertySheetPdf = async (
   const propertyType = toTitleCase(getPropertyTypeName(pdfProperty))
   const operationName = toTitleCase(getOperationName(pdfProperty))
 
+  const normalizeLocationPart = (value: string) =>
+    value.replace(/\s+/g, ' ').trim()
+
+  const joinUniqueLocationParts = (parts: string[]) => {
+    const result: string[] = []
+
+    for (const rawPart of parts) {
+      const part = normalizeLocationPart(rawPart)
+
+      if (!part) continue
+
+      const lowerPart = part.toLowerCase()
+
+      const alreadyIncluded = result.some((existing) => {
+        const lowerExisting = existing.toLowerCase()
+
+        return (
+          lowerExisting === lowerPart ||
+          lowerExisting.includes(lowerPart) ||
+          lowerPart.includes(lowerExisting)
+        )
+      })
+
+      if (!alreadyIncluded) {
+        result.push(part)
+      }
+    }
+
+    return result.join(', ')
+  }
+
+  const propertyStreetAddress =
+    pickFirstString(pdfProperty, [
+      'address.address',
+      'address.street',
+      'streetAddress',
+      'publicAddress',
+      'addressPublic',
+    ]) || ''
+
+  const propertyTitleText =
+    pickFirstString(pdfProperty, [
+      'propertyTitle',
+      'characteristics.propertyTitle',
+      'publicationTitle',
+      'title',
+      'name',
+    ]) ||
+    (propertyStreetAddress
+      ? toTitleCase(propertyStreetAddress)
+      : `Propiedad #${pdfProperty?.id ?? ''}`)
+
+  const propertyLocationText = joinUniqueLocationParts([
+    toTitleCase(propertyStreetAddress),
+    getPropertyCity(pdfProperty),
+    getPropertyState(pdfProperty),
+  ])
+
   doc.setTextColor(...SHEET_COLORS.text)
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(28)
@@ -1098,58 +1128,13 @@ export const generatePropertySheetPdf = async (
 
   const leftColumnX = 52
   const leftColumnY = 388
-  const leftColumnWidth = 360
+  const leftColumnWidth = 350
+
   const rightColumnX = 430
   const thumbWidth = 130
   const thumbHeight = 116
-
-  doc.setFont('helvetica', 'normal')
-  doc.setFontSize(10)
-  doc.setTextColor(...SHEET_COLORS.muted)
-  doc.text(
-    `${propertyType} en ${operationName} | Precio de oportunidad`,
-    leftColumnX,
-    leftColumnY
-  )
-
-  doc.setFont('helvetica', 'bold')
-  doc.setTextColor(...SHEET_COLORS.text)
-  doc.setFontSize(22)
-  doc.text(getPropertyDisplayTitle(pdfProperty), leftColumnX, leftColumnY + 28)
-
-  doc.setFont('helvetica', 'normal')
-  doc.setTextColor(...SHEET_COLORS.muted)
-  doc.setFontSize(9)
-  doc.text(getPropertyLocation(pdfProperty), leftColumnX, leftColumnY + 46)
-
-  doc.setTextColor(...SHEET_COLORS.text)
-  doc.setFontSize(20)
-  doc.text(getPrimaryPrice(pdfProperty), leftColumnX, leftColumnY + 78)
-
-  const secondaryPrice = getSecondaryPrice(pdfProperty)
-
-  if (secondaryPrice) {
-    doc.setFontSize(9)
-    doc.setTextColor(...SHEET_COLORS.muted)
-    doc.text(secondaryPrice, leftColumnX, leftColumnY + 96)
-  }
-
-  const commonExpenses = getCommonExpenses(pdfProperty)
-
-  if (commonExpenses) {
-    doc.setFontSize(8.5)
-    doc.setTextColor(...SHEET_COLORS.text)
-    doc.text(commonExpenses, leftColumnX, leftColumnY + 114)
-  }
-
-  const facts = getMainFacts(pdfProperty)
-
-  if (facts.length > 0) {
-    doc.setFont('helvetica', 'normal')
-    doc.setFontSize(10)
-    doc.setTextColor(...SHEET_COLORS.text)
-    doc.text(facts.join('     ·     '), leftColumnX, leftColumnY + 144)
-  }
+  const thumbGap = 12
+  const rightColumnBottomY = leftColumnY + thumbHeight * 2 + thumbGap
 
   const drawThumb = async (
     imageUrl: string | undefined,
@@ -1178,48 +1163,218 @@ export const generatePropertySheetPdf = async (
   }
 
   await drawThumb(thumbOne, rightColumnX, leftColumnY)
-  await drawThumb(thumbTwo, rightColumnX, leftColumnY + thumbHeight + 12)
+  await drawThumb(thumbTwo, rightColumnX, leftColumnY + thumbHeight + thumbGap)
+
+  const drawWrappedText = ({
+    text,
+    x,
+    y,
+    maxWidth,
+    font = 'helvetica',
+    fontStyle = 'normal',
+    fontSize = 10,
+    color = SHEET_COLORS.text,
+    lineHeight = 12,
+  }: {
+    text: string
+    x: number
+    y: number
+    maxWidth: number
+    font?: 'helvetica' | 'times' | 'courier'
+    fontStyle?: 'normal' | 'bold' | 'italic' | 'bolditalic'
+    fontSize?: number
+    color?: readonly [number, number, number]
+    lineHeight?: number
+  }) => {
+    const safeText = text?.trim() || '-'
+
+    doc.setFont(font, fontStyle)
+    doc.setFontSize(fontSize)
+    doc.setTextColor(...color)
+
+    const lines = doc.splitTextToSize(safeText, maxWidth)
+    doc.text(lines, x, y)
+
+    return {
+      lines,
+      nextY: y + lines.length * lineHeight,
+    }
+  }
+
+  let cursorY = leftColumnY
+
+  const headline = `${propertyType} en ${operationName} | Precio de oportunidad`
+
+  const headlineBlock = drawWrappedText({
+    text: headline,
+    x: leftColumnX,
+    y: cursorY,
+    maxWidth: leftColumnWidth,
+    font: 'helvetica',
+    fontStyle: 'normal',
+    fontSize: 10,
+    color: SHEET_COLORS.muted,
+    lineHeight: 12,
+  })
+
+  cursorY = headlineBlock.nextY + 14
+
+  const titleBlock = drawWrappedText({
+    text: propertyTitleText,
+    x: leftColumnX,
+    y: cursorY,
+    maxWidth: leftColumnWidth,
+    font: 'helvetica',
+    fontStyle: 'bold',
+    fontSize: 22,
+    color: SHEET_COLORS.text,
+    lineHeight: 24,
+  })
+
+  cursorY = titleBlock.nextY + 12
+
+  const locationBlock = drawWrappedText({
+    text: propertyLocationText,
+    x: leftColumnX,
+    y: cursorY,
+    maxWidth: leftColumnWidth,
+    font: 'helvetica',
+    fontStyle: 'normal',
+    fontSize: 9,
+    color: SHEET_COLORS.muted,
+    lineHeight: 12,
+  })
+
+  cursorY = locationBlock.nextY + 16
+
+  const primaryPrice = getPrimaryPrice(pdfProperty)
+
+  const priceBlock = drawWrappedText({
+    text: primaryPrice || '-',
+    x: leftColumnX,
+    y: cursorY,
+    maxWidth: leftColumnWidth,
+    font: 'helvetica',
+    fontStyle: 'normal',
+    fontSize: 20,
+    color: SHEET_COLORS.text,
+    lineHeight: 22,
+  })
+
+  cursorY = priceBlock.nextY + 10
+
+  const secondaryPrice = getSecondaryPrice(pdfProperty)
+
+  if (secondaryPrice) {
+    const secondaryPriceBlock = drawWrappedText({
+      text: secondaryPrice,
+      x: leftColumnX,
+      y: cursorY,
+      maxWidth: leftColumnWidth,
+      font: 'helvetica',
+      fontStyle: 'normal',
+      fontSize: 9,
+      color: SHEET_COLORS.muted,
+      lineHeight: 12,
+    })
+
+    cursorY = secondaryPriceBlock.nextY + 8
+  }
+
+  const commonExpenses = getCommonExpenses(pdfProperty)
+
+  if (commonExpenses) {
+    const commonExpensesBlock = drawWrappedText({
+      text: commonExpenses,
+      x: leftColumnX,
+      y: cursorY,
+      maxWidth: leftColumnWidth,
+      font: 'helvetica',
+      fontStyle: 'normal',
+      fontSize: 8.5,
+      color: SHEET_COLORS.text,
+      lineHeight: 11,
+    })
+
+    cursorY = commonExpensesBlock.nextY + 10
+  }
+
+  const facts = getMainFacts(pdfProperty)
+
+  if (facts.length > 0) {
+    const factsBlock = drawWrappedText({
+      text: facts.join('     ·     '),
+      x: leftColumnX,
+      y: cursorY,
+      maxWidth: leftColumnWidth,
+      font: 'helvetica',
+      fontStyle: 'normal',
+      fontSize: 10,
+      color: SHEET_COLORS.text,
+      lineHeight: 12,
+    })
+
+    cursorY = factsBlock.nextY + 18
+  }
+
+  const featuresSectionY = Math.max(cursorY + 8, rightColumnBottomY + 26)
 
   doc.setDrawColor(...SHEET_COLORS.soft)
   doc.setLineWidth(0.8)
   doc.line(
     leftColumnX,
-    leftColumnY + 162,
+    featuresSectionY - 18,
     leftColumnX + leftColumnWidth,
-    leftColumnY + 162
+    featuresSectionY - 18
   )
 
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(...SHEET_COLORS.text)
   doc.setFontSize(14)
-  doc.text('Características destacadas', leftColumnX, leftColumnY + 186)
+  doc.text('Características destacadas', leftColumnX, featuresSectionY)
 
   const features = getHighlightedFeatures(pdfProperty)
   const descriptionText = getPropertyDescription(pdfProperty)
   const mainFeatures = features.slice(0, FIRST_PAGE_MAIN_FEATURE_COUNT)
   const additionalFeatures = features.slice(FIRST_PAGE_MAIN_FEATURE_COUNT)
 
-  const featureY = leftColumnY + 218
-  const featureLineHeight = 26
-  const featureColOneX = leftColumnX
-  const featureColTwoX = leftColumnX + 180
+  const featureStartY = featuresSectionY + 32
+  const featureColumnGap = 18
+  const featureColumnWidth = (leftColumnWidth - featureColumnGap) / 2
+  const featureValueOffset = 78
+  const featureValueWidth = featureColumnWidth - featureValueOffset - 8
 
-  mainFeatures.forEach((feature, index) => {
-    const x = index % 2 === 0 ? featureColOneX : featureColTwoX
-    const row = Math.floor(index / 2)
-    const y = featureY + row * featureLineHeight
+  let featureCursorY = featureStartY
 
-    doc.setFont('helvetica', 'normal')
-    doc.setTextColor(...SHEET_COLORS.muted)
-    doc.setFontSize(9)
-    doc.text(`${feature.label}:`, x, y)
+  for (let row = 0; row < Math.ceil(mainFeatures.length / 2); row++) {
+    const rowFeatures = [
+      mainFeatures[row * 2],
+      mainFeatures[row * 2 + 1],
+    ].filter(Boolean) as PropertySheetFeature[]
 
-    doc.setTextColor(...SHEET_COLORS.text)
-    doc.text(feature.value, x + 78, y)
-  })
+    let rowHeight = 18
 
-  const rowsUsed = Math.ceil(mainFeatures.length / 2)
-  const mainFeaturesBottomY = featureY + rowsUsed * featureLineHeight + 10
+    rowFeatures.forEach((feature, colIndex) => {
+      const colX =
+        leftColumnX + colIndex * (featureColumnWidth + featureColumnGap)
+
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(...SHEET_COLORS.muted)
+      doc.setFontSize(9)
+      doc.text(`${feature.label}:`, colX, featureCursorY)
+
+      doc.setTextColor(...SHEET_COLORS.text)
+
+      const valueLines = doc.splitTextToSize(feature.value, featureValueWidth)
+      doc.text(valueLines, colX + featureValueOffset, featureCursorY)
+
+      rowHeight = Math.max(rowHeight, valueLines.length * 12)
+    })
+
+    featureCursorY += rowHeight + 8
+  }
+
+  const mainFeaturesBottomY = featureCursorY + 2
 
   const canRenderDescriptionOnFirstPage = (() => {
     if (additionalFeatures.length > 0) return false
@@ -1252,6 +1407,7 @@ export const generatePropertySheetPdf = async (
 
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(10)
+
     const descriptionLines = doc.splitTextToSize(
       descriptionText,
       leftColumnWidth

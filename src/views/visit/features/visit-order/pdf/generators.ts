@@ -384,13 +384,16 @@ const drawTopInformation = (
 
   ctx.y += 12
 
-  const addressLinesProperty = ctx.doc.splitTextToSize(
-    payload.propertyAddress || '',
-    ctx.pageWidth - ctx.marginX * 2
-  )
-
   ctx.doc.setFont('times', 'bold')
   ctx.doc.setFontSize(11)
+
+  const propertyAddressMaxWidth = ctx.pageWidth - ctx.marginX * 2
+
+  const addressLinesProperty = ctx.doc.splitTextToSize(
+    payload.propertyAddress || '',
+    propertyAddressMaxWidth
+  )
+
   ctx.doc.text(addressLinesProperty, ctx.marginX, ctx.y)
   ctx.y += addressLinesProperty.length * 12
 

@@ -751,7 +751,7 @@ const AddressInfomation = ({
 
                 <FormItem
                   asterisk
-                  label="Referencia o Cercanía de ubicación de la propiedad (pública para portales)."
+                  label="Referencia o Cercanía de ubicación de la propiedad"
                   invalid={Boolean(
                     errors.addressPublic && touched.addressPublic
                   )}
@@ -779,9 +779,9 @@ const AddressInfomation = ({
                       Indique un lugar en específico: Nombre de calle, lugar
                       céntrico, centro de eventos, etc.
                     </small>
-                    <small className="italic text-sm">
+                    {/* <small className="italic text-sm">
                       Esta dirección será publicada en el portal de propiedades.
-                    </small>
+                    </small> */}
                   </div>
                 </FormItem>
 
@@ -862,7 +862,7 @@ const AddressInfomation = ({
 
                     <FormItem
                       asterisk
-                      label="Dirección"
+                      label="Dirección (pública para portales)."
                       invalid={Boolean(errors.address && touched.address)}
                       errorMessage={errors.address as any}
                     >
@@ -887,7 +887,7 @@ const AddressInfomation = ({
                           {`"${'Pin'}"`} dentro del Mapa.
                         </small>
                         <small className="italic text-sm">
-                          Esta dirección NO será publicada en el portal de
+                          Esta dirección será publicada en el portal de
                           propiedades.
                         </small>
                       </div>

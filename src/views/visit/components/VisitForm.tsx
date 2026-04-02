@@ -205,8 +205,8 @@ const getOrderVisitAddress = (property: any): string => {
   if (!property?.address) return ''
 
   const addressPublic =
-    typeof property.address.addressPublic === 'string'
-      ? property.address.addressPublic.trim()
+    typeof property.address?.address === 'string'
+      ? property.address.address.trim()
       : ''
 
   const city =
@@ -237,8 +237,8 @@ const getCustomerAddress = (customer: any): string => {
   }
 
   const addressPublic =
-    typeof customer?.address?.addressPublic === 'string'
-      ? customer.address.addressPublic.trim()
+    typeof customer?.address?.address === 'string'
+      ? customer.address.address.trim()
       : ''
 
   const street =
@@ -312,8 +312,8 @@ const getPropertyRelatedPersonAddress = (property: any): string => {
   }
 
   const addressPublic =
-    typeof person?.address?.addressPublic === 'string'
-      ? person.address.addressPublic.trim()
+    typeof person?.address?.address === 'string'
+      ? person.address.address.trim()
       : ''
 
   const street =
