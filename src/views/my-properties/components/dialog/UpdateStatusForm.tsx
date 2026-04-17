@@ -30,18 +30,16 @@ const UpdateStatusForm = ({ onClose, property }: UpdateStatusFormProps) => {
     () =>
       disabledReasons ?? [
         { value: '1', label: 'Vendida' },
-        { value: '2', label: 'Dada de baja' },
-        { value: '3', label: 'Deshabilitada' },
+        // { value: '2', label: 'Dada de baja' },
+        // { value: '3', label: 'Deshabilitada' },
         { value: '4', label: 'Activa' },
       ],
     [disabledReasons]
   )
 
-  // 🔹 Filtrar opciones según el rol del usuario (mantengo tu regla)
-  const selectOptions =
-    userAuthority === 3
-      ? allOptions.filter((opt) => ['2', '4'].includes(String(opt.value)))
-      : allOptions
+  const selectOptions = allOptions.filter((opt) =>
+    ['2', '4'].includes(String(opt.value))
+  )
 
   const openNotification = (
     type: 'success' | 'warning' | 'danger' | 'info',
