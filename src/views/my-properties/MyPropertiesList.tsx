@@ -4,10 +4,11 @@ import Tabs from '@/components/ui/Tabs'
 import { useGetAllPropertiesQuery } from '@/services/RtkQueryService'
 import { injectReducer, RootState } from '@/store'
 import {
+  clearPropertiesData,
   setLoading,
   setPropertiesData,
 } from '@/views/my-properties/store/propertyListSlice'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { HiOutlineBuildingOffice2 } from 'react-icons/hi2'
 import { useDispatch, useSelector } from 'react-redux'
 import PortalOfPortals from '../portal-of-portals'
@@ -24,7 +25,6 @@ injectReducer('propertiesList', reducer)
 const MyPropertiesList = () => {
   const dispatch = useDispatch()
 
-  // Properties view mode from store
   const viewMode = useSelector(
     (state: RootState) => state.propertiesList.data.viewMode
   )
@@ -33,35 +33,52 @@ const MyPropertiesList = () => {
     (state: RootState) => state.propertiesList.data.loading
   )
 
-  // Metadata from properties store
   const { page, limit, filters } = useSelector(
     (state: RootState) => state.propertiesList.data
   )
 
-  const { data, isLoading } = useGetAllPropertiesQuery({
-    page,
-    limit,
-    ...filters,
-  })
+  const queryParams = useMemo(
+    () => ({
+      page,
+      limit,
+      ...filters,
+    }),
+    [page, limit, filters]
+  )
+
+  const { data, isLoading, isFetching, isSuccess, refetch } =
+    useGetAllPropertiesQuery(queryParams, {
+      refetchOnMountOrArgChange: true,
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
+    })
 
   useEffect(() => {
-    dispatch(setLoading(isLoading))
+    dispatch(clearPropertiesData())
+    refetch()
+  }, [dispatch, refetch])
 
-    if (data?.data) {
-      dispatch(
-        setPropertiesData({
-          properties: data?.data,
-          page: data?.meta?.page,
-          limit: data?.meta?.limit,
-          totalItems: data?.meta?.totalItems,
-          totalPages: data?.meta?.totalPages,
-          previousPageUrl: data?.meta?.previousPageUrl,
-          nextPageUrl: data?.meta?.nextPageUrl,
-        })
-      )
-      dispatch(setLoading(isLoading))
-    }
-  }, [data, dispatch])
+  useEffect(() => {
+    dispatch(setLoading(isLoading || isFetching))
+  }, [dispatch, isLoading, isFetching])
+
+  useEffect(() => {
+    if (!isSuccess || !data?.data) return
+
+    dispatch(
+      setPropertiesData({
+        properties: data.data,
+        page: data.meta?.page ?? page,
+        limit: data.meta?.limit ?? limit,
+        totalItems: data.meta?.totalItems ?? 0,
+        totalPages: data.meta?.totalPages ?? 0,
+        previousPageUrl: data.meta?.previousPageUrl ?? null,
+        nextPageUrl: data.meta?.nextPageUrl ?? null,
+      })
+    )
+  }, [data, isSuccess, dispatch, page, limit])
+
+  const shouldShowContent = !isPropertiesLoading && !isFetching
 
   return (
     <AdaptableCard>
@@ -70,6 +87,7 @@ const MyPropertiesList = () => {
           <TabNav value="tab1" icon={<HiOutlineBuildingOffice2 />}>
             Mis Propiedades
           </TabNav>
+
           {/* ℹ️ disable-pdp */}
           {/* <TabNav value="tab2" icon={<FaHouseSignal />}>
             Portal de Portales
@@ -89,9 +107,13 @@ const MyPropertiesList = () => {
               </div>
 
               <div>
-                {isPropertiesLoading && <Skeleton />}
-                {viewMode === 'list' && <PropertiesTable />}
-                {viewMode === 'grid' && <PropertiesGrid />}
+                {!shouldShowContent && <Skeleton />}
+
+                {shouldShowContent && viewMode === 'list' && (
+                  <PropertiesTable />
+                )}
+
+                {shouldShowContent && viewMode === 'grid' && <PropertiesGrid />}
               </div>
             </>
           </TabContent>

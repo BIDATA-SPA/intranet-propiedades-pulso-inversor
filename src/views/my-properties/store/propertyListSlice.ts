@@ -30,6 +30,17 @@ export interface PropertiesListState {
   }
 }
 
+type SetPropertiesDataPayload = Pick<
+  PropertiesListState,
+  | 'properties'
+  | 'page'
+  | 'limit'
+  | 'totalItems'
+  | 'totalPages'
+  | 'previousPageUrl'
+  | 'nextPageUrl'
+>
+
 const initialState: PropertiesListState = {
   properties: [],
   page: 1,
@@ -61,7 +72,10 @@ const propertiesListSlice = createSlice({
   name: `${SLICE_NAME}/state`,
   initialState,
   reducers: {
-    setPropertiesData: (state, action: PayloadAction<PropertiesListState>) => {
+    setPropertiesData: (
+      state,
+      action: PayloadAction<SetPropertiesDataPayload>
+    ) => {
       const {
         properties,
         page,
@@ -81,18 +95,34 @@ const propertiesListSlice = createSlice({
       state.nextPageUrl = nextPageUrl
       state.loading = false
     },
+
+    clearPropertiesData: (state) => {
+      state.properties = []
+      state.totalItems = 0
+      state.totalPages = 0
+      state.previousPageUrl = null
+      state.nextPageUrl = null
+      state.loading = true
+    },
+
+    resetPropertiesListState: () => initialState,
+
     setPageIndex: (state, action: PayloadAction<number>) => {
       state.page = action.payload
     },
+
     setPageSize: (state, action: PayloadAction<number>) => {
       state.limit = action.payload
     },
+
     toggleViewMode: (state) => {
       state.viewMode = state.viewMode === 'list' ? 'grid' : 'list'
     },
+
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload
     },
+
     setFilters: (
       state,
       action: PayloadAction<{ [key: string]: string | number | boolean }>
@@ -104,6 +134,8 @@ const propertiesListSlice = createSlice({
 
 export const {
   setPropertiesData,
+  clearPropertiesData,
+  resetPropertiesListState,
   setPageIndex,
   setPageSize,
   toggleViewMode,
