@@ -15,6 +15,36 @@ interface MetaCardProps {
   className?: string
 }
 
+interface PropertiesMetaProps {
+  cacheUserKey: string
+}
+
+const getErrorMessage = (error: unknown) => {
+  if (!error) return undefined
+
+  if (typeof error === 'string') return error
+
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'data' in error &&
+    typeof error.data === 'string'
+  ) {
+    return error.data
+  }
+
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'message' in error &&
+    typeof error.message === 'string'
+  ) {
+    return error.message
+  }
+
+  return 'Ha ocurrido un error al obtener la información'
+}
+
 const MetaCard = ({
   isFetching,
   isError,
@@ -31,7 +61,7 @@ const MetaCard = ({
     <Card className={`${className} shadow-sm`}>
       <div className="flex items-center gap-4">
         <span
-          className={`${iconClass} w-14 h-14 text-2xl rounded items-center justify-center flex`}
+          className={`${iconClass} flex h-14 w-14 items-center justify-center rounded text-2xl`}
         >
           {icon && <i className="text-2xl text-white">{icon}</i>}
         </span>
@@ -69,19 +99,19 @@ const MetaCard = ({
   )
 }
 
-const PropertiesMeta = () => {
+const PropertiesMeta = ({ cacheUserKey }: PropertiesMetaProps) => {
   const { metadata, isMetadataFetching, isMetadataError, isMetadataErrorMsg } =
-    useMetadata()
+    useMetadata({ cacheUserKey })
 
   return (
     <div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
+      <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
         <MetaCard
           isFetching={isMetadataFetching}
           isError={isMetadataError}
-          errorMessage={isMetadataErrorMsg}
+          errorMessage={getErrorMessage(isMetadataErrorMsg)}
           title="Total de Propiedades"
-          value={metadata?.totalProperties}
+          value={metadata.totalProperties}
           icon={<TbHomeCheck />}
           iconClass="bg-gray-500"
         />

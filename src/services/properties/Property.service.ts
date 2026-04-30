@@ -7,10 +7,18 @@ import {
 } from '../core-entities/paginated-result.entity'
 import { CreatePropertyBody } from './types/property.type'
 
+export type GetAllPropertiesParams = PaginateSearch & {
+  cacheUserKey: string
+}
+
 export function getPropertiesQuery(builder: EndpointBuilderType) {
   return {
-    getAllProperties: builder.query<PaginateResult<Property>, PaginateSearch>({
+    getAllProperties: builder.query<
+      PaginateResult<Property>,
+      GetAllPropertiesParams
+    >({
       query: ({
+        cacheUserKey,
         limit,
         page,
         search = '',
@@ -21,15 +29,26 @@ export function getPropertiesQuery(builder: EndpointBuilderType) {
         orderById = 'asc',
         orderByPrice = 'asc',
         currencyId = '',
-      }) => ({
-        url: `properties?page=${page}&limit=${limit}&search=${search}&sold=${sold}&deRegistered=${deRegistered}&disabled=${disabled}&favorites=${favorites}&orderById=${orderById}&orderByPrice=${orderByPrice}&currencyId=${currencyId}`,
-        method: 'get',
-      }),
+      }) => {
+        /**
+         * cacheUserKey se destructura para que RTK Query lo use como parte
+         * del cache key, pero no se envía en la URL.
+         */
+        void cacheUserKey
+
+        return {
+          url: `properties?page=${page}&limit=${limit}&search=${search}&sold=${sold}&deRegistered=${deRegistered}&disabled=${disabled}&favorites=${favorites}&orderById=${orderById}&orderByPrice=${orderByPrice}&currencyId=${currencyId}`,
+          method: 'get',
+        }
+      },
       providesTags: ['Properties'] as any,
     }),
 
     getPropertyById: builder.query<Property, string>({
-      query: (id: string) => ({ url: `properties/${id}`, method: 'get' }),
+      query: (id: string) => ({
+        url: `properties/${id}`,
+        method: 'get',
+      }),
       providesTags: ['Properties'] as any,
     }),
 
@@ -39,7 +58,7 @@ export function getPropertiesQuery(builder: EndpointBuilderType) {
         method: 'post',
         data: body,
       }),
-      invalidatesTags: ['Properties'] as any,
+      invalidatesTags: ['Properties', 'PropertiesMetadata'] as any,
     }),
 
     updateProperty: builder.mutation<Property, Partial<any> & { id: string }>({
@@ -48,7 +67,7 @@ export function getPropertiesQuery(builder: EndpointBuilderType) {
         method: 'patch',
         data: body,
       }),
-      invalidatesTags: ['Properties'] as any,
+      invalidatesTags: ['Properties', 'PropertiesMetadata'] as any,
     }),
 
     deleteProperty: builder.mutation<void, string>({
@@ -56,7 +75,7 @@ export function getPropertiesQuery(builder: EndpointBuilderType) {
         url: `properties/${id}`,
         method: 'delete',
       }),
-      invalidatesTags: ['Properties'] as any,
+      invalidatesTags: ['Properties', 'PropertiesMetadata'] as any,
     }),
 
     createPropertyImages: builder.mutation({
@@ -68,7 +87,7 @@ export function getPropertiesQuery(builder: EndpointBuilderType) {
           'Content-Type': 'multipart/form-data',
         },
       }),
-      invalidatesTags: ['Properties'] as any,
+      invalidatesTags: ['Properties', 'PropertiesMetadata'] as any,
     }),
 
     deletePropertyImage: builder.mutation<void, { name: string }>({
@@ -76,7 +95,7 @@ export function getPropertiesQuery(builder: EndpointBuilderType) {
         url: `properties/images/${name}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['Properties'] as any,
+      invalidatesTags: ['Properties', 'PropertiesMetadata'] as any,
     }),
 
     updateImageOrder: builder.mutation<
@@ -88,7 +107,7 @@ export function getPropertiesQuery(builder: EndpointBuilderType) {
         method: 'PATCH',
         data: { images },
       }),
-      invalidatesTags: ['Properties'] as any,
+      invalidatesTags: ['Properties', 'PropertiesMetadata'] as any,
     }),
   }
 }

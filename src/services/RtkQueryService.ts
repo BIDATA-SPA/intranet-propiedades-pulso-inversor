@@ -65,8 +65,8 @@ const RtkQueryService = createApi({
     'Customers',
     'Countries',
     'Properties',
+    'PropertiesMetadata',
     'SignIn',
-    'Countries',
     'States',
     'ConfirmAccountToken',
     'UserImage',
@@ -113,7 +113,7 @@ const RtkQueryService = createApi({
           }, data.expirationInSeconds * 1000)
 
           dispatch(addRefreshTimeout({ timeout }))
-        } catch (error) {
+        } catch (error: any) {
           throw new Error(error.message)
         }
       },
@@ -122,6 +122,7 @@ const RtkQueryService = createApi({
 })
 
 export default RtkQueryService
+
 export const {
   useValidateSessionQuery,
   useGetAllCountriesQuery,

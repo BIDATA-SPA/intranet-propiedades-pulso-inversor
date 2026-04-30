@@ -37,26 +37,53 @@ const MyPropertiesList = () => {
     (state: RootState) => state.propertiesList.data
   )
 
+  /**
+   * IMPORTANTE:
+   * Ajusta estos selectores según tu store real.
+   * La idea es obtener un dato único del usuario actual.
+   */
+  const authUser = useSelector((state: RootState) => {
+    return (
+      state.auth?.user ||
+      state.auth?.session?.user ||
+      state.auth?.data?.user ||
+      null
+    )
+  })
+
+  const cacheUserKey = useMemo(() => {
+    const userIdentifier =
+      authUser?.id ||
+      authUser?._id ||
+      authUser?.email ||
+      authUser?.rut ||
+      'authenticated-user'
+
+    return `properties-${userIdentifier}`
+  }, [authUser])
+
   const queryParams = useMemo(
     () => ({
       page,
       limit,
+      cacheUserKey,
       ...filters,
     }),
-    [page, limit, filters]
+    [page, limit, filters, cacheUserKey]
   )
 
-  const { data, isLoading, isFetching, isSuccess, refetch } =
-    useGetAllPropertiesQuery(queryParams, {
+  const { data, isLoading, isFetching, isSuccess } = useGetAllPropertiesQuery(
+    queryParams,
+    {
       refetchOnMountOrArgChange: true,
       refetchOnFocus: true,
       refetchOnReconnect: true,
-    })
+    }
+  )
 
   useEffect(() => {
     dispatch(clearPropertiesData())
-    refetch()
-  }, [dispatch, refetch])
+  }, [dispatch, cacheUserKey])
 
   useEffect(() => {
     dispatch(setLoading(isLoading || isFetching))
@@ -87,22 +114,16 @@ const MyPropertiesList = () => {
           <TabNav value="tab1" icon={<HiOutlineBuildingOffice2 />}>
             Mis Propiedades
           </TabNav>
-
-          {/* ℹ️ disable-pdp */}
-          {/* <TabNav value="tab2" icon={<FaHouseSignal />}>
-            Portal de Portales
-          </TabNav> */}
-          {/* ℹ️ end disable-pdp */}
         </TabList>
 
         <div className="p-4">
           <TabContent value="tab1">
             <>
               <div className="w-full">
-                <PropertiesMeta />
+                <PropertiesMeta cacheUserKey={cacheUserKey} />
               </div>
 
-              <div className="flex justify-end flex-col lg:flex-row lg:items-center gap-4 mb-5">
+              <div className="mb-5 flex flex-col justify-end gap-4 lg:flex-row lg:items-center">
                 <PropertiesTableTools />
               </div>
 
@@ -118,7 +139,6 @@ const MyPropertiesList = () => {
             </>
           </TabContent>
 
-          {/* ! ℹ️ disable-pdp */}
           <TabContent value="tab2">
             <PortalOfPortals />
           </TabContent>

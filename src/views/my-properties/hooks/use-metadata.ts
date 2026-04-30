@@ -1,23 +1,38 @@
 import { useGetPropertiesMetadataQuery } from '@/services/RtkQueryService'
+import { skipToken } from '@reduxjs/toolkit/query'
 
-export const useMetadata = () => {
+interface UseMetadataParams {
+  cacheUserKey?: string
+}
+
+export const useMetadata = ({ cacheUserKey }: UseMetadataParams) => {
+  const queryArg = cacheUserKey ? { cacheUserKey } : skipToken
+
   const {
     data: metadata,
-    isFetching: isMetadataFetching,
-    isError: isMetadataError,
-    error: isMetadataErrorMsg,
-  } = useGetPropertiesMetadataQuery()
+    isLoading,
+    isFetching,
+    isError,
+    error,
+    refetch,
+  } = useGetPropertiesMetadataQuery(queryArg, {
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
+  })
 
   const meta = {
-    totalProperties: metadata?.totalProperties,
-    totalPropertiesInExchange: metadata?.totalPropertiesInExchange,
-    totalPropertiesSold: metadata?.totalPropertiesSold,
+    totalProperties: metadata?.totalProperties ?? 0,
+    totalPropertiesInExchange: metadata?.totalPropertiesInExchange ?? 0,
+    totalPropertiesSold: metadata?.totalPropertiesSold ?? 0,
   }
 
   return {
     metadata: meta,
-    isMetadataFetching,
-    isMetadataError,
-    isMetadataErrorMsg,
+    isMetadataLoading: isLoading,
+    isMetadataFetching: isFetching,
+    isMetadataError: isError,
+    isMetadataErrorMsg: error,
+    refetchMetadata: refetch,
   }
 }
