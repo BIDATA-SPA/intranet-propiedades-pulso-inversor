@@ -83,6 +83,7 @@ const PropertiesTable: React.FC = () => {
         accessorKey: 'propertyPrice',
         cell: (cellProps) => {
           const { currencyId } = cellProps.row.original
+
           return (
             <div className="flex items-center justify-start">
               <span>{switchPrice(currencyId, cellProps.row.original)}</span>

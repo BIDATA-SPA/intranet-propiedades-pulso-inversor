@@ -64,6 +64,14 @@ const validationSchema = Yup.object({
     .min(0, 'No se aceptan valores negativos.'),
 })
 
+const getPropertyPriceLabel = (currencyId?: string | null) => {
+  if (currencyId === 'M2') return 'Precio en M2'
+  if (currencyId === 'UF') return 'Precio en UF'
+  if (currencyId === 'CLP') return 'Precio en CLP'
+
+  return 'Precio'
+}
+
 const InformacionPrincipal = ({
   data = {
     customerId: null,
@@ -119,14 +127,10 @@ const InformacionPrincipal = ({
     (opt) => opt.value !== 'Compra'
   )
 
-  // =========================
-  // Customers Guards (UX + Data)
-  // =========================
   const normalizedCustomerOptions = (
     Array.isArray(customerOptions) ? customerOptions : []
   ) as { value: number; label: string }[]
 
-  // Rol 3: el "cliente" se fuerza al usuario (no debe bloquearse por cartera vacía)
   const hasNoCustomers =
     userAuthority !== 3 &&
     isCustomersSuccess &&
@@ -200,11 +204,12 @@ const InformacionPrincipal = ({
       </div>
 
       <Formik
+        enableReinitialize
         initialValues={data}
-        enableReinitialize={true}
         validationSchema={validationSchema}
         onSubmit={(values, { setSubmitting }) => {
           setSubmitting(true)
+
           setTimeout(() => {
             onNext(values, setSubmitting)
           }, 1000)
@@ -439,27 +444,20 @@ const InformacionPrincipal = ({
                           value={filterCurrencyType?.filter(
                             (option) => option.value === values.currencyId
                           )}
-                          onChange={(option) =>
+                          onChange={(option) => {
                             form.setFieldValue(field.name, option?.value)
-                          }
+                            form.setFieldTouched('propertyPrice', false, false)
+                          }}
                         />
                       )}
                     </Field>
                   </FormItem>
 
                   <div className="flex items-center w-full gap-4">
-                    <div className="w-[100%]">
+                    <div className="w-full">
                       <FormItem
                         asterisk
-                        label={
-                          values.currencyId === 'M2'
-                            ? 'Precio en M2'
-                            : values.currencyId === 'UF'
-                            ? 'Precio en UF'
-                            : values.currencyId === 'CLP'
-                            ? 'Precio en CLP'
-                            : 'Precio'
-                        }
+                        label={getPropertyPriceLabel(values.currencyId)}
                         invalid={Boolean(
                           errors.propertyPrice && touched.propertyPrice
                         )}
@@ -471,6 +469,7 @@ const InformacionPrincipal = ({
                               field={field}
                               form={form}
                               currencyId={values.currencyId}
+                              placeholder="Ej: 1.300,305"
                             />
                           )}
                         </Field>
