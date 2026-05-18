@@ -27,18 +27,13 @@ const UpdateStatusForm = ({ onClose, property }: UpdateStatusFormProps) => {
 
   // ✅ NO invento estados: uso API si viene, si no, tu fallback
   const allOptions = useMemo(
-    () =>
-      disabledReasons ?? [
-        { value: '1', label: 'Vendida' },
-        // { value: '2', label: 'Dada de baja' },
-        // { value: '3', label: 'Deshabilitada' },
-        { value: '4', label: 'Activa' },
-      ],
-    [disabledReasons]
-  )
-
-  const selectOptions = allOptions.filter((opt) =>
-    ['2', '4'].includes(String(opt.value))
+    () => [
+      { value: '4', label: 'Activa' },
+      { value: '1', label: 'Vendida' },
+      { value: '5', label: 'Arrendada' },
+      { value: '2', label: 'Dada de baja' },
+    ],
+    []
   )
 
   const openNotification = (
@@ -107,9 +102,9 @@ const UpdateStatusForm = ({ onClose, property }: UpdateStatusFormProps) => {
     <form onSubmit={onSubmit}>
       <Select
         isSearchable
-        options={selectOptions}
+        options={allOptions}
         placeholder="Seleccionar"
-        value={selectOptions.find(
+        value={allOptions?.find(
           (option) => String(option.value) === String(selectedStatusId)
         )}
         onChange={handleSelectChange}

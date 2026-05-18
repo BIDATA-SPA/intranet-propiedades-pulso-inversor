@@ -120,34 +120,113 @@ const PropertiesTable: React.FC = () => {
         accessorKey: 'statusProperty',
         cell: (cellProps) => {
           const { propertyStatus } = cellProps.row.original
+
+          const statusName = propertyStatus?.name?.trim()
+
+          console.log('statusName', statusName)
+
           return (
             <div className="flex items-center justify-start">
               <span
                 className={classNames(
                   'badge-dot',
-                  propertyStatus?.name === 'Activa' && 'bg-emerald-500',
-                  propertyStatus?.name === 'Vendida' && 'bg-emerald-500',
-                  propertyStatus?.name === 'Dada de baja' && 'bg-yellow-500',
-                  propertyStatus?.name === 'Deshabilitada' && 'bg-red-500',
-                  propertyStatus === null && 'bg-gray-500'
+
+                  /**
+                   * Activa
+                   */
+                  statusName === 'Activa' && 'bg-emerald-500',
+
+                  /**
+                   * Vendida
+                   */
+                  statusName === 'Vendida' && 'bg-blue-500',
+
+                  /**
+                   * Arrendada
+                   */
+                  statusName === 'Arrendada' && 'bg-cyan-500',
+
+                  /**
+                   * Dada de Baja
+                   */
+                  statusName === 'Dada de baja' && 'bg-red-500',
+
+                  /**
+                   * Sin estado
+                   */
+                  !statusName && 'bg-gray-500'
                 )}
-              ></span>
+              />
+
               <span
                 className={classNames(
                   'ml-2 rtl:mr-2 capitalize font-semibold',
-                  propertyStatus?.name === 'Activa' && 'text-emerald-500',
-                  propertyStatus?.name === 'Vendida' && 'text-emerald-500',
-                  propertyStatus?.name === 'Dada de baja' && 'text-yellow-500',
-                  propertyStatus?.name === 'Deshabilitada' && 'text-red-500',
-                  propertyStatus === null && 'text-gray-500'
+
+                  /**
+                   * Activa
+                   */
+                  statusName === 'Activa' && 'text-emerald-500',
+
+                  /**
+                   * Vendida
+                   */
+                  statusName === 'Vendida' && 'text-blue-700',
+
+                  /**
+                   * Arrendada
+                   */
+                  statusName === 'Arrendada' && 'text-cyan-500',
+
+                  /**
+                   * Dada de Baja
+                   */
+                  statusName === 'Dada de baja' && 'text-red-500',
+
+                  /**
+                   * Sin estado
+                   */
+                  !statusName && 'text-gray-500'
                 )}
               >
-                {propertyStatus?.name ?? 'No definido'}
+                {statusName || 'No definido'}
               </span>
             </div>
           )
         },
       },
+      //   {
+      //     header: 'Estado de Propiedad',
+      //     accessorKey: 'statusProperty',
+      //     cell: (cellProps) => {
+      //       const { propertyStatus } = cellProps.row.original
+      //       return (
+      //         <div className="flex items-center justify-start">
+      //           <span
+      //             className={classNames(
+      //               'badge-dot',
+      //               propertyStatus?.name === 'Activa' && 'bg-emerald-500',
+      //               propertyStatus?.name === 'Vendida' && 'bg-emerald-500',
+      //               propertyStatus?.name === 'Dada de baja' && 'bg-yellow-500',
+      //               propertyStatus?.name === 'Deshabilitada' && 'bg-red-500',
+      //               propertyStatus === null && 'bg-gray-500'
+      //             )}
+      //           ></span>
+      //           <span
+      //             className={classNames(
+      //               'ml-2 rtl:mr-2 capitalize font-semibold',
+      //               propertyStatus?.name === 'Activa' && 'text-emerald-500',
+      //               propertyStatus?.name === 'Vendida' && 'text-emerald-500',
+      //               propertyStatus?.name === 'Dada de baja' && 'text-yellow-500',
+      //               propertyStatus?.name === 'Deshabilitada' && 'text-red-500',
+      //               propertyStatus === null && 'text-gray-500'
+      //             )}
+      //           >
+      //             {propertyStatus?.name ?? 'No definido'}
+      //           </span>
+      //         </div>
+      //       )
+      //     },
+      //   },
       {
         header: 'Creada',
         accessorKey: 'createdAt',
