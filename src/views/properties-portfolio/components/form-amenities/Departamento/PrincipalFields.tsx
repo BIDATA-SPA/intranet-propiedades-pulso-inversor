@@ -407,7 +407,7 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
           </Field>
         </FormItem>
 
-        <FormItem label="Número de pisos">
+        {/* <FormItem label="Número de pisos">
           <Field name="characteristics.numberOfFloors">
             {({ field, form }: FieldProps) => {
               return (
@@ -427,7 +427,7 @@ const PrincipalFields = ({ values, errors, touched }: FieldNameProps) => {
               )
             }}
           </Field>
-        </FormItem>
+        </FormItem> */}
 
         <FormItem label="Número de piso de la unidad">
           <Field name="characteristics.floorNumber">
